@@ -29,6 +29,7 @@
             <HyperlinkButton TargetName="ContentFrame" NavigateUri="/busyindicator" Content="BusyIndicator" />
             <HyperlinkButton TargetName="ContentFrame" NavigateUri="/starrating" Content="StarRating" />
             <HyperlinkButton TargetName="ContentFrame" NavigateUri="/canvasitemscontrol" Content="CanvasItemsControl" />
+            <HyperlinkButton TargetName="ContentFrame" NavigateUri="/dataform" Content="DataForm" />
         </StackPanel>
         <Frame x:Name="ContentFrame" Grid.Column="1">
             <Frame.UriMapper>

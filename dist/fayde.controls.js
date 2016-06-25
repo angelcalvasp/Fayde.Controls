@@ -1,3 +1,8 @@
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var Fayde;
 (function (Fayde) {
     var Controls;
@@ -12,11 +17,6 @@ var Fayde;
         Controls.Library = Fayde.TypeManager.resolveLibrary("lib://fayde.controls");
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Fayde;
 (function (Fayde) {
     var Controls;
@@ -36,7 +36,7 @@ var Fayde;
             BusyIndicator.BusyContentTemplateProperty = DependencyProperty.Register("BusyContentTemplate", function () { return Fayde.DataTemplate; }, BusyIndicator);
             BusyIndicator.OverlayStyleProperty = DependencyProperty.Register("OverlayStyle", function () { return Fayde.Style; }, BusyIndicator);
             return BusyIndicator;
-        })(Controls.ContentControl);
+        }(Controls.ContentControl));
         Controls.BusyIndicator = BusyIndicator;
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
@@ -79,12 +79,11 @@ var Fayde;
                 };
                 MenuBase.ItemContainerStyleProperty = DependencyProperty.Register("ItemContainerStyle", function () { return Fayde.Style; }, MenuBase);
                 return MenuBase;
-            })(Fayde.Controls.ItemsControl);
+            }(Fayde.Controls.ItemsControl));
             Primitives.MenuBase = MenuBase;
         })(Primitives = Controls.Primitives || (Controls.Primitives = {}));
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
-/// <reference path="Primitives/MenuBase.ts" />
 var Fayde;
 (function (Fayde) {
     var Controls;
@@ -264,7 +263,7 @@ var Fayde;
             ContextMenu.VerticalOffsetProperty = DependencyProperty.Register("VerticalOffset", function () { return Number; }, ContextMenu, 0.0);
             ContextMenu.IsOpenProperty = DependencyProperty.Register("IsOpen", function () { return Boolean; }, ContextMenu, false);
             return ContextMenu;
-        })(Controls.Primitives.MenuBase);
+        }(Controls.Primitives.MenuBase));
         Controls.ContextMenu = ContextMenu;
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
@@ -290,7 +289,7 @@ var Fayde;
             };
             ContextMenuService.ContextMenuProperty = DependencyProperty.RegisterAttached("ContextMenu", function () { return Controls.ContextMenu; }, ContextMenuService, undefined, ContextMenuService.OnContextMenuPropertyChanged);
             return ContextMenuService;
-        })();
+        }());
         Controls.ContextMenuService = ContextMenuService;
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
@@ -399,7 +398,7 @@ var Fayde;
             DatePicker.SelectedYearProperty = DependencyProperty.Register("SelectedYear", function () { return Number; }, DatePicker, NaN, function (d, args) { return d.OnSelectedYearChanged(args); });
             DatePicker.SelectedDateProperty = DependencyProperty.Register("SelectedDate", function () { return DateTime; }, DatePicker, undefined, function (d, args) { return d.OnSelectedDateChanged(args); });
             return DatePicker;
-        })(Controls.Control);
+        }(Controls.Control));
         Controls.DatePicker = DatePicker;
         Controls.TemplateParts(DatePicker, { Name: "MonthTextBox", Type: Controls.TextBox }, { Name: "DayTextBox", Type: Controls.TextBox }, { Name: "YearTextBox", Type: Controls.TextBox });
         Controls.TemplateVisualStates(DatePicker, { GroupName: "CommonStates", Name: "Normal" }, { GroupName: "CommonStates", Name: "Disabled" }, { GroupName: "ValidationStates", Name: "Valid" }, { GroupName: "ValidationStates", Name: "InvalidFocused" }, { GroupName: "ValidationStates", Name: "InvalidUnfocused" });
@@ -476,7 +475,6 @@ var Fayde;
         Controls.Library.addEnum(StretchDirection, "StretchDirection");
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
-/// <reference path="Enums.ts" />
 var Fayde;
 (function (Fayde) {
     var Controls;
@@ -575,14 +573,13 @@ var Fayde;
             Spinner.ContentProperty = DependencyProperty.Register("Content", function () { return Object; }, Spinner, undefined, function (d, args) { return d.OnContentChanged(args.OldValue, args.NewValue); });
             Spinner.ValidSpinDirectionProperty = DependencyProperty.Register("ValidSpinDirection", function () { return new Fayde.Enum(Controls.ValidSpinDirections); }, Spinner, Controls.ValidSpinDirections.Increase, function (d, args) { return d.OnValidSpinDirectionChanged(args); });
             return Spinner;
-        })(Controls.Control);
+        }(Controls.Control));
         Controls.Spinner = Spinner;
         Fayde.Markup.Content(Spinner, Spinner.ContentProperty);
         Controls.TemplateVisualStates(Spinner, { GroupName: "CommonStates", Name: "Normal" }, { GroupName: "CommonStates", Name: "MouseOver" }, { GroupName: "CommonStates", Name: "Disabled" }, { GroupName: "FocusStates", Name: "Unfocused" }, { GroupName: "FocusStates", Name: "Focused" }, { GroupName: "IncreaseStates", Name: "IncreaseEnabled" }, { GroupName: "IncreaseStates", Name: "IncreaseDisabled" }, { GroupName: "DecreaseStates", Name: "DecreaseEnabled" }, { GroupName: "DecreaseStates", Name: "DecreaseDisabled" });
         Controls.TemplateParts(Spinner, { Name: "IncreaseButton", Type: Controls.Primitives.ButtonBase }, { Name: "DecreaseButton", Type: Controls.Primitives.ButtonBase });
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
-/// <reference path="Spinner.ts" />
 var Fayde;
 (function (Fayde) {
     var Controls;
@@ -788,13 +785,12 @@ var Fayde;
             UpDownBase.SpinnerStyleProperty = DependencyProperty.Register("SpinnerStyle", function () { return Fayde.Style; }, UpDownBase, undefined, function (d, args) { return d.OnSpinnerStyleChanged(args.OldValue, args.NewValue); });
             UpDownBase.IsEditableProperty = DependencyProperty.Register("IsEditable", function () { return Boolean; }, UpDownBase, true, function (d, args) { return d.OnIsEditableChanged(args); });
             return UpDownBase;
-        })(Controls.Control);
+        }(Controls.Control));
         Controls.UpDownBase = UpDownBase;
         Controls.TemplateVisualStates(UpDownBase, { GroupName: "CommonStates", Name: "Normal" }, { GroupName: "CommonStates", Name: "MouseOver" }, { GroupName: "CommonStates", Name: "Pressed" }, { GroupName: "CommonStates", Name: "Disabled" }, { GroupName: "FocusStates", Name: "Unfocused" }, { GroupName: "FocusStates", Name: "Focused" });
         Controls.TemplateParts(UpDownBase, { Name: "Text", Type: Controls.TextBox }, { Name: "Spinner", Type: Controls.Spinner });
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
-/// <reference path="UpDownBase.ts" />
 var Fayde;
 (function (Fayde) {
     var Controls;
@@ -1069,7 +1065,7 @@ var Fayde;
             DomainUpDown.ItemsSourceProperty = DependencyProperty.Register("ItemsSource", function () { return nullstone.IEnumerable_; }, DomainUpDown, undefined, function (d, args) { return d._OnItemsSourceChanged(args.OldValue, args.NewValue); });
             DomainUpDown.ItemTemplateProperty = DependencyProperty.Register("ItemTemplate", function () { return Fayde.DataTemplate; }, DomainUpDown);
             return DomainUpDown;
-        })(Controls.Control);
+        }(Controls.Control));
         Controls.DomainUpDown = DomainUpDown;
         Controls.TemplateVisualStates(DomainUpDown, { GroupName: "CommonStates", Name: "Normal" }, { GroupName: "CommonStates", Name: "MouseOver" }, { GroupName: "CommonStates", Name: "Pressed" }, { GroupName: "CommonStates", Name: "Disabled" }, { GroupName: "FocusStates", Name: "Unfocused" }, { GroupName: "FocusStates", Name: "Focused" }, { GroupName: "ValidationStates", Name: "Valid" }, { GroupName: "ValidationStates", Name: "InvalidUnfocused" }, { GroupName: "ValidationStates", Name: "InvalidFocused" }, { GroupName: "DomainStates", Name: "ValidDomain" }, { GroupName: "DomainStates", Name: "InvalidDomain" });
         function inputActionValidator(d, propd, value) {
@@ -1221,7 +1217,7 @@ var Fayde;
                 return e.GetPosition(this);
             };
             return GridSplitter;
-        })(Controls.Control);
+        }(Controls.Control));
         Controls.GridSplitter = GridSplitter;
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
@@ -1300,14 +1296,13 @@ var Fayde;
             HeaderedItemsControl.HeaderTemplateProperty = DependencyProperty.Register("HeaderTemplate", function () { return Fayde.DataTemplate; }, HeaderedItemsControl, undefined, function (d, args) { return d.OnHeaderTemplateChanged(args.OldValue, args.NewValue); });
             HeaderedItemsControl.ItemContainerStyleProperty = DependencyProperty.Register("ItemContainerStyle", function () { return Fayde.Style; }, HeaderedItemsControl, undefined, function (d, args) { return d.OnItemContainerStyleChanged(args); });
             return HeaderedItemsControl;
-        })(Controls.ItemsControl);
+        }(Controls.ItemsControl));
         Controls.HeaderedItemsControl = HeaderedItemsControl;
         function hasDefaultValue(control, propd) {
             return control.ReadLocalValue(propd) === DependencyProperty.UnsetValue;
         }
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
-/// <reference path="Primitives/MenuBase.ts" />
 var Fayde;
 (function (Fayde) {
     var Controls;
@@ -1401,13 +1396,11 @@ var Fayde;
             MenuItem.CommandParameterProperty = DependencyProperty.Register("CommandParameter", function () { return Object; }, MenuItem, undefined, function (d, args) { return d.OnCommandParameterChanged(args); });
             MenuItem.IconProperty = DependencyProperty.Register("Icon", function () { return Object; }, MenuItem);
             return MenuItem;
-        })(Fayde.Controls.HeaderedItemsControl);
+        }(Fayde.Controls.HeaderedItemsControl));
         Controls.MenuItem = MenuItem;
         Controls.TemplateVisualStates(MenuItem, { GroupName: "CommonStates", Name: "Normal" }, { GroupName: "CommonStates", Name: "Disabled" }, { GroupName: "FocusStates", Name: "Unfocused" }, { GroupName: "FocusStates", Name: "Focused" });
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
-/// <reference path="UpDownBase.ts" />
-/// <reference path="Spinner.ts" />
 var Fayde;
 (function (Fayde) {
     var Controls;
@@ -1481,7 +1474,7 @@ var Fayde;
             NumericUpDown.SpinnerStyleProperty = DependencyProperty.Register("SpinnerStyle", function () { return Fayde.Style; }, NumericUpDown);
             NumericUpDown.IsEditableProperty = DependencyProperty.Register("IsEditable", function () { return Boolean; }, NumericUpDown, true, function (d, args) { return d._Formatter.UpdateIsEditable(); });
             return NumericUpDown;
-        })(Controls.Control);
+        }(Controls.Control));
         Controls.NumericUpDown = NumericUpDown;
         Controls.TemplateVisualStates(NumericUpDown, { GroupName: "CommonStates", Name: "Normal" }, { GroupName: "CommonStates", Name: "MouseOver" }, { GroupName: "CommonStates", Name: "Pressed" }, { GroupName: "CommonStates", Name: "Disabled" }, { GroupName: "FocusStates", Name: "Unfocused" }, { GroupName: "FocusStates", Name: "Focused" }, { GroupName: "ValidationStates", Name: "Valid" }, { GroupName: "ValidationStates", Name: "InvalidUnfocused" }, { GroupName: "ValidationStates", Name: "InvalidFocused" });
         Controls.TemplateParts(NumericUpDown, { Name: "Text", Type: Controls.TextBox }, { Name: "Spinner", Type: Controls.Spinner });
@@ -1512,7 +1505,7 @@ var Fayde;
                 this.DefaultStyleKey = Separator;
             }
             return Separator;
-        })(Controls.Control);
+        }(Controls.Control));
         Controls.Separator = Separator;
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
@@ -1527,7 +1520,7 @@ var Fayde;
                 Object.defineProperty(this, "Direction", { value: direction, writable: false });
             }
             return SpinEventArgs;
-        })(Fayde.RoutedEventArgs);
+        }(Fayde.RoutedEventArgs));
         Controls.SpinEventArgs = SpinEventArgs;
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
@@ -1951,7 +1944,7 @@ var Fayde;
             TabControl.SelectedContentProperty = DependencyProperty.Register("SelectedContent", function () { return Object; }, TabControl, null, function (d, args) { return d.OnSelectedContentChanged(args); });
             TabControl.TabStripPlacementProperty = DependencyProperty.Register("TabStripPlacement", function () { return new Fayde.Enum(Controls.Dock); }, TabControl, Controls.Dock.Top, function (d, args) { return d.OnTabStripPlacementPropertyChanged(args); });
             return TabControl;
-        })(Controls.ItemsControl);
+        }(Controls.ItemsControl));
         Controls.TabControl = TabControl;
         Controls.TemplateVisualStates(TabControl, { GroupName: "CommonStates", Name: "Normal" }, { GroupName: "CommonStates", Name: "Disabled" });
         Controls.TemplateParts(TabControl, { Name: "TemplateLeft", Type: Fayde.FrameworkElement }, { Name: "ContentLeft", Type: Controls.ContentPresenter }, { Name: "TabPanelLeft", Type: Controls.TabPanel }, { Name: "TemplateTop", Type: Fayde.FrameworkElement }, { Name: "ContentTop", Type: Controls.ContentPresenter }, { Name: "TabPanelTop", Type: Controls.TabPanel }, { Name: "TemplateRight", Type: Fayde.FrameworkElement }, { Name: "ContentRight", Type: Controls.ContentPresenter }, { Name: "TabPanelRight", Type: Controls.TabPanel }, { Name: "TemplateBottom", Type: Fayde.FrameworkElement }, { Name: "ContentBottom", Type: Controls.ContentPresenter }, { Name: "TabPanelBottom", Type: Controls.TabPanel });
@@ -2137,7 +2130,7 @@ var Fayde;
             TabItem.IsFocusedProperty = DependencyProperty.Register("IsFocused", function () { return Boolean; }, TabItem, false);
             TabItem.IsSelectedProperty = DependencyProperty.Register("IsSelected", function () { return Boolean; }, TabItem, false, function (d, args) { return d._OnIsSelectedChanged(args); });
             return TabItem;
-        })(Controls.ContentControl);
+        }(Controls.ContentControl));
         Controls.TabItem = TabItem;
         Controls.TemplateVisualStates(TabItem, { GroupName: "CommonStates", Name: "Normal" }, { GroupName: "CommonStates", Name: "MouseOver" }, { GroupName: "CommonStates", Name: "Disabled" }, { GroupName: "FocusStates", Name: "Unfocused" }, { GroupName: "FocusStates", Name: "Focused" }, { GroupName: "SelectionStates", Name: "Unselected" }, { GroupName: "SelectionStates", Name: "Selected" });
         Controls.TemplateParts(TabItem, { Name: "HeaderLeftSelected", Type: Fayde.FrameworkElement }, { Name: "HeaderTopSelected", Type: Fayde.FrameworkElement }, { Name: "HeaderRightSelected", Type: Fayde.FrameworkElement }, { Name: "HeaderBottomSelected", Type: Fayde.FrameworkElement }, { Name: "TemplateLeftSelected", Type: Fayde.FrameworkElement }, { Name: "TemplateTopSelected", Type: Fayde.FrameworkElement }, { Name: "TemplateRightSelected", Type: Fayde.FrameworkElement }, { Name: "TemplateBottomSelected", Type: Fayde.FrameworkElement }, { Name: "HeaderLeftUnselected", Type: Fayde.FrameworkElement }, { Name: "HeaderTopUnselected", Type: Fayde.FrameworkElement }, { Name: "HeaderRightUnselected", Type: Fayde.FrameworkElement }, { Name: "HeaderBottomUnselected", Type: Fayde.FrameworkElement }, { Name: "TemplateLeftUnselected", Type: Fayde.FrameworkElement }, { Name: "TemplateTopUnselected", Type: Fayde.FrameworkElement }, { Name: "TemplateRightUnselected", Type: Fayde.FrameworkElement }, { Name: "TemplateBottomUnselected", Type: Fayde.FrameworkElement });
@@ -2155,7 +2148,7 @@ var Fayde;
                 this.Right.OnApplyTemplate(control, isSelected, "Right");
             };
             return Elements;
-        })();
+        }());
         var Element = (function () {
             function Element() {
                 this.Header = null;
@@ -2167,7 +2160,7 @@ var Fayde;
                 this.Template = control.GetTemplateChild("Template" + post, Fayde.FrameworkElement);
             };
             return Element;
-        })();
+        }());
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
 var Fayde;
@@ -2322,7 +2315,7 @@ var Fayde;
             TimePicker.IsSecondsShownProperty = DependencyProperty.Register("IsSecondsShown", function () { return Boolean; }, TimePicker, true, function (d, args) { return d._UpdateText(); });
             TimePicker.DisplayModeProperty = DependencyProperty.Register("DisplayMode", function () { return new Fayde.Enum(Controls.TimeDisplayMode); }, TimePicker, Controls.TimeDisplayMode.Regular, function (d, args) { return d.OnDisplayModeChanged(args); });
             return TimePicker;
-        })(Controls.Control);
+        }(Controls.Control));
         Controls.TimePicker = TimePicker;
         Controls.TemplateParts(TimePicker, { Name: "HourTextBox", Type: Controls.TextBox }, { Name: "MinuteTextBox", Type: Controls.TextBox }, { Name: "SecondTextBox", Type: Controls.TextBox }, { Name: "SecondSeparator", Type: Fayde.FrameworkElement }, { Name: "SuffixTextBlock", Type: Controls.TextBlock });
         Controls.TemplateVisualStates(TimePicker, { GroupName: "CommonStates", Name: "Normal" }, { GroupName: "CommonStates", Name: "Disabled" }, { GroupName: "ValidationStates", Name: "Valid" }, { GroupName: "ValidationStates", Name: "InvalidFocused" }, { GroupName: "ValidationStates", Name: "InvalidUnfocused" });
@@ -2707,7 +2700,7 @@ var Fayde;
             TreeView.SelectedValuePathProperty = DependencyProperty.Register("SelectedValuePath", function () { return String; }, TreeView, "", function (d, args) { return d.OnSelectedValuePathChanged(args); });
             TreeView.ItemContainerStyleProperty = DependencyProperty.Register("ItemContainerStyle", function () { return Fayde.Style; }, TreeView, null, function (d, args) { return d.OnItemContainerStyleChanged(args); });
             return TreeView;
-        })(Controls.ItemsControl);
+        }(Controls.ItemsControl));
         Controls.TreeView = TreeView;
         Controls.TemplateVisualStates(TreeView, { GroupName: "CommonStates", Name: "Normal" }, { GroupName: "CommonStates", Name: "MouseOver" }, { GroupName: "CommonStates", Name: "Disabled" }, { GroupName: "FocusStates", Name: "Unfocused" }, { GroupName: "FocusStates", Name: "Focused" }, { GroupName: "ValidationStates", Name: "Valid" }, { GroupName: "ValidationStates", Name: "InvalidUnfocused" }, { GroupName: "ValidationStates", Name: "InvalidFocused" });
         Object.defineProperty(TreeView.prototype, "SelectedValue", {
@@ -3332,7 +3325,7 @@ var Fayde;
             TreeViewItem.IsSelectedProperty = DependencyProperty.Register("IsSelected", function () { return Boolean; }, TreeViewItem, false, function (d, args) { return d.OnIsSelectedChanged(args); });
             TreeViewItem.IsSelectionActiveProperty = DependencyProperty.RegisterReadOnly("IsSelectionActive", function () { return Boolean; }, TreeViewItem, false, function (d, args) { return d.OnIsSelectionActiveChanged(args); });
             return TreeViewItem;
-        })(Controls.HeaderedItemsControl);
+        }(Controls.HeaderedItemsControl));
         Controls.TreeViewItem = TreeViewItem;
         Controls.TemplateVisualStates(TreeViewItem, { GroupName: "CommonStates", Name: "Normal" }, { GroupName: "CommonStates", Name: "MouseOver" }, { GroupName: "CommonStates", Name: "Pressed" }, { GroupName: "CommonStates", Name: "Disabled" }, { GroupName: "FocusStates", Name: "Unfocused" }, { GroupName: "FocusStates", Name: "Focused" }, { GroupName: "ExpansionStates", Name: "Collapsed" }, { GroupName: "ExpansionStates", Name: "Expanded" }, { GroupName: "HasItemsStates", Name: "HasItems" }, { GroupName: "HasItemsStates", Name: "NoItems" }, { GroupName: "SelectionStates", Name: "Unselected" }, { GroupName: "SelectionStates", Name: "Selected" }, { GroupName: "SelectionStates", Name: "SelectedInactive" });
         Controls.TemplateParts(TreeViewItem, { Name: "Header", Type: Fayde.FrameworkElement }, { Name: "ExpanderButton", Type: Controls.Primitives.ToggleButton });
@@ -3366,7 +3359,7 @@ var Fayde;
                 Object.defineProperty(this, "Error", { value: error, writable: false });
             }
             return UpDownParseErrorEventArgs;
-        })(Fayde.RoutedEventArgs);
+        }(Fayde.RoutedEventArgs));
         Controls.UpDownParseErrorEventArgs = UpDownParseErrorEventArgs;
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
@@ -3383,7 +3376,7 @@ var Fayde;
                 Object.defineProperty(this, "Text", { value: text, writable: false });
             }
             return UpDownParsingEventArgs;
-        })(Fayde.RoutedEventArgs);
+        }(Fayde.RoutedEventArgs));
         Controls.UpDownParsingEventArgs = UpDownParsingEventArgs;
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
@@ -3424,7 +3417,7 @@ var Fayde;
                 }));
             };
             return CanvasItemsControl;
-        })(Controls.ItemsControl);
+        }(Controls.ItemsControl));
         Controls.CanvasItemsControl = CanvasItemsControl;
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
@@ -3488,9 +3481,48 @@ var Fayde;
                     this.$$onSizeChanged && this.$$onSizeChanged(e.NewSize);
                 };
                 return RootVisualTracker;
-            })();
+            }());
             contextmenu.RootVisualTracker = RootVisualTracker;
         })(contextmenu = Controls.contextmenu || (Controls.contextmenu = {}));
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var DataField = (function () {
+            function DataField() {
+            }
+            return DataField;
+        }());
+        Controls.DataField = DataField;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var DataForm = (function (_super) {
+            __extends(DataForm, _super);
+            function DataForm() {
+                _super.call(this);
+                this.DefaultStyleKey = DataForm;
+            }
+            return DataForm;
+        }(Controls.Control));
+        Controls.DataForm = DataForm;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var PropertyDisplayInfo = (function () {
+            function PropertyDisplayInfo() {
+            }
+            return PropertyDisplayInfo;
+        }());
+        Controls.PropertyDisplayInfo = PropertyDisplayInfo;
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
 var Fayde;
@@ -3536,7 +3568,7 @@ var Fayde;
                 };
                 BindingSourceEvaluator.ValueProperty = DependencyProperty.Register("Value", function () { return Object; }, BindingSourceEvaluator);
                 return BindingSourceEvaluator;
-            })(Fayde.FrameworkElement);
+            }(Fayde.FrameworkElement));
             Internal.BindingSourceEvaluator = BindingSourceEvaluator;
         })(Internal = Controls.Internal || (Controls.Internal = {}));
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
@@ -3716,7 +3748,7 @@ var Fayde;
                     }
                 };
                 return DomainCoercer;
-            })();
+            }());
             Internal.DomainCoercer = DomainCoercer;
         })(Internal = Controls.Internal || (Controls.Internal = {}));
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
@@ -3746,7 +3778,7 @@ var Fayde;
                     this._Callback && this._Callback(sender, e);
                 };
                 return EventGesture;
-            })();
+            }());
             Internal.EventGesture = EventGesture;
         })(Internal = Controls.Internal || (Controls.Internal = {}));
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
@@ -3773,7 +3805,7 @@ var Fayde;
                     this.RequestedVal = this.Value;
                 };
                 return FormattedRangeCoercer;
-            })(Internal.RangeCoercer);
+            }(Internal.RangeCoercer));
             Internal.FormattedRangeCoercer = FormattedRangeCoercer;
         })(Internal = Controls.Internal || (Controls.Internal = {}));
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
@@ -3918,7 +3950,7 @@ var Fayde;
                     }
                 };
                 return GridSplitterResizer;
-            })();
+            }());
             Internal.GridSplitterResizer = GridSplitterResizer;
             var resizeBehaviors = [];
             resizeBehaviors[Fayde.VerticalAlignment.Top] = GridResizeBehavior.PreviousAndCurrent;
@@ -4108,7 +4140,7 @@ var Fayde;
                     scrollHost.ScrollToHorizontalOffset(horizontalOffset);
                 };
                 return ItemsControlHelper;
-            })();
+            }());
             Internal.ItemsControlHelper = ItemsControlHelper;
         })(Internal = Controls.Internal || (Controls.Internal = {}));
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
@@ -4140,7 +4172,7 @@ var Fayde;
                     this.LastClickPosition = pos;
                 };
                 return MultiClickHelper;
-            })();
+            }());
             Internal.MultiClickHelper = MultiClickHelper;
             function getDistance(oldPosition, newPosition) {
                 var xdiff = newPosition.x;
@@ -4202,7 +4234,7 @@ var Fayde;
                     _super.prototype.Clear.call(this);
                 };
                 return ObservableObjectCollection;
-            })(Fayde.Collections.ObservableCollection);
+            }(Fayde.Collections.ObservableCollection));
             Internal.ObservableObjectCollection = ObservableObjectCollection;
         })(Internal = Controls.Internal || (Controls.Internal = {}));
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
@@ -4291,7 +4323,7 @@ var Fayde;
                     bottom.Value = xform.Transform(new Point(0.0, element.ActualHeight)).y;
                 };
                 return ScrollEx;
-            })();
+            }());
             Internal.ScrollEx = ScrollEx;
             function scrollByVerticalOffset(viewer, offset) {
                 offset += viewer.VerticalOffset;
@@ -4362,7 +4394,7 @@ var Fayde;
                         this._ActiveBox = null;
                 };
                 return SelectionHandler;
-            })();
+            }());
             Internal.SelectionHandler = SelectionHandler;
         })(Internal = Controls.Internal || (Controls.Internal = {}));
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
@@ -4446,7 +4478,7 @@ var Fayde;
                         this.Owner.OnDecrement();
                 };
                 return SpinFlow;
-            })();
+            }());
             Internal.SpinFlow = SpinFlow;
         })(Internal = Controls.Internal || (Controls.Internal = {}));
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
@@ -4553,7 +4585,7 @@ var Fayde;
                         this.TextBox.IsReadOnly = !this.Control.IsEditable;
                 };
                 return TextBoxFormatter;
-            })();
+            }());
             Internal.TextBoxFormatter = TextBoxFormatter;
         })(Internal = Controls.Internal || (Controls.Internal = {}));
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
@@ -4585,7 +4617,7 @@ var Fayde;
             Star.StrokeThicknessProperty = DependencyProperty.Register("StrokeThickness", function () { return Number; }, Star, 2.0);
             Star.StrokeLineJoinProperty = DependencyProperty.Register("StrokeLineJoin", function () { return Fayde.Shapes.PenLineJoin; }, Star, Fayde.Shapes.PenLineJoin.Round);
             return Star;
-        })(Control);
+        }(Control));
         Controls.Star = Star;
         Fayde.Controls.TemplateParts(Star, { Name: "scaleTransform", Type: Fayde.Media.ScaleTransform });
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
@@ -4757,69 +4789,9 @@ var Fayde;
             StarRating.StrokeThicknessProperty = DependencyProperty.Register("StrokeThickness", function () { return Number; }, StarRating, 2.0);
             StarRating.StrokeLineJoinProperty = DependencyProperty.Register("StrokeLineJoin", function () { return Fayde.Shapes.PenLineJoin; }, StarRating, Fayde.Shapes.PenLineJoin.Round);
             return StarRating;
-        })(Control);
+        }(Control));
         Controls.StarRating = StarRating;
         Fayde.Controls.TemplateParts(StarRating, { Name: "LayoutRootStarList", Type: Fayde.Controls.Grid });
-    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
-})(Fayde || (Fayde = {}));
-var Fayde;
-(function (Fayde) {
-    var Controls;
-    (function (Controls) {
-        var TabPanel = (function (_super) {
-            __extends(TabPanel, _super);
-            function TabPanel() {
-                _super.apply(this, arguments);
-            }
-            TabPanel.prototype.CreateLayoutUpdater = function () {
-                return new Controls.tabpanel.TabPanelUpdater();
-            };
-            Object.defineProperty(TabPanel.prototype, "TabAlignment", {
-                get: function () {
-                    var tabControlParent = Fayde.VisualTreeHelper.GetParentOfType(this, Controls.TabControl);
-                    if (tabControlParent != null)
-                        return tabControlParent.TabStripPlacement;
-                    return Controls.Dock.Top;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            TabPanel.setTabAlignment = function (tp, alignment) {
-                if (!tp)
-                    return;
-                var upd = tp.XamlNode.LayoutUpdater;
-                upd.assets.tabAlignment = alignment;
-            };
-            return TabPanel;
-        })(Controls.Panel);
-        Controls.TabPanel = TabPanel;
-    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
-})(Fayde || (Fayde = {}));
-var Fayde;
-(function (Fayde) {
-    var Controls;
-    (function (Controls) {
-        var tabpanel;
-        (function (tabpanel) {
-            var TabPanelUpdater = (function (_super) {
-                __extends(TabPanelUpdater, _super);
-                function TabPanelUpdater() {
-                    _super.apply(this, arguments);
-                }
-                TabPanelUpdater.prototype.init = function () {
-                    this.setMeasurePipe(minerva.singleton(tabpanel.measure.TabPanelMeasurePipeDef))
-                        .setArrangePipe(minerva.singleton(tabpanel.arrange.TabPanelArrangePipeDef));
-                    var assets = this.assets;
-                    assets.tabAlignment = Controls.Dock.Top;
-                    assets.numRows = 1;
-                    assets.numHeaders = 0;
-                    assets.rowHeight = 0.0;
-                    _super.prototype.init.call(this);
-                };
-                return TabPanelUpdater;
-            })(minerva.controls.panel.PanelUpdater);
-            tabpanel.TabPanelUpdater = TabPanelUpdater;
-        })(tabpanel = Controls.tabpanel || (Controls.tabpanel = {}));
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
 var Fayde;
@@ -5002,6 +4974,133 @@ var Fayde;
 (function (Fayde) {
     var Controls;
     (function (Controls) {
+        var TabPanel = (function (_super) {
+            __extends(TabPanel, _super);
+            function TabPanel() {
+                _super.apply(this, arguments);
+            }
+            TabPanel.prototype.CreateLayoutUpdater = function () {
+                return new Controls.tabpanel.TabPanelUpdater();
+            };
+            Object.defineProperty(TabPanel.prototype, "TabAlignment", {
+                get: function () {
+                    var tabControlParent = Fayde.VisualTreeHelper.GetParentOfType(this, Controls.TabControl);
+                    if (tabControlParent != null)
+                        return tabControlParent.TabStripPlacement;
+                    return Controls.Dock.Top;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            TabPanel.setTabAlignment = function (tp, alignment) {
+                if (!tp)
+                    return;
+                var upd = tp.XamlNode.LayoutUpdater;
+                upd.assets.tabAlignment = alignment;
+            };
+            return TabPanel;
+        }(Controls.Panel));
+        Controls.TabPanel = TabPanel;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var tabpanel;
+        (function (tabpanel) {
+            var TabPanelUpdater = (function (_super) {
+                __extends(TabPanelUpdater, _super);
+                function TabPanelUpdater() {
+                    _super.apply(this, arguments);
+                }
+                TabPanelUpdater.prototype.init = function () {
+                    this.setMeasurePipe(minerva.singleton(tabpanel.measure.TabPanelMeasurePipeDef))
+                        .setArrangePipe(minerva.singleton(tabpanel.arrange.TabPanelArrangePipeDef));
+                    var assets = this.assets;
+                    assets.tabAlignment = Controls.Dock.Top;
+                    assets.numRows = 1;
+                    assets.numHeaders = 0;
+                    assets.rowHeight = 0.0;
+                    _super.prototype.init.call(this);
+                };
+                return TabPanelUpdater;
+            }(minerva.controls.panel.PanelUpdater));
+            tabpanel.TabPanelUpdater = TabPanelUpdater;
+        })(tabpanel = Controls.tabpanel || (Controls.tabpanel = {}));
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        function compareSummaryItems(item1, item2) {
+            var refs = compareRefs(item1, item2);
+            if (refs != null)
+                return refs;
+            var comp = compareNum(item1.ItemType, item2.ItemType);
+            if (comp !== 0)
+                return comp;
+            var control1 = item1.Sources.Count > 0 ? item1.Sources.GetValueAt(0).Control : null;
+            var control2 = item2.Sources.Count > 0 ? item2.Sources.GetValueAt(0).Control : null;
+            if (control1 !== control2) {
+                refs = compareRefs(control1, control2);
+                if (refs != null)
+                    return refs;
+                comp = compareNum(control1.TabIndex, control2.TabIndex);
+                if (comp !== 0)
+                    return comp;
+                return compareVisualOrder(control1, control2);
+            }
+        }
+        Controls.compareSummaryItems = compareSummaryItems;
+        function compareRefs(item1, item2) {
+            if (item1 == null)
+                return item2 == null ? null : -1;
+            if (item2 == null)
+                return 1;
+            return null;
+        }
+        function compareNum(x, y) {
+            return x === y ? 0 : (x < y ? -1 : 1);
+        }
+        function compareVisualOrder(control1, control2) {
+            if (!control1 || !control2 || control1 === control2)
+                return 0;
+            var trail = [];
+            var cur = control1;
+            trail.push(cur);
+            while ((cur = Fayde.VisualTreeHelper.GetParent(cur)) != null) {
+                trail.push(cur);
+            }
+            cur = control2;
+            var last = cur;
+            while ((cur = Fayde.VisualTreeHelper.GetParent(cur)) != null) {
+                var index = trail.indexOf(cur);
+                if (index === 0)
+                    return -1;
+                if (index < 0)
+                    continue;
+                var prev = trail[index - 1];
+                if (!last || !prev)
+                    return 0;
+                for (var i = 0, count = Fayde.VisualTreeHelper.GetChildrenCount(cur); i < count; i++) {
+                    var child = Fayde.VisualTreeHelper.GetChild(cur, i);
+                    if (child === prev)
+                        return 1;
+                    if (child === last)
+                        return -1;
+                }
+                last = cur;
+            }
+            return 0;
+        }
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
         var FocusingInvalidControlEventArgs = (function () {
             function FocusingInvalidControlEventArgs(item, target) {
                 this.Handled = false;
@@ -5017,7 +5116,7 @@ var Fayde;
                 });
             }
             return FocusingInvalidControlEventArgs;
-        })();
+        }());
         Controls.FocusingInvalidControlEventArgs = FocusingInvalidControlEventArgs;
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
@@ -5283,7 +5382,7 @@ var Fayde;
             ValidationSummary.SummaryListBoxStyleProperty = DependencyProperty.Register("SummaryListBoxStyle", function () { return Fayde.Style; }, ValidationSummary);
             ValidationSummary.TargetProperty = DependencyProperty.Register("Target", function () { return Fayde.UIElement; }, ValidationSummary, undefined, function (d, args) { return d.OnTargetChanged(args.OldValue, args.NewValue); });
             return ValidationSummary;
-        })(Controls.Control);
+        }(Controls.Control));
         Controls.ValidationSummary = ValidationSummary;
         Controls.TemplateVisualStates(ValidationSummary, { GroupName: "CommonStates", Name: "Normal" }, { GroupName: "CommonStates", Name: "Disabled" }, { GroupName: "ValidationStates", Name: "HasErrors" }, { GroupName: "ValidationStates", Name: "Empty" });
         Controls.TemplateParts(ValidationSummary, { Name: "SummaryListBox", Type: Controls.ListBox });
@@ -5308,7 +5407,7 @@ var Fayde;
                 }
             };
             return ValidationItemCollection;
-        })(ObservableCollection);
+        }(ObservableCollection));
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
 var Fayde;
@@ -5336,7 +5435,7 @@ var Fayde;
                 configurable: true
             });
             return ValidationSummaryItem;
-        })(Fayde.MVVM.ObservableObject);
+        }(Fayde.MVVM.ObservableObject));
         Controls.ValidationSummaryItem = ValidationSummaryItem;
         Fayde.MVVM.NotifyProperties(ValidationSummaryItem, ["Message", "MessageHeader", "ItemType", "Context"]);
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
@@ -5365,166 +5464,8 @@ var Fayde;
                 return vsis.PropertyName === this.PropertyName && vsis.Control === this.Control;
             };
             return ValidationSummaryItemSource;
-        })();
+        }());
         Controls.ValidationSummaryItemSource = ValidationSummaryItemSource;
-    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
-})(Fayde || (Fayde = {}));
-var Fayde;
-(function (Fayde) {
-    var Controls;
-    (function (Controls) {
-        function compareSummaryItems(item1, item2) {
-            var refs = compareRefs(item1, item2);
-            if (refs != null)
-                return refs;
-            var comp = compareNum(item1.ItemType, item2.ItemType);
-            if (comp !== 0)
-                return comp;
-            var control1 = item1.Sources.Count > 0 ? item1.Sources.GetValueAt(0).Control : null;
-            var control2 = item2.Sources.Count > 0 ? item2.Sources.GetValueAt(0).Control : null;
-            if (control1 !== control2) {
-                refs = compareRefs(control1, control2);
-                if (refs != null)
-                    return refs;
-                comp = compareNum(control1.TabIndex, control2.TabIndex);
-                if (comp !== 0)
-                    return comp;
-                return compareVisualOrder(control1, control2);
-            }
-        }
-        Controls.compareSummaryItems = compareSummaryItems;
-        function compareRefs(item1, item2) {
-            if (item1 == null)
-                return item2 == null ? null : -1;
-            if (item2 == null)
-                return 1;
-            return null;
-        }
-        function compareNum(x, y) {
-            return x === y ? 0 : (x < y ? -1 : 1);
-        }
-        function compareVisualOrder(control1, control2) {
-            if (!control1 || !control2 || control1 === control2)
-                return 0;
-            var trail = [];
-            var cur = control1;
-            trail.push(cur);
-            while ((cur = Fayde.VisualTreeHelper.GetParent(cur)) != null) {
-                trail.push(cur);
-            }
-            cur = control2;
-            var last = cur;
-            while ((cur = Fayde.VisualTreeHelper.GetParent(cur)) != null) {
-                var index = trail.indexOf(cur);
-                if (index === 0)
-                    return -1;
-                if (index < 0)
-                    continue;
-                var prev = trail[index - 1];
-                if (!last || !prev)
-                    return 0;
-                for (var i = 0, count = Fayde.VisualTreeHelper.GetChildrenCount(cur); i < count; i++) {
-                    var child = Fayde.VisualTreeHelper.GetChild(cur, i);
-                    if (child === prev)
-                        return 1;
-                    if (child === last)
-                        return -1;
-                }
-                last = cur;
-            }
-            return 0;
-        }
-    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
-})(Fayde || (Fayde = {}));
-var Fayde;
-(function (Fayde) {
-    var Controls;
-    (function (Controls) {
-        var Viewbox = (function (_super) {
-            __extends(Viewbox, _super);
-            function Viewbox() {
-                _super.apply(this, arguments);
-            }
-            Viewbox.prototype.CreateLayoutUpdater = function () {
-                return new Controls.viewbox.ViewboxUpdater();
-            };
-            Viewbox.ChildProperty = DependencyProperty.Register("Child", function () { return Fayde.UIElement; }, Viewbox);
-            Viewbox.StretchProperty = DependencyProperty.Register("Stretch", function () { return new Fayde.Enum(Fayde.Media.Stretch); }, Viewbox, undefined, function (d, args) { return d.InvalidateMeasure(); });
-            Viewbox.StretchDirectionProperty = DependencyProperty.Register("StretchDirection", function () { return new Fayde.Enum(Controls.StretchDirection); }, Viewbox, undefined, function (d, args) { return d.InvalidateMeasure(); });
-            return Viewbox;
-        })(Fayde.FrameworkElement);
-        Controls.Viewbox = Viewbox;
-        Fayde.Markup.Content(Viewbox, Viewbox.ChildProperty);
-        var reactions;
-        (function (reactions) {
-            Fayde.UIReaction(Viewbox.StretchProperty, function (updater, ov, nv) { return updater.invalidateMeasure(); }, false);
-            Fayde.UIReaction(Viewbox.StretchDirectionProperty, function (updater, ov, nv) { return updater.invalidateMeasure(); }, false);
-            Fayde.UIReaction(Viewbox.ChildProperty, function (upd, ov, nv, viewbox) {
-                var node = viewbox.XamlNode;
-                var error = new BError();
-                if (ov instanceof Fayde.UIElement)
-                    node.DetachVisualChild(ov, error);
-                if (nv instanceof Fayde.UIElement)
-                    node.AttachVisualChild(nv, error);
-                if (error.Message)
-                    error.ThrowException();
-                upd.updateBounds();
-                upd.invalidateMeasure();
-            }, false, false);
-        })(reactions || (reactions = {}));
-    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
-})(Fayde || (Fayde = {}));
-var Fayde;
-(function (Fayde) {
-    var Controls;
-    (function (Controls) {
-        var viewbox;
-        (function (viewbox) {
-            var ViewboxUpdater = (function (_super) {
-                __extends(ViewboxUpdater, _super);
-                function ViewboxUpdater() {
-                    _super.apply(this, arguments);
-                }
-                ViewboxUpdater.prototype.init = function () {
-                    this.setProcessDownPipe(minerva.singleton(viewbox.processdown.ViewboxProcessDownPipeDef));
-                    var assets = this.assets;
-                    assets.stretch = Fayde.Media.Stretch.Uniform;
-                    assets.stretchDirection = Controls.StretchDirection.Both;
-                    assets.viewXform = mat3.identity();
-                    _super.prototype.init.call(this);
-                };
-                ViewboxUpdater.prototype.measureOverride = function (availableSize) {
-                    var child = this.tree.subtree;
-                    if (!child)
-                        return new Size();
-                    child.measure(new Size(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
-                    var childSize = child.assets.desiredSize;
-                    var scalefac = viewbox.helpers.computeScaleFactor(availableSize, childSize, this.assets.stretch, this.assets.stretchDirection);
-                    return new Size(scalefac.width * childSize.width, scalefac.height * childSize.height);
-                };
-                ViewboxUpdater.prototype.arrangeOverride = function (finalSize) {
-                    var child = this.tree.subtree;
-                    if (!child)
-                        return new Size();
-                    var assets = this.assets;
-                    var childSize = child.assets.desiredSize;
-                    var scale = viewbox.helpers.computeScaleFactor(finalSize, childSize, assets.stretch, assets.stretchDirection);
-                    child.arrange(new Rect(0, 0, childSize.width, childSize.height));
-                    this.setViewXform(scale.width, scale.height);
-                    return new Size(scale.width * childSize.width, scale.height * childSize.height);
-                };
-                ViewboxUpdater.prototype.setViewXform = function (sx, sy) {
-                    var assets = this.assets;
-                    var xform = mat3.createScale(sx, sy);
-                    if (!mat3.equal(assets.viewXform, xform)) {
-                        mat3.copyTo(xform, assets.viewXform);
-                        assets.dirtyFlags |= minerva.DirtyFlags.Transform;
-                    }
-                };
-                return ViewboxUpdater;
-            })(minerva.anon.AnonymousUpdater);
-            viewbox.ViewboxUpdater = ViewboxUpdater;
-        })(viewbox = Controls.viewbox || (Controls.viewbox = {}));
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
 var Fayde;
@@ -5596,6 +5537,120 @@ var Fayde;
 (function (Fayde) {
     var Controls;
     (function (Controls) {
+        var Viewbox = (function (_super) {
+            __extends(Viewbox, _super);
+            function Viewbox() {
+                _super.apply(this, arguments);
+            }
+            Viewbox.prototype.CreateLayoutUpdater = function () {
+                return new Controls.viewbox.ViewboxUpdater();
+            };
+            Viewbox.ChildProperty = DependencyProperty.Register("Child", function () { return Fayde.UIElement; }, Viewbox);
+            Viewbox.StretchProperty = DependencyProperty.Register("Stretch", function () { return new Fayde.Enum(Fayde.Media.Stretch); }, Viewbox, undefined, function (d, args) { return d.InvalidateMeasure(); });
+            Viewbox.StretchDirectionProperty = DependencyProperty.Register("StretchDirection", function () { return new Fayde.Enum(Controls.StretchDirection); }, Viewbox, undefined, function (d, args) { return d.InvalidateMeasure(); });
+            return Viewbox;
+        }(Fayde.FrameworkElement));
+        Controls.Viewbox = Viewbox;
+        Fayde.Markup.Content(Viewbox, Viewbox.ChildProperty);
+        var reactions;
+        (function (reactions) {
+            Fayde.UIReaction(Viewbox.StretchProperty, function (updater, ov, nv) { return updater.invalidateMeasure(); }, false);
+            Fayde.UIReaction(Viewbox.StretchDirectionProperty, function (updater, ov, nv) { return updater.invalidateMeasure(); }, false);
+            Fayde.UIReaction(Viewbox.ChildProperty, function (upd, ov, nv, viewbox) {
+                var node = viewbox.XamlNode;
+                var error = new BError();
+                if (ov instanceof Fayde.UIElement)
+                    node.DetachVisualChild(ov, error);
+                if (nv instanceof Fayde.UIElement)
+                    node.AttachVisualChild(nv, error);
+                if (error.Message)
+                    error.ThrowException();
+                upd.updateBounds();
+                upd.invalidateMeasure();
+            }, false, false);
+        })(reactions || (reactions = {}));
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var viewbox;
+        (function (viewbox) {
+            var ViewboxUpdater = (function (_super) {
+                __extends(ViewboxUpdater, _super);
+                function ViewboxUpdater() {
+                    _super.apply(this, arguments);
+                }
+                ViewboxUpdater.prototype.init = function () {
+                    this.setProcessDownPipe(minerva.singleton(viewbox.processdown.ViewboxProcessDownPipeDef));
+                    var assets = this.assets;
+                    assets.stretch = Fayde.Media.Stretch.Uniform;
+                    assets.stretchDirection = Controls.StretchDirection.Both;
+                    assets.viewXform = mat3.identity();
+                    _super.prototype.init.call(this);
+                };
+                ViewboxUpdater.prototype.measureOverride = function (availableSize) {
+                    var child = this.tree.subtree;
+                    if (!child)
+                        return new Size();
+                    child.measure(new Size(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
+                    var childSize = child.assets.desiredSize;
+                    var scalefac = viewbox.helpers.computeScaleFactor(availableSize, childSize, this.assets.stretch, this.assets.stretchDirection);
+                    return new Size(scalefac.width * childSize.width, scalefac.height * childSize.height);
+                };
+                ViewboxUpdater.prototype.arrangeOverride = function (finalSize) {
+                    var child = this.tree.subtree;
+                    if (!child)
+                        return new Size();
+                    var assets = this.assets;
+                    var childSize = child.assets.desiredSize;
+                    var scale = viewbox.helpers.computeScaleFactor(finalSize, childSize, assets.stretch, assets.stretchDirection);
+                    child.arrange(new Rect(0, 0, childSize.width, childSize.height));
+                    this.setViewXform(scale.width, scale.height);
+                    return new Size(scale.width * childSize.width, scale.height * childSize.height);
+                };
+                ViewboxUpdater.prototype.setViewXform = function (sx, sy) {
+                    var assets = this.assets;
+                    var xform = mat3.createScale(sx, sy);
+                    if (!mat3.equal(assets.viewXform, xform)) {
+                        mat3.copyTo(xform, assets.viewXform);
+                        assets.dirtyFlags |= minerva.DirtyFlags.Transform;
+                    }
+                };
+                return ViewboxUpdater;
+            }(minerva.anon.AnonymousUpdater));
+            viewbox.ViewboxUpdater = ViewboxUpdater;
+        })(viewbox = Controls.viewbox || (Controls.viewbox = {}));
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var wrappanel;
+        (function (wrappanel) {
+            var helpers;
+            (function (helpers) {
+                function coerceChildSize(child, itemWidth, itemHeight) {
+                    var node = child.getAttachedValue("$node");
+                    var xobj = node ? node.XObject : null;
+                    if (!xobj)
+                        return;
+                    if (isNaN(child.assets.width) && !isNaN(itemWidth))
+                        xobj.Width = itemWidth;
+                    if (isNaN(child.assets.height) && !isNaN(itemHeight))
+                        xobj.Height = itemHeight;
+                }
+                helpers.coerceChildSize = coerceChildSize;
+            })(helpers = wrappanel.helpers || (wrappanel.helpers = {}));
+        })(wrappanel = Controls.wrappanel || (Controls.wrappanel = {}));
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
         var WrapPanel = (function (_super) {
             __extends(WrapPanel, _super);
             function WrapPanel() {
@@ -5608,7 +5663,7 @@ var Fayde;
             WrapPanel.ItemWidthProperty = DependencyProperty.Register("ItemWidth", function () { return Number; }, WrapPanel, NaN);
             WrapPanel.ItemHeightProperty = DependencyProperty.Register("ItemHeight", function () { return Number; }, WrapPanel, NaN);
             return WrapPanel;
-        })(Fayde.Controls.Panel);
+        }(Fayde.Controls.Panel));
         Controls.WrapPanel = WrapPanel;
         var reactions;
         (function (reactions) {
@@ -5639,31 +5694,8 @@ var Fayde;
                     _super.prototype.init.call(this);
                 };
                 return WrapPanelUpdater;
-            })(minerva.controls.panel.PanelUpdater);
+            }(minerva.controls.panel.PanelUpdater));
             wrappanel.WrapPanelUpdater = WrapPanelUpdater;
-        })(wrappanel = Controls.wrappanel || (Controls.wrappanel = {}));
-    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
-})(Fayde || (Fayde = {}));
-var Fayde;
-(function (Fayde) {
-    var Controls;
-    (function (Controls) {
-        var wrappanel;
-        (function (wrappanel) {
-            var helpers;
-            (function (helpers) {
-                function coerceChildSize(child, itemWidth, itemHeight) {
-                    var node = child.getAttachedValue("$node");
-                    var xobj = node ? node.XObject : null;
-                    if (!xobj)
-                        return;
-                    if (isNaN(child.assets.width) && !isNaN(itemWidth))
-                        xobj.Width = itemWidth;
-                    if (isNaN(child.assets.height) && !isNaN(itemHeight))
-                        xobj.Height = itemHeight;
-                }
-                helpers.coerceChildSize = coerceChildSize;
-            })(helpers = wrappanel.helpers || (wrappanel.helpers = {}));
         })(wrappanel = Controls.wrappanel || (Controls.wrappanel = {}));
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
@@ -5684,7 +5716,7 @@ var Fayde;
                             .removeTapin('doOverride');
                     }
                     return TabPanelArrangePipeDef;
-                })(minerva.controls.panel.arrange.PanelArrangePipeDef);
+                }(minerva.controls.panel.arrange.PanelArrangePipeDef));
                 arrange.TabPanelArrangePipeDef = TabPanelArrangePipeDef;
             })(arrange = tabpanel.arrange || (tabpanel.arrange = {}));
         })(tabpanel = Controls.tabpanel || (Controls.tabpanel = {}));
@@ -5727,7 +5759,7 @@ var Fayde;
                         input.rowHeight = output.rowHeight;
                     };
                     return TabPanelMeasurePipeDef;
-                })(panel.measure.PanelMeasurePipeDef);
+                }(panel.measure.PanelMeasurePipeDef));
                 measure.TabPanelMeasurePipeDef = TabPanelMeasurePipeDef;
             })(measure = tabpanel.measure || (tabpanel.measure = {}));
         })(tabpanel = Controls.tabpanel || (Controls.tabpanel = {}));
@@ -5748,7 +5780,7 @@ var Fayde;
                         this.addTapinAfter('calcRenderXform', 'applyViewXform', tapins.applyViewXform);
                     }
                     return ViewboxProcessDownPipeDef;
-                })(minerva.core.processdown.ProcessDownPipeDef);
+                }(minerva.core.processdown.ProcessDownPipeDef));
                 processdown.ViewboxProcessDownPipeDef = ViewboxProcessDownPipeDef;
                 var tapins;
                 (function (tapins) {
@@ -5782,7 +5814,7 @@ var Fayde;
                             .removeTapin('doOverride');
                     }
                     return WrapPanelArrangePipeDef;
-                })(panel.arrange.PanelArrangePipeDef);
+                }(panel.arrange.PanelArrangePipeDef));
                 arrange.WrapPanelArrangePipeDef = WrapPanelArrangePipeDef;
             })(arrange = wrappanel.arrange || (wrappanel.arrange = {}));
         })(wrappanel = Controls.wrappanel || (Controls.wrappanel = {}));
@@ -5806,7 +5838,7 @@ var Fayde;
                             .removeTapin('doOverride');
                     }
                     return WrapPanelMeasurePipeDef;
-                })(panel.measure.PanelMeasurePipeDef);
+                }(panel.measure.PanelMeasurePipeDef));
                 measure.WrapPanelMeasurePipeDef = WrapPanelMeasurePipeDef;
             })(measure = wrappanel.measure || (wrappanel.measure = {}));
         })(wrappanel = Controls.wrappanel || (Controls.wrappanel = {}));

@@ -699,6 +699,21 @@ declare module Fayde.Controls.contextmenu {
         private _HandleSizeChanged(sender, e);
     }
 }
+declare module Fayde.Controls {
+    class DataField {
+        Content: FrameworkElement;
+        Label: FrameworkElement;
+    }
+}
+declare module Fayde.Controls {
+    class DataForm extends Control {
+        constructor();
+    }
+}
+declare module Fayde.Controls {
+    class PropertyDisplayInfo {
+    }
+}
 declare module Fayde.Controls.Internal {
     class BindingSourceEvaluator<T> extends FrameworkElement {
         static ValueProperty: DependencyProperty;
@@ -1019,6 +1034,17 @@ declare module Fayde.Controls {
         private DrawStarRating(value, fillBrush, outlineBrush, unselectedBrush);
     }
 }
+declare module Fayde.Controls.tabpanel {
+    import Size = minerva.Size;
+    import PanelUpdaterTree = minerva.controls.panel.PanelUpdaterTree;
+    module helpers {
+        function getDesiredSizeWithoutMargin(upd: minerva.core.Updater): Size;
+        function getHeadersSize(tree: PanelUpdaterTree): number[];
+        function setTabItemZ(upd: minerva.core.Updater): void;
+        function getActiveRow(tree: PanelUpdaterTree, solution: number[], isDockTop: boolean): number;
+        function calculateHeaderDistribution(tree: PanelUpdaterTree, rowWidthLimit: number, headerWidth: number[]): number[];
+    }
+}
 declare module Fayde.Controls {
     class TabPanel extends Panel {
         CreateLayoutUpdater(): tabpanel.TabPanelUpdater;
@@ -1034,16 +1060,8 @@ declare module Fayde.Controls.tabpanel {
         init(): void;
     }
 }
-declare module Fayde.Controls.tabpanel {
-    import Size = minerva.Size;
-    import PanelUpdaterTree = minerva.controls.panel.PanelUpdaterTree;
-    module helpers {
-        function getDesiredSizeWithoutMargin(upd: minerva.core.Updater): Size;
-        function getHeadersSize(tree: PanelUpdaterTree): number[];
-        function setTabItemZ(upd: minerva.core.Updater): void;
-        function getActiveRow(tree: PanelUpdaterTree, solution: number[], isDockTop: boolean): number;
-        function calculateHeaderDistribution(tree: PanelUpdaterTree, rowWidthLimit: number, headerWidth: number[]): number[];
-    }
+declare module Fayde.Controls {
+    function compareSummaryItems(item1: ValidationSummaryItem, item2: ValidationSummaryItem): number;
 }
 declare module Fayde.Controls {
     class FocusingInvalidControlEventArgs implements nullstone.IEventArgs {
@@ -1135,8 +1153,8 @@ declare module Fayde.Controls {
         Equals(other: any): boolean;
     }
 }
-declare module Fayde.Controls {
-    function compareSummaryItems(item1: ValidationSummaryItem, item2: ValidationSummaryItem): number;
+declare module Fayde.Controls.viewbox.helpers {
+    function computeScaleFactor(availableSize: minerva.ISize, contentSize: minerva.ISize, stretch: Media.Stretch, stretchDirection: StretchDirection): Size;
 }
 declare module Fayde.Controls {
     class Viewbox extends FrameworkElement {
@@ -1163,8 +1181,10 @@ declare module Fayde.Controls.viewbox {
         private setViewXform(sx, sy);
     }
 }
-declare module Fayde.Controls.viewbox.helpers {
-    function computeScaleFactor(availableSize: minerva.ISize, contentSize: minerva.ISize, stretch: Media.Stretch, stretchDirection: StretchDirection): Size;
+declare module Fayde.Controls.wrappanel {
+    module helpers {
+        function coerceChildSize(child: minerva.core.Updater, itemWidth: number, itemHeight: number): void;
+    }
 }
 declare module Fayde.Controls {
     class WrapPanel extends Fayde.Controls.Panel {
@@ -1183,11 +1203,6 @@ declare module Fayde.Controls.wrappanel {
     class WrapPanelUpdater extends minerva.controls.panel.PanelUpdater {
         assets: IWrapPanelUpdaterAssets;
         init(): void;
-    }
-}
-declare module Fayde.Controls.wrappanel {
-    module helpers {
-        function coerceChildSize(child: minerva.core.Updater, itemWidth: number, itemHeight: number): void;
     }
 }
 declare module Fayde.Controls.tabpanel.arrange {
