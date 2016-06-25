@@ -4,6 +4,22 @@ declare module Fayde.Controls {
 declare module Fayde.Controls {
     var Library: nullstone.ILibrary;
 }
+declare module Fayde.Controls {
+    class BusyIndicator extends ContentControl {
+        static IsBusyProperty: DependencyProperty;
+        static HasContentProperty: DependencyProperty;
+        static BusyContentProperty: DependencyProperty;
+        static BusyContentTemplateProperty: DependencyProperty;
+        static OverlayStyleProperty: DependencyProperty;
+        IsBusy: boolean;
+        OverlayStyle: Style;
+        HasContent: boolean;
+        BusyContent: any;
+        BusyContentTemplate: DataTemplate;
+        protected OnBusyContentChanged(oldBusyContent: any, newBusyContent: any): void;
+        constructor();
+    }
+}
 declare module Fayde.Controls.Primitives {
     class MenuBase extends Fayde.Controls.ItemsControl {
         static ItemContainerStyleProperty: DependencyProperty;
@@ -660,6 +676,14 @@ declare module Fayde.Controls {
         constructor(text: string);
     }
 }
+declare module Fayde.Controls {
+    class CanvasItemsControl extends ItemsControl {
+        constructor();
+        PrepareContainerForItem(container: UIElement, item: any): void;
+        ClearContainerForItem(container: UIElement, item: any): void;
+        protected BindContainerToCanvas(sender: FrameworkElement, args: nullstone.IEventArgs): void;
+    }
+}
 declare module Fayde.Controls.contextmenu {
     class RootVisualTracker {
         mousePosition: Point;
@@ -929,6 +953,70 @@ declare module Fayde.Controls.Internal {
         SelectAllText(): void;
         UpdateTextBoxText(): void;
         UpdateIsEditable(): void;
+    }
+}
+declare module Fayde.Controls {
+    import Control = Fayde.Controls.Control;
+    class Star extends Control {
+        static StarFillBrushProperty: DependencyProperty;
+        StarFillBrush: Fayde.Media.Brush;
+        static HalfFillBrushProperty: DependencyProperty;
+        HalfFillBrush: Fayde.Media.Brush;
+        static StrokeThicknessProperty: DependencyProperty;
+        StrokeThickness: number;
+        static StrokeLineJoinProperty: DependencyProperty;
+        StrokeLineJoin: Fayde.Shapes.PenLineJoin;
+        private scaleTransform;
+        constructor();
+        Star_SizeChanged(sender: Object, e: Fayde.SizeChangedEventArgs): void;
+        OnApplyTemplate(): void;
+    }
+}
+declare module Fayde.Controls {
+    import Control = Fayde.Controls.Control;
+    import Brush = Fayde.Media.Brush;
+    class StarRating extends Control {
+        static NumberOfStarsProperty: DependencyProperty;
+        static RatingProperty: DependencyProperty;
+        static HoverRatingProperty: DependencyProperty;
+        static StarFillBrushProperty: DependencyProperty;
+        static UnselectedStarFillBrushProperty: DependencyProperty;
+        static StarOutlineBrushProperty: DependencyProperty;
+        static HoverFillBrushProperty: DependencyProperty;
+        static UnselectedHoverFillBrushProperty: DependencyProperty;
+        static HoverOutlineBrushProperty: DependencyProperty;
+        static StrokeThicknessProperty: DependencyProperty;
+        static StrokeLineJoinProperty: DependencyProperty;
+        NumberOfStars: number;
+        Rating: number;
+        HoverRating: number;
+        StarFillBrush: Brush;
+        UnselectedStarFillBrush: Brush;
+        StarOutlineBrush: Brush;
+        HoverFillBrush: Brush;
+        UnselectedHoverFillBrush: Brush;
+        HoverOutlineBrush: Brush;
+        StrokeThickness: number;
+        StrokeLineJoin: Fayde.Shapes.PenLineJoin;
+        OnNumberOfStarsChanged(e: DependencyPropertyChangedEventArgs): void;
+        OnRatingChanged(e: DependencyPropertyChangedEventArgs): void;
+        private stars;
+        private isHovering;
+        private LayoutRootStarList;
+        constructor();
+        OnApplyTemplate(): void;
+        OnMouseEnter(e: Fayde.Input.MouseEventArgs): void;
+        OnMouseMove(e: Fayde.Input.MouseEventArgs): void;
+        OnMouseLeave(e: Fayde.Input.MouseEventArgs): void;
+        OnMouseLeftButtonDown(e: Fayde.Input.MouseEventArgs): void;
+        private HandleMouseOver(mousePos);
+        private IsInBounds(p);
+        private GetRatingFromPosition(mousePos);
+        private IsHovering;
+        CreateStars(): void;
+        RefreshStarRating(): void;
+        private DrawUnhovered();
+        private DrawStarRating(value, fillBrush, outlineBrush, unselectedBrush);
     }
 }
 declare module Fayde.Controls {
