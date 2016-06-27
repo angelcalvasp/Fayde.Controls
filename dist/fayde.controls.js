@@ -473,6 +473,16 @@ var Fayde;
         })(Controls.StretchDirection || (Controls.StretchDirection = {}));
         var StretchDirection = Controls.StretchDirection;
         Controls.Library.addEnum(StretchDirection, "StretchDirection");
+        (function (FormTypes) {
+            FormTypes[FormTypes["_default"] = 0] = "_default";
+            FormTypes[FormTypes["check"] = 1] = "check";
+            FormTypes[FormTypes["dates"] = 2] = "dates";
+            FormTypes[FormTypes["box"] = 3] = "box";
+            FormTypes[FormTypes["textArea"] = 4] = "textArea";
+            FormTypes[FormTypes["calculator"] = 5] = "calculator";
+        })(Controls.FormTypes || (Controls.FormTypes = {}));
+        var FormTypes = Controls.FormTypes;
+        Controls.Library.addEnum(FormTypes, "FormTypes");
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
 var Fayde;
@@ -3502,15 +3512,213 @@ var Fayde;
 (function (Fayde) {
     var Controls;
     (function (Controls) {
+        var Dictionary = (function () {
+            function Dictionary(init) {
+                this._keys = new Array();
+                this._values = new Array();
+                for (var x = 0; x < init.length; x++) {
+                    this[init[x].key] = init[x].value;
+                    this._keys.push(init[x].key);
+                    this._values.push(init[x].value);
+                }
+            }
+            Dictionary.prototype.Add = function (key, value) {
+                this[key] = value;
+                this._keys.push(key);
+                this._values.push(value);
+            };
+            Dictionary.prototype.Remove = function (key) {
+                var index = this._keys.indexOf(key, 0);
+                this._keys.splice(index, 1);
+                this._values.splice(index, 1);
+                delete this[key];
+            };
+            Dictionary.prototype.Keys = function () {
+                return this._keys;
+            };
+            Dictionary.prototype.Values = function () {
+                return this._values;
+            };
+            Dictionary.prototype.Clear = function () {
+                this._keys = new Array();
+                this._values = new Array();
+            };
+            Dictionary.prototype.Count = function () {
+                return this._keys.length;
+            };
+            Dictionary.prototype.ContainsKey = function (key) {
+                if (typeof this[key] === "undefined") {
+                    return false;
+                }
+                return true;
+            };
+            Dictionary.prototype.ElementAt = function (index) {
+            };
+            return Dictionary;
+        }());
+        Controls.Dictionary = Dictionary;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var GridUnitType = minerva.controls.grid.GridUnitType;
         var DataForm = (function (_super) {
             __extends(DataForm, _super);
             function DataForm() {
                 _super.call(this);
+                this.m_labelSeparator = ":";
                 this.DefaultStyleKey = DataForm;
+                this.properties = [];
+                this.bindings = [];
+                this.controls = [];
             }
+            DataForm.prototype.CurrentItemValueChanged = function (args) {
+                this.CurrentItemChanged();
+            };
+            Object.defineProperty(DataForm.prototype, "LabelSeparator", {
+                get: function () { return this.m_labelSeparator; },
+                set: function (value) { this.m_labelSeparator = value; },
+                enumerable: true,
+                configurable: true
+            });
+            DataForm.prototype.OnApplyTemplate = function () {
+                _super.prototype.OnApplyTemplate.call(this);
+                this.partGrid = this.GetTemplateChild("PART_Grid", Controls.Grid);
+                this.InvalidateForm();
+            };
+            DataForm.prototype.CurrentItemChanged = function () {
+                this.InvalidateForm();
+            };
+            DataForm.prototype.InvalidateForm = function () {
+                var _this = this;
+                if (this.partGrid) {
+                    this.partGrid.Children.Clear();
+                    this.DiscoverObject();
+                    var grid1 = new Controls.Grid();
+                    grid1.Margin = new Thickness(5);
+                    var definition1 = new Controls.ColumnDefinition();
+                    definition1.Width = new Fayde.Controls.GridLength(1, GridUnitType.Auto);
+                    var definition2 = new Controls.ColumnDefinition();
+                    grid1.ColumnDefinitions.Add(definition1);
+                    grid1.ColumnDefinitions.Add(definition2);
+                    var row = 0;
+                    this.properties.forEach(function (element) {
+                        var propertyName = element;
+                        var lbl = _this.GetLabelTextBlock(propertyName);
+                        var binding = new Fayde.Data.Binding(propertyName);
+                        binding.Source = _this.CurrentItem;
+                        binding.Mode = Fayde.Data.BindingMode.TwoWay;
+                        binding.ValidatesOnDataErrors = true;
+                        binding.ValidatesOnExceptions = true;
+                        binding.NotifyOnValidationError = true;
+                        var editorControl = _this.GetControlFromProperty(element, binding);
+                        if (editorControl == null)
+                            return;
+                        var df = new Controls.DataField();
+                        df.Content = editorControl;
+                        df.Label = lbl;
+                        var newRow = new Controls.RowDefinition();
+                        newRow.Height = new Controls.GridLength(1, GridUnitType.Auto);
+                        grid1.RowDefinitions.Add(newRow);
+                        if (isNaN(df.Content.Height)) {
+                            newRow.Height = new Controls.GridLength(df.Content.Height);
+                        }
+                        Controls.Grid.SetColumn(df.Label, 0);
+                        Controls.Grid.SetRow(df.Label, row);
+                        Controls.Grid.SetColumn(df.Content, 1);
+                        Controls.Grid.SetRow(df.Content, row);
+                        grid1.Children.Add(df.Label);
+                        grid1.Children.Add(df.Content);
+                        _this.controls.push(df.Content);
+                        row++;
+                    });
+                    this.partGrid.Children.Add(grid1);
+                }
+            };
+            DataForm.prototype.DiscoverObject = function () {
+                this.properties = [];
+                this.bindings = [];
+                this.controls = [];
+                if (!this.CurrentItem)
+                    return;
+                this.properties = this.GetProperties(this.CurrentItem);
+            };
+            DataForm.prototype.GetLabelTextBlock = function (name) {
+                var lbl = new Controls.TextBlock();
+                lbl.Text = name + " " + this.m_labelSeparator;
+                lbl.TextAlignment = Fayde.TextAlignment.Right;
+                lbl.Margin = new Thickness(5, 0, 5, 0);
+                lbl.HorizontalAlignment = Fayde.HorizontalAlignment.Stretch;
+                lbl.VerticalAlignment = Fayde.VerticalAlignment.Center;
+                return lbl;
+            };
+            DataForm.prototype.GetControlFromProperty = function (propertyName, binding) {
+                var control = null;
+                var propertyValue = this.CurrentItem[propertyName];
+                if (typeof propertyValue == 'boolean') {
+                    control = this.GenerateCheckBox(propertyName, binding);
+                }
+                else if (typeof propertyValue == 'string') {
+                    control = this.GenerateWaterMarkedTextBox(propertyName, binding);
+                }
+                else if (typeof propertyValue == 'number') {
+                    control = this.GenerateIntegerUpDow(propertyName, binding);
+                }
+                return control;
+            };
+            DataForm.prototype.GenerateCheckBox = function (propertyName, binding) {
+                var checkBox = new Controls.CheckBox();
+                checkBox.VerticalAlignment = Fayde.VerticalAlignment.Center;
+                checkBox.Margin = new Thickness(2, 4, 0, 4);
+                checkBox.IsEnabled = true;
+                return checkBox;
+            };
+            DataForm.prototype.GenerateWaterMarkedTextBox = function (propertyName, binding) {
+                var txtBox = new Controls.TextBox();
+                txtBox.Margin = new Thickness(0, 3, 18, 3);
+                txtBox.IsReadOnly = false;
+                txtBox.TextAlignment = Fayde.TextAlignment.Right;
+                return txtBox;
+            };
+            DataForm.prototype.GenerateIntegerUpDow = function (propertyName, binding) {
+                var integerUpDown = new Controls.Border();
+                integerUpDown.Opacity = 1.0;
+                integerUpDown.Margin = new Thickness(0, 3, 18, 3);
+                var n = new Controls.NumericUpDown();
+                integerUpDown.Child = n;
+                n.IsEnabled = true;
+                n.Maximum = Number.MAX_VALUE;
+                n.Minimum = Number.MIN_VALUE;
+                return integerUpDown;
+            };
+            DataForm.prototype.GetProperties = function (obj) {
+                var properties = [];
+                for (var prop in obj) {
+                    if (typeof obj[prop] != 'function') {
+                        properties.push(prop);
+                    }
+                }
+                return properties;
+            };
+            DataForm.ErrorTemplateProperty = DependencyProperty.Register("ErrorTemplate", function () { return Object; }, DataForm, NaN);
+            DataForm.CurrentItemProperty = DependencyProperty.Register("CurrentItem", function () { return Object; }, DataForm, NaN, function (d, args) { return d.CurrentItemValueChanged(args); });
             return DataForm;
         }(Controls.Control));
         Controls.DataForm = DataForm;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var DataFormInputTypes = (function () {
+            function DataFormInputTypes() {
+            }
+            return DataFormInputTypes;
+        }());
+        Controls.DataFormInputTypes = DataFormInputTypes;
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
 var Fayde;

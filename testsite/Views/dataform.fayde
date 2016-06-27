@@ -4,7 +4,7 @@
       xmlns:viewmodels="ViewModels"
       Title="Dataform Demo">
     <Page.DataContext>
-        <viewmodels:BusyIndicatorViewModel />
+        <viewmodels:DataFormViewModel />
     </Page.DataContext>
     <Grid x:Name="LayoutRoot">
         <Grid.RowDefinitions>
@@ -13,7 +13,7 @@
         </Grid.RowDefinitions>
         <TextBlock Text="Data time!" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center"/> 
         
-        <controls:DataForm Grid.Row="1" Width="200" Height="500">
+        <controls:DataForm CurrentItem="{Binding CurrentItem}" Grid.Row="1" Width="200" Height="500">
            
         </controls:DataForm>
     </Grid>

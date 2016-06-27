@@ -58,4 +58,15 @@ module Fayde.Controls {
         Both,
     }
     Library.addEnum(StretchDirection, "StretchDirection");
+
+    export enum FormTypes {
+            _default, //lets the class decide
+            check, // for boolean
+            dates, //datepicker
+            box, // no increments
+            textArea, //larger, multi-line box               
+            calculator
+    }
+    Library.addEnum(FormTypes, "FormTypes");
+
 }

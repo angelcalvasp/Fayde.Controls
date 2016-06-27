@@ -1,4 +1,4 @@
-module Fayde.Controls{
+module Fayde.Controls {
     export class PropertyDisplayInfo{
         
     }

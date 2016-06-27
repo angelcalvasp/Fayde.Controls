@@ -2824,7 +2824,7 @@
     </Style>
 
     <!-- controls.DataForm -->
-    <ControlTemplate x:Key="errorTemplate">
+    <ControlTemplate x:Key="dataFormErrorTemplate" TargetType="Control">
         <DockPanel>
             <Border BorderThickness="1" BorderBrush="Red">
                 <AdornedElementPlaceholder x:Name="placeholder"/>
@@ -2835,7 +2835,7 @@
     </ControlTemplate>
 
     <Style TargetType="controls:DataForm">
-        <Setter Property="ErrorTemplate" Value="{StaticResource errorTemplate}" />
+        <Setter Property="ErrorTemplate" Value="{StaticResource dataFormErrorTemplate}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="controls:DataForm">

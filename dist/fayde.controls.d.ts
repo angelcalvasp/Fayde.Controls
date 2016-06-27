@@ -147,6 +147,14 @@ declare module Fayde.Controls {
         DownOnly = 1,
         Both = 2,
     }
+    enum FormTypes {
+        _default = 0,
+        check = 1,
+        dates = 2,
+        box = 3,
+        textArea = 4,
+        calculator = 5,
+    }
 }
 declare module Fayde.Controls {
     class Spinner extends Control {
@@ -706,9 +714,57 @@ declare module Fayde.Controls {
     }
 }
 declare module Fayde.Controls {
-    class DataForm extends Control {
-        constructor();
+    class Dictionary {
+        _keys: string[];
+        _values: any[];
+        constructor(init: {
+            key: string;
+            value: any;
+        }[]);
+        Add(key: string, value: any): void;
+        Remove(key: string): void;
+        Keys(): string[];
+        Values(): any[];
+        Clear(): void;
+        Count(): number;
+        ContainsKey(key: string): boolean;
+        ElementAt(index: number): void;
     }
+}
+declare module Fayde.Controls {
+    class DataForm extends Control {
+        static ErrorTemplateProperty: DependencyProperty;
+        static CurrentItemProperty: DependencyProperty;
+        private properties;
+        private bindings;
+        private controls;
+        private partGrid;
+        CurrentItem: any;
+        ErrorTemplate: any;
+        private CurrentItemValueChanged(args);
+        private m_labelSeparator;
+        LabelSeparator: string;
+        constructor();
+        OnApplyTemplate(): void;
+        private CurrentItemChanged();
+        private InvalidateForm();
+        private DiscoverObject();
+        private GetLabelTextBlock(name);
+        private GetControlFromProperty(propertyName, binding);
+        private GenerateCheckBox(propertyName, binding);
+        private GenerateWaterMarkedTextBox(propertyName, binding);
+        private GenerateIntegerUpDow(propertyName, binding);
+        private GetProperties(obj);
+    }
+}
+declare module Fayde.Controls {
+    class DataFormInputTypes {
+        FormType: FormTypes;
+        PreferredWidth: number;
+        PreferredHeight: number;
+    }
+}
+declare module Fayde.Controls {
 }
 declare module Fayde.Controls {
     class PropertyDisplayInfo {
