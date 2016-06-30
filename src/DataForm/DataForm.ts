@@ -462,8 +462,8 @@ module Fayde.Controls {
                         var nextIndex = 0;
                         if(this.SelectedIndex != 0){
                             nextIndex = this.SelectedIndex + 1;
-                            if(nextIndex > this.Items.Count){
-                                nextIndex = this.Items.Count;
+                            if(nextIndex >= this.Items.Count){
+                                nextIndex = this.Items.Count-1;
                             }
                         }
                         

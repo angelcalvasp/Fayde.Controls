@@ -1256,34 +1256,6 @@ declare module Fayde.Controls.tabpanel {
         init(): void;
     }
 }
-declare module Fayde.Controls.viewbox.helpers {
-    function computeScaleFactor(availableSize: minerva.ISize, contentSize: minerva.ISize, stretch: Media.Stretch, stretchDirection: StretchDirection): Size;
-}
-declare module Fayde.Controls {
-    class Viewbox extends FrameworkElement {
-        CreateLayoutUpdater(): viewbox.ViewboxUpdater;
-        static ChildProperty: DependencyProperty;
-        static StretchProperty: DependencyProperty;
-        static StretchDirectionProperty: DependencyProperty;
-        Child: UIElement;
-        Stretch: Media.Stretch;
-        StretchDirection: StretchDirection;
-    }
-}
-declare module Fayde.Controls.viewbox {
-    interface IViewboxUpdaterAssets extends minerva.core.IUpdaterAssets, processdown.IInput {
-        stretch: Media.Stretch;
-        stretchDirection: StretchDirection;
-    }
-    class ViewboxUpdater extends minerva.anon.AnonymousUpdater {
-        tree: minerva.core.UpdaterTree;
-        assets: IViewboxUpdaterAssets;
-        init(): void;
-        measureOverride(availableSize: Size): Size;
-        arrangeOverride(finalSize: Size): Size;
-        private setViewXform(sx, sy);
-    }
-}
 declare module Fayde.Controls {
     function compareSummaryItems(item1: ValidationSummaryItem, item2: ValidationSummaryItem): number;
 }
@@ -1377,6 +1349,34 @@ declare module Fayde.Controls {
         Equals(other: any): boolean;
     }
 }
+declare module Fayde.Controls.viewbox.helpers {
+    function computeScaleFactor(availableSize: minerva.ISize, contentSize: minerva.ISize, stretch: Media.Stretch, stretchDirection: StretchDirection): Size;
+}
+declare module Fayde.Controls {
+    class Viewbox extends FrameworkElement {
+        CreateLayoutUpdater(): viewbox.ViewboxUpdater;
+        static ChildProperty: DependencyProperty;
+        static StretchProperty: DependencyProperty;
+        static StretchDirectionProperty: DependencyProperty;
+        Child: UIElement;
+        Stretch: Media.Stretch;
+        StretchDirection: StretchDirection;
+    }
+}
+declare module Fayde.Controls.viewbox {
+    interface IViewboxUpdaterAssets extends minerva.core.IUpdaterAssets, processdown.IInput {
+        stretch: Media.Stretch;
+        stretchDirection: StretchDirection;
+    }
+    class ViewboxUpdater extends minerva.anon.AnonymousUpdater {
+        tree: minerva.core.UpdaterTree;
+        assets: IViewboxUpdaterAssets;
+        init(): void;
+        measureOverride(availableSize: Size): Size;
+        arrangeOverride(finalSize: Size): Size;
+        private setViewXform(sx, sy);
+    }
+}
 declare module Fayde.Controls.wrappanel {
     module helpers {
         function coerceChildSize(child: minerva.core.Updater, itemWidth: number, itemHeight: number): void;
@@ -1401,6 +1401,22 @@ declare module Fayde.Controls.wrappanel {
         init(): void;
     }
 }
+declare module Fayde.Controls.tabpanel.arrange {
+    import panel = minerva.controls.panel;
+    interface IInput extends panel.arrange.IInput {
+        tabAlignment: Dock;
+        numRows: number;
+        numHeaders: number;
+        rowHeight: number;
+    }
+    interface IState extends panel.arrange.IState {
+    }
+    interface IOutput extends panel.arrange.IOutput {
+    }
+    class TabPanelArrangePipeDef extends minerva.controls.panel.arrange.PanelArrangePipeDef {
+        constructor();
+    }
+}
 declare module Fayde.Controls.tabpanel.measure {
     import panel = minerva.controls.panel;
     interface IInput extends panel.measure.IInput {
@@ -1421,22 +1437,6 @@ declare module Fayde.Controls.tabpanel.measure {
         createOutput(): IOutput;
         prepare(input: IInput, state: IState, output: IOutput): void;
         flush(input: IInput, state: IState, output: IOutput): void;
-    }
-}
-declare module Fayde.Controls.tabpanel.arrange {
-    import panel = minerva.controls.panel;
-    interface IInput extends panel.arrange.IInput {
-        tabAlignment: Dock;
-        numRows: number;
-        numHeaders: number;
-        rowHeight: number;
-    }
-    interface IState extends panel.arrange.IState {
-    }
-    interface IOutput extends panel.arrange.IOutput {
-    }
-    class TabPanelArrangePipeDef extends minerva.controls.panel.arrange.PanelArrangePipeDef {
-        constructor();
     }
 }
 declare module Fayde.Controls.viewbox.processdown {
@@ -1481,17 +1481,17 @@ declare module Fayde.Controls.wrappanel.measure {
         constructor();
     }
 }
-declare module Fayde.Controls.tabpanel.measure.tapins {
-    function doHorizontal(input: IInput, state: IState, output: IOutput, tree: minerva.core.IUpdaterTree, availableSize: minerva.Size): boolean;
-}
-declare module Fayde.Controls.tabpanel.measure.tapins {
-    function doVertical(input: IInput, state: IState, output: IOutput, tree: minerva.core.IUpdaterTree, availableSize: minerva.Size): boolean;
-}
 declare module Fayde.Controls.tabpanel.arrange.tapins {
     function doHorizontal(input: IInput, state: IState, output: IOutput, tree: minerva.controls.panel.PanelUpdaterTree, finalRect: minerva.Rect): boolean;
 }
 declare module Fayde.Controls.tabpanel.arrange.tapins {
     function doVertical(input: IInput, state: IState, output: IOutput, tree: minerva.core.IUpdaterTree, finalRect: minerva.Rect): boolean;
+}
+declare module Fayde.Controls.tabpanel.measure.tapins {
+    function doHorizontal(input: IInput, state: IState, output: IOutput, tree: minerva.core.IUpdaterTree, availableSize: minerva.Size): boolean;
+}
+declare module Fayde.Controls.tabpanel.measure.tapins {
+    function doVertical(input: IInput, state: IState, output: IOutput, tree: minerva.core.IUpdaterTree, availableSize: minerva.Size): boolean;
 }
 declare module Fayde.Controls.wrappanel.arrange.tapins {
     import Rect = minerva.Rect;
