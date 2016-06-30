@@ -3853,13 +3853,78 @@ var Fayde;
                 this.GoToStateMode(gotoFunc);
             };
             DataForm.prototype.GoToStateMode = function (gotoFunc) {
+                if (this.Items.Count == 0) {
+                    return gotoFunc("Empty");
+                }
                 if (this.Mode == DataFormMode.ReadOnly) {
                     return gotoFunc("ReadOnly");
                 }
-                if (this.Mode == DataFormMode.Edit) {
+                if (this.Mode == DataFormMode.Edit || this.Mode == DataFormMode.AddNew) {
                     return gotoFunc("Edit");
                 }
-                return gotoFunc("Empty");
+            };
+            DataForm.prototype.ProcessNavigationButtons = function () {
+                var count = this.Items.Count;
+                if (count == 0) {
+                    if (this.deleteButton)
+                        this.deleteButton.IsEnabled = false;
+                    if (this.editButton)
+                        this.editButton.IsEnabled = false;
+                    if (this.previousItemButton)
+                        this.previousItemButton.IsEnabled = false;
+                    if (this.nextItemButton)
+                        this.nextItemButton.IsEnabled = false;
+                    if (this.firstItemButton)
+                        this.firstItemButton.IsEnabled = false;
+                    if (this.lastItemButton)
+                        this.lastItemButton.IsEnabled = false;
+                }
+                else if (count == 1) {
+                    if (this.deleteButton)
+                        this.deleteButton.IsEnabled = true;
+                    if (this.editButton)
+                        this.editButton.IsEnabled = true;
+                    if (this.previousItemButton)
+                        this.previousItemButton.IsEnabled = false;
+                    if (this.nextItemButton)
+                        this.nextItemButton.IsEnabled = false;
+                    if (this.firstItemButton)
+                        this.firstItemButton.IsEnabled = false;
+                    if (this.lastItemButton)
+                        this.lastItemButton.IsEnabled = false;
+                }
+                else {
+                    if (this.CurrentItem == this.Items.GetValueAt(0)) {
+                        if (this.firstItemButton)
+                            this.firstItemButton.IsEnabled = false;
+                        if (this.previousItemButton)
+                            this.previousItemButton.IsEnabled = false;
+                        if (this.lastItemButton)
+                            this.lastItemButton.IsEnabled = true;
+                        if (this.nextItemButton)
+                            this.nextItemButton.IsEnabled = true;
+                    }
+                    else if (this.CurrentItem == this.Items.GetValueAt(count - 1)) {
+                        if (this.firstItemButton)
+                            this.firstItemButton.IsEnabled = true;
+                        if (this.previousItemButton)
+                            this.previousItemButton.IsEnabled = true;
+                        if (this.lastItemButton)
+                            this.lastItemButton.IsEnabled = false;
+                        if (this.nextItemButton)
+                            this.nextItemButton.IsEnabled = false;
+                    }
+                    else {
+                        if (this.firstItemButton)
+                            this.firstItemButton.IsEnabled = true;
+                        if (this.previousItemButton)
+                            this.previousItemButton.IsEnabled = true;
+                        if (this.lastItemButton)
+                            this.lastItemButton.IsEnabled = true;
+                        if (this.nextItemButton)
+                            this.nextItemButton.IsEnabled = true;
+                    }
+                }
             };
             DataForm.prototype.DefaultCurrentItem = function () {
                 if (this.ItemsSource) {
@@ -3879,6 +3944,7 @@ var Fayde;
                     this.SelectedIndex = this.Items.IndexOf(this.CurrentItem);
                 }
                 this.InvalidateForm();
+                this.ProcessNavigationButtons();
             };
             DataForm.prototype.InvalidateForm = function () {
                 var _this = this;
@@ -4013,8 +4079,9 @@ var Fayde;
                 if (collection) {
                     var newItem = collection.GetNew();
                     if (newItem) {
-                        this.CurrentItem = newItem;
                         collection.Add(newItem);
+                        this.CurrentItem = newItem;
+                        this.ProcessNavigationButtons();
                     }
                 }
                 this.InvalidateForm();
@@ -4026,6 +4093,27 @@ var Fayde;
                 this.EditMode();
             };
             DataForm.prototype.handleDeleteItemClick = function (sender, args) {
+                this.Mode = DataFormMode.ReadOnly;
+                if (this.CurrentItem) {
+                    var collection = this.ItemsSource;
+                    if (collection) {
+                        collection.Remove(this.CurrentItem);
+                        if (this.Items.Count > 0) {
+                            var nextIndex = 0;
+                            if (this.SelectedIndex != 0) {
+                                nextIndex = this.SelectedIndex + 1;
+                                if (nextIndex > this.Items.Count) {
+                                    nextIndex = this.Items.Count;
+                                }
+                            }
+                            this.CurrentItem = this.Items.GetValueAt(nextIndex);
+                        }
+                        else {
+                            this.UpdateVisualState();
+                            this.CurrentItem = null;
+                        }
+                    }
+                }
             };
             DataForm.prototype.handleCommitClick = function (sender, args) {
                 this.TryCommit();
@@ -4057,10 +4145,26 @@ var Fayde;
                 this.ReadOnlyMode();
             };
             DataForm.prototype.Commit = function () {
+                this.ProcessNavigationButtons();
             };
             DataForm.prototype.CancelCommit = function () {
-                if (this.backupItem)
-                    this.CopyObj(this.backupItem, this.CurrentItem);
+                if (this.Mode == DataFormMode.AddNew) {
+                    var collection = this.ItemsSource;
+                    if (collection) {
+                        collection.Remove(this.CurrentItem);
+                        if (collection.Count > 0 && collection.GetValueAt(0) != null) {
+                            this.CurrentItem = collection.GetValueAt(0);
+                        }
+                        else {
+                            this.UpdateVisualState();
+                        }
+                        this.ProcessNavigationButtons();
+                    }
+                }
+                else {
+                    if (this.backupItem)
+                        this.CopyObj(this.backupItem, this.CurrentItem);
+                }
             };
             DataForm.prototype.GetProperties = function (obj) {
                 var properties = [];
@@ -4127,7 +4231,11 @@ var Fayde;
                 this.tCreator = TCreator;
             }
             DataFormDataSource.prototype.GetNew = function () {
-                return this.activator(this.tCreator);
+                var item = this.activator(this.tCreator);
+                var dataformObject = item;
+                if (dataformObject)
+                    return dataformObject.CreateItem();
+                return null;
             };
             DataFormDataSource.prototype.activator = function (type) {
                 return new type();
@@ -5670,6 +5778,162 @@ var Fayde;
 (function (Fayde) {
     var Controls;
     (function (Controls) {
+        var viewbox;
+        (function (viewbox) {
+            var helpers;
+            (function (helpers) {
+                function computeScaleFactor(availableSize, contentSize, stretch, stretchDirection) {
+                    var scaleX = 1.0;
+                    var scaleY = 1.0;
+                    var isConstrainedWidth = isFinite(availableSize.width);
+                    var isConstrainedHeight = isFinite(availableSize.height);
+                    if ((stretch === Fayde.Media.Stretch.Uniform || stretch === Fayde.Media.Stretch.UniformToFill || stretch === Fayde.Media.Stretch.Fill)
+                        && (isConstrainedWidth || isConstrainedHeight)) {
+                        scaleX = isZero(contentSize.width) ? 0.0 : availableSize.width / contentSize.width;
+                        scaleY = isZero(contentSize.height) ? 0.0 : availableSize.height / contentSize.height;
+                        if (!isConstrainedWidth)
+                            scaleX = scaleY;
+                        else if (!isConstrainedHeight)
+                            scaleY = scaleX;
+                        else {
+                            switch (stretch) {
+                                case Fayde.Media.Stretch.Uniform:
+                                    var minscale = scaleX < scaleY ? scaleX : scaleY;
+                                    scaleX = scaleY = minscale;
+                                    break;
+                                case Fayde.Media.Stretch.UniformToFill:
+                                    var maxscale = scaleX > scaleY ? scaleX : scaleY;
+                                    scaleX = scaleY = maxscale;
+                                    break;
+                                case Fayde.Media.Stretch.Fill:
+                                    break;
+                            }
+                        }
+                        switch (stretchDirection) {
+                            case Controls.StretchDirection.UpOnly:
+                                if (scaleX < 1.0)
+                                    scaleX = 1.0;
+                                if (scaleY < 1.0)
+                                    scaleY = 1.0;
+                                break;
+                            case Controls.StretchDirection.DownOnly:
+                                if (scaleX > 1.0)
+                                    scaleX = 1.0;
+                                if (scaleY > 1.0)
+                                    scaleY = 1.0;
+                                break;
+                            case Controls.StretchDirection.Both:
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    return new Size(scaleX, scaleY);
+                }
+                helpers.computeScaleFactor = computeScaleFactor;
+                var epsilon = 1.192093E-07;
+                function isZero(val) {
+                    return Math.abs(val) < epsilon;
+                }
+            })(helpers = viewbox.helpers || (viewbox.helpers = {}));
+        })(viewbox = Controls.viewbox || (Controls.viewbox = {}));
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var Viewbox = (function (_super) {
+            __extends(Viewbox, _super);
+            function Viewbox() {
+                _super.apply(this, arguments);
+            }
+            Viewbox.prototype.CreateLayoutUpdater = function () {
+                return new Controls.viewbox.ViewboxUpdater();
+            };
+            Viewbox.ChildProperty = DependencyProperty.Register("Child", function () { return Fayde.UIElement; }, Viewbox);
+            Viewbox.StretchProperty = DependencyProperty.Register("Stretch", function () { return new Fayde.Enum(Fayde.Media.Stretch); }, Viewbox, undefined, function (d, args) { return d.InvalidateMeasure(); });
+            Viewbox.StretchDirectionProperty = DependencyProperty.Register("StretchDirection", function () { return new Fayde.Enum(Controls.StretchDirection); }, Viewbox, undefined, function (d, args) { return d.InvalidateMeasure(); });
+            return Viewbox;
+        }(Fayde.FrameworkElement));
+        Controls.Viewbox = Viewbox;
+        Fayde.Markup.Content(Viewbox, Viewbox.ChildProperty);
+        var reactions;
+        (function (reactions) {
+            Fayde.UIReaction(Viewbox.StretchProperty, function (updater, ov, nv) { return updater.invalidateMeasure(); }, false);
+            Fayde.UIReaction(Viewbox.StretchDirectionProperty, function (updater, ov, nv) { return updater.invalidateMeasure(); }, false);
+            Fayde.UIReaction(Viewbox.ChildProperty, function (upd, ov, nv, viewbox) {
+                var node = viewbox.XamlNode;
+                var error = new BError();
+                if (ov instanceof Fayde.UIElement)
+                    node.DetachVisualChild(ov, error);
+                if (nv instanceof Fayde.UIElement)
+                    node.AttachVisualChild(nv, error);
+                if (error.Message)
+                    error.ThrowException();
+                upd.updateBounds();
+                upd.invalidateMeasure();
+            }, false, false);
+        })(reactions || (reactions = {}));
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var viewbox;
+        (function (viewbox) {
+            var ViewboxUpdater = (function (_super) {
+                __extends(ViewboxUpdater, _super);
+                function ViewboxUpdater() {
+                    _super.apply(this, arguments);
+                }
+                ViewboxUpdater.prototype.init = function () {
+                    this.setProcessDownPipe(minerva.singleton(viewbox.processdown.ViewboxProcessDownPipeDef));
+                    var assets = this.assets;
+                    assets.stretch = Fayde.Media.Stretch.Uniform;
+                    assets.stretchDirection = Controls.StretchDirection.Both;
+                    assets.viewXform = mat3.identity();
+                    _super.prototype.init.call(this);
+                };
+                ViewboxUpdater.prototype.measureOverride = function (availableSize) {
+                    var child = this.tree.subtree;
+                    if (!child)
+                        return new Size();
+                    child.measure(new Size(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
+                    var childSize = child.assets.desiredSize;
+                    var scalefac = viewbox.helpers.computeScaleFactor(availableSize, childSize, this.assets.stretch, this.assets.stretchDirection);
+                    return new Size(scalefac.width * childSize.width, scalefac.height * childSize.height);
+                };
+                ViewboxUpdater.prototype.arrangeOverride = function (finalSize) {
+                    var child = this.tree.subtree;
+                    if (!child)
+                        return new Size();
+                    var assets = this.assets;
+                    var childSize = child.assets.desiredSize;
+                    var scale = viewbox.helpers.computeScaleFactor(finalSize, childSize, assets.stretch, assets.stretchDirection);
+                    child.arrange(new Rect(0, 0, childSize.width, childSize.height));
+                    this.setViewXform(scale.width, scale.height);
+                    return new Size(scale.width * childSize.width, scale.height * childSize.height);
+                };
+                ViewboxUpdater.prototype.setViewXform = function (sx, sy) {
+                    var assets = this.assets;
+                    var xform = mat3.createScale(sx, sy);
+                    if (!mat3.equal(assets.viewXform, xform)) {
+                        mat3.copyTo(xform, assets.viewXform);
+                        assets.dirtyFlags |= minerva.DirtyFlags.Transform;
+                    }
+                };
+                return ViewboxUpdater;
+            }(minerva.anon.AnonymousUpdater));
+            viewbox.ViewboxUpdater = ViewboxUpdater;
+        })(viewbox = Controls.viewbox || (Controls.viewbox = {}));
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
         function compareSummaryItems(item1, item2) {
             var refs = compareRefs(item1, item2);
             if (refs != null)
@@ -6108,162 +6372,6 @@ var Fayde;
 (function (Fayde) {
     var Controls;
     (function (Controls) {
-        var viewbox;
-        (function (viewbox) {
-            var helpers;
-            (function (helpers) {
-                function computeScaleFactor(availableSize, contentSize, stretch, stretchDirection) {
-                    var scaleX = 1.0;
-                    var scaleY = 1.0;
-                    var isConstrainedWidth = isFinite(availableSize.width);
-                    var isConstrainedHeight = isFinite(availableSize.height);
-                    if ((stretch === Fayde.Media.Stretch.Uniform || stretch === Fayde.Media.Stretch.UniformToFill || stretch === Fayde.Media.Stretch.Fill)
-                        && (isConstrainedWidth || isConstrainedHeight)) {
-                        scaleX = isZero(contentSize.width) ? 0.0 : availableSize.width / contentSize.width;
-                        scaleY = isZero(contentSize.height) ? 0.0 : availableSize.height / contentSize.height;
-                        if (!isConstrainedWidth)
-                            scaleX = scaleY;
-                        else if (!isConstrainedHeight)
-                            scaleY = scaleX;
-                        else {
-                            switch (stretch) {
-                                case Fayde.Media.Stretch.Uniform:
-                                    var minscale = scaleX < scaleY ? scaleX : scaleY;
-                                    scaleX = scaleY = minscale;
-                                    break;
-                                case Fayde.Media.Stretch.UniformToFill:
-                                    var maxscale = scaleX > scaleY ? scaleX : scaleY;
-                                    scaleX = scaleY = maxscale;
-                                    break;
-                                case Fayde.Media.Stretch.Fill:
-                                    break;
-                            }
-                        }
-                        switch (stretchDirection) {
-                            case Controls.StretchDirection.UpOnly:
-                                if (scaleX < 1.0)
-                                    scaleX = 1.0;
-                                if (scaleY < 1.0)
-                                    scaleY = 1.0;
-                                break;
-                            case Controls.StretchDirection.DownOnly:
-                                if (scaleX > 1.0)
-                                    scaleX = 1.0;
-                                if (scaleY > 1.0)
-                                    scaleY = 1.0;
-                                break;
-                            case Controls.StretchDirection.Both:
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    return new Size(scaleX, scaleY);
-                }
-                helpers.computeScaleFactor = computeScaleFactor;
-                var epsilon = 1.192093E-07;
-                function isZero(val) {
-                    return Math.abs(val) < epsilon;
-                }
-            })(helpers = viewbox.helpers || (viewbox.helpers = {}));
-        })(viewbox = Controls.viewbox || (Controls.viewbox = {}));
-    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
-})(Fayde || (Fayde = {}));
-var Fayde;
-(function (Fayde) {
-    var Controls;
-    (function (Controls) {
-        var Viewbox = (function (_super) {
-            __extends(Viewbox, _super);
-            function Viewbox() {
-                _super.apply(this, arguments);
-            }
-            Viewbox.prototype.CreateLayoutUpdater = function () {
-                return new Controls.viewbox.ViewboxUpdater();
-            };
-            Viewbox.ChildProperty = DependencyProperty.Register("Child", function () { return Fayde.UIElement; }, Viewbox);
-            Viewbox.StretchProperty = DependencyProperty.Register("Stretch", function () { return new Fayde.Enum(Fayde.Media.Stretch); }, Viewbox, undefined, function (d, args) { return d.InvalidateMeasure(); });
-            Viewbox.StretchDirectionProperty = DependencyProperty.Register("StretchDirection", function () { return new Fayde.Enum(Controls.StretchDirection); }, Viewbox, undefined, function (d, args) { return d.InvalidateMeasure(); });
-            return Viewbox;
-        }(Fayde.FrameworkElement));
-        Controls.Viewbox = Viewbox;
-        Fayde.Markup.Content(Viewbox, Viewbox.ChildProperty);
-        var reactions;
-        (function (reactions) {
-            Fayde.UIReaction(Viewbox.StretchProperty, function (updater, ov, nv) { return updater.invalidateMeasure(); }, false);
-            Fayde.UIReaction(Viewbox.StretchDirectionProperty, function (updater, ov, nv) { return updater.invalidateMeasure(); }, false);
-            Fayde.UIReaction(Viewbox.ChildProperty, function (upd, ov, nv, viewbox) {
-                var node = viewbox.XamlNode;
-                var error = new BError();
-                if (ov instanceof Fayde.UIElement)
-                    node.DetachVisualChild(ov, error);
-                if (nv instanceof Fayde.UIElement)
-                    node.AttachVisualChild(nv, error);
-                if (error.Message)
-                    error.ThrowException();
-                upd.updateBounds();
-                upd.invalidateMeasure();
-            }, false, false);
-        })(reactions || (reactions = {}));
-    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
-})(Fayde || (Fayde = {}));
-var Fayde;
-(function (Fayde) {
-    var Controls;
-    (function (Controls) {
-        var viewbox;
-        (function (viewbox) {
-            var ViewboxUpdater = (function (_super) {
-                __extends(ViewboxUpdater, _super);
-                function ViewboxUpdater() {
-                    _super.apply(this, arguments);
-                }
-                ViewboxUpdater.prototype.init = function () {
-                    this.setProcessDownPipe(minerva.singleton(viewbox.processdown.ViewboxProcessDownPipeDef));
-                    var assets = this.assets;
-                    assets.stretch = Fayde.Media.Stretch.Uniform;
-                    assets.stretchDirection = Controls.StretchDirection.Both;
-                    assets.viewXform = mat3.identity();
-                    _super.prototype.init.call(this);
-                };
-                ViewboxUpdater.prototype.measureOverride = function (availableSize) {
-                    var child = this.tree.subtree;
-                    if (!child)
-                        return new Size();
-                    child.measure(new Size(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
-                    var childSize = child.assets.desiredSize;
-                    var scalefac = viewbox.helpers.computeScaleFactor(availableSize, childSize, this.assets.stretch, this.assets.stretchDirection);
-                    return new Size(scalefac.width * childSize.width, scalefac.height * childSize.height);
-                };
-                ViewboxUpdater.prototype.arrangeOverride = function (finalSize) {
-                    var child = this.tree.subtree;
-                    if (!child)
-                        return new Size();
-                    var assets = this.assets;
-                    var childSize = child.assets.desiredSize;
-                    var scale = viewbox.helpers.computeScaleFactor(finalSize, childSize, assets.stretch, assets.stretchDirection);
-                    child.arrange(new Rect(0, 0, childSize.width, childSize.height));
-                    this.setViewXform(scale.width, scale.height);
-                    return new Size(scale.width * childSize.width, scale.height * childSize.height);
-                };
-                ViewboxUpdater.prototype.setViewXform = function (sx, sy) {
-                    var assets = this.assets;
-                    var xform = mat3.createScale(sx, sy);
-                    if (!mat3.equal(assets.viewXform, xform)) {
-                        mat3.copyTo(xform, assets.viewXform);
-                        assets.dirtyFlags |= minerva.DirtyFlags.Transform;
-                    }
-                };
-                return ViewboxUpdater;
-            }(minerva.anon.AnonymousUpdater));
-            viewbox.ViewboxUpdater = ViewboxUpdater;
-        })(viewbox = Controls.viewbox || (Controls.viewbox = {}));
-    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
-})(Fayde || (Fayde = {}));
-var Fayde;
-(function (Fayde) {
-    var Controls;
-    (function (Controls) {
         var wrappanel;
         (function (wrappanel) {
             var helpers;
@@ -6341,29 +6449,6 @@ var Fayde;
     (function (Controls) {
         var tabpanel;
         (function (tabpanel) {
-            var arrange;
-            (function (arrange) {
-                var TabPanelArrangePipeDef = (function (_super) {
-                    __extends(TabPanelArrangePipeDef, _super);
-                    function TabPanelArrangePipeDef() {
-                        _super.call(this);
-                        this.addTapinAfter('doOverride', 'doVertical', arrange.tapins.doVertical)
-                            .addTapinAfter('doVertical', 'doHorizontal', arrange.tapins.doHorizontal)
-                            .removeTapin('doOverride');
-                    }
-                    return TabPanelArrangePipeDef;
-                }(minerva.controls.panel.arrange.PanelArrangePipeDef));
-                arrange.TabPanelArrangePipeDef = TabPanelArrangePipeDef;
-            })(arrange = tabpanel.arrange || (tabpanel.arrange = {}));
-        })(tabpanel = Controls.tabpanel || (Controls.tabpanel = {}));
-    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
-})(Fayde || (Fayde = {}));
-var Fayde;
-(function (Fayde) {
-    var Controls;
-    (function (Controls) {
-        var tabpanel;
-        (function (tabpanel) {
             var measure;
             (function (measure) {
                 var panel = minerva.controls.panel;
@@ -6398,6 +6483,29 @@ var Fayde;
                 }(panel.measure.PanelMeasurePipeDef));
                 measure.TabPanelMeasurePipeDef = TabPanelMeasurePipeDef;
             })(measure = tabpanel.measure || (tabpanel.measure = {}));
+        })(tabpanel = Controls.tabpanel || (Controls.tabpanel = {}));
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var tabpanel;
+        (function (tabpanel) {
+            var arrange;
+            (function (arrange) {
+                var TabPanelArrangePipeDef = (function (_super) {
+                    __extends(TabPanelArrangePipeDef, _super);
+                    function TabPanelArrangePipeDef() {
+                        _super.call(this);
+                        this.addTapinAfter('doOverride', 'doVertical', arrange.tapins.doVertical)
+                            .addTapinAfter('doVertical', 'doHorizontal', arrange.tapins.doHorizontal)
+                            .removeTapin('doOverride');
+                    }
+                    return TabPanelArrangePipeDef;
+                }(minerva.controls.panel.arrange.PanelArrangePipeDef));
+                arrange.TabPanelArrangePipeDef = TabPanelArrangePipeDef;
+            })(arrange = tabpanel.arrange || (tabpanel.arrange = {}));
         })(tabpanel = Controls.tabpanel || (Controls.tabpanel = {}));
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
@@ -6478,6 +6586,97 @@ var Fayde;
                 measure.WrapPanelMeasurePipeDef = WrapPanelMeasurePipeDef;
             })(measure = wrappanel.measure || (wrappanel.measure = {}));
         })(wrappanel = Controls.wrappanel || (Controls.wrappanel = {}));
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var tabpanel;
+        (function (tabpanel) {
+            var measure;
+            (function (measure) {
+                var tapins;
+                (function (tapins) {
+                    function doHorizontal(input, state, output, tree, availableSize) {
+                        if (input.tabAlignment !== Controls.Dock.Top && input.tabAlignment !== Controls.Dock.Bottom)
+                            return true;
+                        var ds = output.desiredSize;
+                        ds.width = ds.height = 0;
+                        output.numRows = 1;
+                        output.numHeaders = 0;
+                        output.rowHeight = 0.0;
+                        var count = 0;
+                        var totalWidth = 0.0;
+                        var num3 = 0.0;
+                        for (var walker = tree.walk(); walker.step();) {
+                            var child = walker.current;
+                            if (child.assets.visibility === minerva.Visibility.Collapsed)
+                                break;
+                            output.numHeaders++;
+                            child.measure(state.availableSize);
+                            var sizeWithoutMargin = tabpanel.helpers.getDesiredSizeWithoutMargin(child);
+                            if (output.rowHeight < sizeWithoutMargin.height)
+                                output.rowHeight = sizeWithoutMargin.height;
+                            if (totalWidth + sizeWithoutMargin.width > availableSize.width && count > 0) {
+                                if (num3 < totalWidth)
+                                    num3 = totalWidth;
+                                totalWidth = sizeWithoutMargin.width;
+                                count = 1;
+                                output.numRows++;
+                            }
+                            else {
+                                totalWidth += sizeWithoutMargin.width;
+                                count++;
+                            }
+                        }
+                        if (num3 < totalWidth)
+                            num3 = totalWidth;
+                        ds.height = output.rowHeight * output.numRows;
+                        ds.width = !isFinite(ds.width) || isNaN(ds.width) || num3 < availableSize.width ? num3 : availableSize.width;
+                        return true;
+                    }
+                    tapins.doHorizontal = doHorizontal;
+                })(tapins = measure.tapins || (measure.tapins = {}));
+            })(measure = tabpanel.measure || (tabpanel.measure = {}));
+        })(tabpanel = Controls.tabpanel || (Controls.tabpanel = {}));
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var tabpanel;
+        (function (tabpanel) {
+            var measure;
+            (function (measure) {
+                var tapins;
+                (function (tapins) {
+                    function doVertical(input, state, output, tree, availableSize) {
+                        if (input.tabAlignment !== Controls.Dock.Left && input.tabAlignment !== Controls.Dock.Right)
+                            return true;
+                        var ds = output.desiredSize;
+                        ds.width = ds.height = 0;
+                        output.numRows = 1;
+                        output.numHeaders = 0;
+                        output.rowHeight = 0.0;
+                        for (var walker = tree.walk(); walker.step();) {
+                            var child = walker.current;
+                            if (child.assets.visibility === minerva.Visibility.Collapsed)
+                                break;
+                            output.numHeaders++;
+                            child.measure(state.availableSize);
+                            var sizeWithoutMargin = tabpanel.helpers.getDesiredSizeWithoutMargin(child);
+                            if (ds.width < sizeWithoutMargin.width)
+                                ds.width = sizeWithoutMargin.width;
+                            ds.height += sizeWithoutMargin.height;
+                        }
+                        return true;
+                    }
+                    tapins.doVertical = doVertical;
+                })(tapins = measure.tapins || (measure.tapins = {}));
+            })(measure = tabpanel.measure || (tabpanel.measure = {}));
+        })(tabpanel = Controls.tabpanel || (Controls.tabpanel = {}));
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
 var Fayde;
@@ -6574,97 +6773,6 @@ var Fayde;
                     tapins.doVertical = doVertical;
                 })(tapins = arrange.tapins || (arrange.tapins = {}));
             })(arrange = tabpanel.arrange || (tabpanel.arrange = {}));
-        })(tabpanel = Controls.tabpanel || (Controls.tabpanel = {}));
-    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
-})(Fayde || (Fayde = {}));
-var Fayde;
-(function (Fayde) {
-    var Controls;
-    (function (Controls) {
-        var tabpanel;
-        (function (tabpanel) {
-            var measure;
-            (function (measure) {
-                var tapins;
-                (function (tapins) {
-                    function doHorizontal(input, state, output, tree, availableSize) {
-                        if (input.tabAlignment !== Controls.Dock.Top && input.tabAlignment !== Controls.Dock.Bottom)
-                            return true;
-                        var ds = output.desiredSize;
-                        ds.width = ds.height = 0;
-                        output.numRows = 1;
-                        output.numHeaders = 0;
-                        output.rowHeight = 0.0;
-                        var count = 0;
-                        var totalWidth = 0.0;
-                        var num3 = 0.0;
-                        for (var walker = tree.walk(); walker.step();) {
-                            var child = walker.current;
-                            if (child.assets.visibility === minerva.Visibility.Collapsed)
-                                break;
-                            output.numHeaders++;
-                            child.measure(state.availableSize);
-                            var sizeWithoutMargin = tabpanel.helpers.getDesiredSizeWithoutMargin(child);
-                            if (output.rowHeight < sizeWithoutMargin.height)
-                                output.rowHeight = sizeWithoutMargin.height;
-                            if (totalWidth + sizeWithoutMargin.width > availableSize.width && count > 0) {
-                                if (num3 < totalWidth)
-                                    num3 = totalWidth;
-                                totalWidth = sizeWithoutMargin.width;
-                                count = 1;
-                                output.numRows++;
-                            }
-                            else {
-                                totalWidth += sizeWithoutMargin.width;
-                                count++;
-                            }
-                        }
-                        if (num3 < totalWidth)
-                            num3 = totalWidth;
-                        ds.height = output.rowHeight * output.numRows;
-                        ds.width = !isFinite(ds.width) || isNaN(ds.width) || num3 < availableSize.width ? num3 : availableSize.width;
-                        return true;
-                    }
-                    tapins.doHorizontal = doHorizontal;
-                })(tapins = measure.tapins || (measure.tapins = {}));
-            })(measure = tabpanel.measure || (tabpanel.measure = {}));
-        })(tabpanel = Controls.tabpanel || (Controls.tabpanel = {}));
-    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
-})(Fayde || (Fayde = {}));
-var Fayde;
-(function (Fayde) {
-    var Controls;
-    (function (Controls) {
-        var tabpanel;
-        (function (tabpanel) {
-            var measure;
-            (function (measure) {
-                var tapins;
-                (function (tapins) {
-                    function doVertical(input, state, output, tree, availableSize) {
-                        if (input.tabAlignment !== Controls.Dock.Left && input.tabAlignment !== Controls.Dock.Right)
-                            return true;
-                        var ds = output.desiredSize;
-                        ds.width = ds.height = 0;
-                        output.numRows = 1;
-                        output.numHeaders = 0;
-                        output.rowHeight = 0.0;
-                        for (var walker = tree.walk(); walker.step();) {
-                            var child = walker.current;
-                            if (child.assets.visibility === minerva.Visibility.Collapsed)
-                                break;
-                            output.numHeaders++;
-                            child.measure(state.availableSize);
-                            var sizeWithoutMargin = tabpanel.helpers.getDesiredSizeWithoutMargin(child);
-                            if (ds.width < sizeWithoutMargin.width)
-                                ds.width = sizeWithoutMargin.width;
-                            ds.height += sizeWithoutMargin.height;
-                        }
-                        return true;
-                    }
-                    tapins.doVertical = doVertical;
-                })(tapins = measure.tapins || (measure.tapins = {}));
-            })(measure = tabpanel.measure || (tabpanel.measure = {}));
         })(tabpanel = Controls.tabpanel || (Controls.tabpanel = {}));
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));

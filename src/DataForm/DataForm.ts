@@ -62,7 +62,8 @@ module Fayde.Controls {
 
         OnItemsSourceChanged(e: IDependencyPropertyChangedEventArgs) {
             super.OnItemsSourceChanged(e);
-            this.DefaultCurrentItem();            
+            this.DefaultCurrentItem();         
+            
         }
 
         private m_labelSeparator: string = ":";
@@ -141,19 +142,92 @@ module Fayde.Controls {
 
         GoToStateMode (gotoFunc: (state: string) => boolean): boolean { 
 
+            if(this.Items.Count ==0){
+                return gotoFunc("Empty"); 
+            }
+
             if(this.Mode == DataFormMode.ReadOnly)
              {
                  return gotoFunc("ReadOnly"); 
              }
              
-             if(this.Mode == DataFormMode.Edit)
+             if(this.Mode == DataFormMode.Edit || this.Mode == DataFormMode.AddNew)
              {
                  return gotoFunc("Edit"); 
              }
 
-             return gotoFunc("Empty"); 
+             
              
          }  
+
+        private ProcessNavigationButtons(){
+            var count = this.Items.Count;
+            if(count == 0){
+                if(this.deleteButton)
+                    this.deleteButton.IsEnabled = false;
+                if(this.editButton)
+                    this.editButton.IsEnabled = false;
+                if(this.previousItemButton)
+                    this.previousItemButton.IsEnabled = false;
+                if(this.nextItemButton)
+                    this.nextItemButton.IsEnabled = false;
+                if(this.firstItemButton)
+                    this.firstItemButton.IsEnabled = false;
+                if(this.lastItemButton)
+                    this.lastItemButton.IsEnabled = false;
+            }else if(count == 1){
+                if(this.deleteButton)
+                    this.deleteButton.IsEnabled = true;
+                if(this.editButton)
+                    this.editButton.IsEnabled = true;
+                if(this.previousItemButton)
+                    this.previousItemButton.IsEnabled = false;
+                if(this.nextItemButton)
+                    this.nextItemButton.IsEnabled = false;
+                if(this.firstItemButton)
+                    this.firstItemButton.IsEnabled = false;
+                if(this.lastItemButton)
+                    this.lastItemButton.IsEnabled = false;
+            }else{
+                if(this.CurrentItem == this.Items.GetValueAt(0)){
+
+                    if(this.firstItemButton)
+                        this.firstItemButton.IsEnabled = false;
+                    if(this.previousItemButton)
+                        this.previousItemButton.IsEnabled = false;
+                    if(this.lastItemButton) 
+                        this.lastItemButton.IsEnabled = true;
+                    if(this.nextItemButton)
+                        this.nextItemButton.IsEnabled = true;
+
+                }else if(this.CurrentItem == this.Items.GetValueAt(count-1)){
+
+                    if(this.firstItemButton)
+                        this.firstItemButton.IsEnabled = true;
+                    if(this.previousItemButton)
+                        this.previousItemButton.IsEnabled = true;
+                    if(this.lastItemButton) 
+                        this.lastItemButton.IsEnabled = false;
+                    if(this.nextItemButton)
+                        this.nextItemButton.IsEnabled = false;
+
+                }else{
+
+                    if(this.firstItemButton)
+                        this.firstItemButton.IsEnabled = true;
+                    if(this.previousItemButton)
+                        this.previousItemButton.IsEnabled = true;
+                    if(this.lastItemButton) 
+                        this.lastItemButton.IsEnabled = true;
+                    if(this.nextItemButton)
+                        this.nextItemButton.IsEnabled = true;
+
+                }
+
+
+            }
+
+        }
 
         private DefaultCurrentItem():boolean {
             if(this.ItemsSource){
@@ -179,6 +253,7 @@ module Fayde.Controls {
                 
 
             this.InvalidateForm();
+            this.ProcessNavigationButtons();
         }
 
         private InvalidateForm(): void {
@@ -354,20 +429,17 @@ module Fayde.Controls {
 
         private handleNewItemClick(sender: Primitives.ButtonBase, args){
             this._mode = DataFormMode.AddNew;
-            //var collection = <DataFormDataSource>this.ItemsSource;
-            //var newItem = this.ItemsSource.GetNew();
-            
+
             var collection = <DataFormDataSource<any>>this.ItemsSource;
             if(collection){
                 var newItem = collection.GetNew();
                 if(newItem){
-                    this.CurrentItem = newItem;
                     collection.Add(newItem);
+                    this.CurrentItem = newItem;
+                    this.ProcessNavigationButtons();   
                 }
                 
             }
-            
-            
             this.InvalidateForm();
             this.UpdateVisualState();
         }
@@ -381,8 +453,32 @@ module Fayde.Controls {
         }
 
         private handleDeleteItemClick(sender: Primitives.ButtonBase, args){
-            
+            this.Mode = DataFormMode.ReadOnly;
+            if(this.CurrentItem){
+                var collection = <DataFormDataSource<any>>this.ItemsSource;
+                if(collection){
+                    collection.Remove(this.CurrentItem);
+                    if(this.Items.Count > 0){
+                        var nextIndex = 0;
+                        if(this.SelectedIndex != 0){
+                            nextIndex = this.SelectedIndex + 1;
+                            if(nextIndex > this.Items.Count){
+                                nextIndex = this.Items.Count;
+                            }
+                        }
+                        
+                        this.CurrentItem = this.Items.GetValueAt(nextIndex);
+
+                    }else{
+                        this.UpdateVisualState();
+                        this.CurrentItem = null;
+                    }
+                }
+                
+                
+            }
         }
+
 
         private handleCommitClick(sender: Primitives.ButtonBase, args){
             this.TryCommit();
@@ -423,13 +519,28 @@ module Fayde.Controls {
         }
 
         public Commit():void {
-            
-
+            this.ProcessNavigationButtons();
         }
 
         public CancelCommit(): void {
-            if(this.backupItem)
+
+            if(this.Mode == DataFormMode.AddNew){
+                var collection = <DataFormDataSource<any>>this.ItemsSource;
+                if(collection){
+                    collection.Remove(this.CurrentItem);
+                    if(collection.Count>0 && collection.GetValueAt(0) != null){
+                        this.CurrentItem = collection.GetValueAt(0);
+                    }else{
+                        this.UpdateVisualState();
+                    }
+                    this.ProcessNavigationButtons();                    
+                }
+                
+            }else{
+                if(this.backupItem)
                 this.CopyObj(this.backupItem,this.CurrentItem);
+            }
+            
         }
 
         private GetProperties(obj: any): any[] {
@@ -490,7 +601,7 @@ module Fayde.Controls {
 
     }
 
-    export class DataFormDataSource<T> extends ObservableCollection<T>{
+    export class DataFormDataSource<T> extends ObservableCollection<T> {
 
         private tCreator: any;
 
@@ -500,14 +611,24 @@ module Fayde.Controls {
             this.tCreator = TCreator;
         }
 
-        public GetNew():T {
-            return <T>this.activator(this.tCreator);
+        public GetNew():any {
+            var item =  this.activator(this.tCreator);
+            var dataformObject = <IDataFormObject>item;
+            if(dataformObject)
+                return dataformObject.CreateItem();
+            return null;
         }
 
         private activator<T>(type: { new(): T ;} ): T {
             return new type();
         }
-    }                   
+
+    }                 
+
+    export interface IDataFormObject {
+        CreateItem():any;
+    }
+      
 
     
 }

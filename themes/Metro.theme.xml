@@ -2855,10 +2855,10 @@
                                 <VisualState x:Name="ReadOnly"/>
                                 <VisualState x:Name="Empty">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Duration="0" Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="IsHitTestVisible">
+                                        <ObjectAnimationUsingKeyFrames Duration="0" Storyboard.TargetName="PART_Grid" Storyboard.TargetProperty="IsHitTestVisible">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="False"/>
                                         </ObjectAnimationUsingKeyFrames>
-                                        <DoubleAnimation Duration="0" Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Opacity" To="0"/>
+                                        <DoubleAnimation Duration="0" Storyboard.TargetName="PART_Grid" Storyboard.TargetProperty="Opacity" To="0"/>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Edit">

@@ -5,11 +5,6 @@ class DataFormViewModel extends Fayde.MVVM.ViewModelBase {
     constructor(){
         super();
 
-        //this.Types = new Fayde.Collections.ObservableCollection<BaseItem>();
-        //this.Types.Add(new BaseItem(StudenType.Loco,"Loco"));
-        //this.Types.Add(new BaseItem(StudenType.Sane,"Sane"));
-        //this.Types.Add(new BaseItem(StudenType.Unknown,"Unknown"));
-
         this.Students = new Fayde.Controls.DataFormDataSource<Student>(Student);
         this.Students.Add(new Student("Angel",25,"John Doe",true));
         this.Students.Add(new Student("Adrian",24,"Something",false));
@@ -36,7 +31,7 @@ class BaseItem {
     Value: any;
 }
 
-class Student extends Fayde.MVVM.ObservableObject {
+class Student extends Fayde.MVVM.ObservableObject implements Fayde.Controls.IDataFormObject {
 
 
     private _name: string;
@@ -74,30 +69,28 @@ class Student extends Fayde.MVVM.ObservableObject {
         this._active = value;
         this.OnPropertyChanged("Active");
     }
-/*
-    private _type: StudenType;
-    get Type (): StudenType {
-        return this._type;
-    }
-    set Type (value: StudenType) {
-        this._type = value;
-        this.OnPropertyChanged("Type");
-    }
 
-    */
     constructor();
     constructor(name:string,age:number,description:string,active: boolean)
     constructor(name?:string,age?:number,description?:string,active?: boolean) {
         super();
         if(name)
-        this.Name = name;
+            this.Name = name;
         if(age)
-        this.Age = age;
+            this.Age = age;
         if(description)
-        this.Description = description;
-        if(active)
+            this.Description = description;
+
         this.Active = active;
-        //this.Type = StudenType.Unknown;
+    }
+
+    public CreateItem():Student{
+        var item = new Student();
+        item.Name = "";
+        item.Age = 0;
+        item.Description = "";
+        item.Active = false;
+        return item;
     }
 }
 
