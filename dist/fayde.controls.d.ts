@@ -732,29 +732,167 @@ declare module Fayde.Controls {
     }
 }
 declare module Fayde.Controls {
-    class DataForm extends Control {
+    interface IDataField {
+        PropertyName: string;
+        PropertyBinding: Fayde.Data.Binding;
+        PreferredWidth: number;
+        PreferredHeight: number;
+        Content: FrameworkElement;
+        GetEditControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+        GetReadOnlyControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+    }
+    class DataFormDataField implements Fayde.Controls.IDataField {
+        constructor();
+        constructor(propertyName: string, binding: Fayde.Data.Binding);
+        constructor(propertyName: string, binding: Fayde.Data.Binding, preferredWidth: number, preferredHeight: number);
+        PropertyName: string;
+        PropertyBinding: Fayde.Data.Binding;
+        PreferredWidth: number;
+        PreferredHeight: number;
+        Content: FrameworkElement;
+        GetEditControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+        GetReadOnlyControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+    }
+    class DataFormCheckBoxField implements Fayde.Controls.IDataField {
+        constructor();
+        constructor(propertyName: string, binding: Fayde.Data.Binding);
+        constructor(propertyName: string, binding: Fayde.Data.Binding, preferredWidth: number, preferredHeight: number);
+        PropertyName: string;
+        PropertyBinding: Fayde.Data.Binding;
+        PreferredWidth: number;
+        PreferredHeight: number;
+        Content: FrameworkElement;
+        GetEditControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+        GetReadOnlyControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+    }
+    class DataFormNumericField implements Fayde.Controls.IDataField {
+        constructor();
+        constructor(propertyName: string, binding: Fayde.Data.Binding);
+        constructor(propertyName: string, binding: Fayde.Data.Binding, preferredWidth: number, preferredHeight: number);
+        PropertyName: string;
+        PropertyBinding: Fayde.Data.Binding;
+        PreferredWidth: number;
+        PreferredHeight: number;
+        Content: FrameworkElement;
+        GetEditControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+        GetReadOnlyControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+    }
+    class DataFormComboBoxField extends DependencyObject implements Fayde.Controls.IDataField {
+        constructor();
+        constructor(propertyName: string, binding: Fayde.Data.Binding);
+        constructor(propertyName: string, binding: Fayde.Data.Binding, itemssource: nullstone.IEnumerable<any>);
+        constructor(propertyName: string, binding: Fayde.Data.Binding, itemssource: nullstone.IEnumerable<any>, preferredWidth: number, preferredHeight: number);
+        static ItemsSourceProperty: DependencyProperty;
+        static SelectedValuePathProperty: DependencyProperty;
+        static DisplayMemberPathProperty: DependencyProperty;
+        PropertyName: string;
+        PropertyBinding: Fayde.Data.Binding;
+        PreferredWidth: number;
+        PreferredHeight: number;
+        ItemsSource: nullstone.IEnumerable<any>;
+        SelectedValuePath: string;
+        DisplayMemberPath: string;
+        Content: FrameworkElement;
+        OnItemsSourceChanged(e: IDependencyPropertyChangedEventArgs): void;
+        OnSelectedValuePathChanged(e: IDependencyPropertyChangedEventArgs): void;
+        OnDisplayMemberPathChanged(e: IDependencyPropertyChangedEventArgs): void;
+        GetEditControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+        GetReadOnlyControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+    }
+}
+declare module Fayde.Controls {
+    enum DataFormMode {
+        AddNew = 0,
+        Edit = 1,
+        ReadOnly = 2,
+    }
+}
+declare module Fayde.Controls {
+    import IDataField = Fayde.Controls.IDataField;
+    import ObservableCollection = Fayde.Collections.ObservableCollection;
+    import DataFormMode = Fayde.Controls.DataFormMode;
+    class DataForm extends ItemsControl {
+        private partGrid;
+        private firstItemButton;
+        private previousItemButton;
+        private nextItemButton;
+        private lastItemButton;
+        private newButton;
+        private editButton;
+        private deleteButton;
+        private commitButton;
+        private cancelButton;
+        static HeaderProperty: DependencyProperty;
         static ErrorTemplateProperty: DependencyProperty;
         static CurrentItemProperty: DependencyProperty;
+        static DataFieldsProperty: DependencyProperty;
+        static HeaderVisibilityProperty: DependencyProperty;
+        static HeaderTemplateProperty: DependencyProperty;
+        static SelectedIndexProperty: DependencyProperty;
+        static AutoCommitProperty: DependencyProperty;
+        static AutoGenerateFieldsProperty: DependencyProperty;
         private properties;
         private bindings;
         private controls;
-        private partGrid;
+        private backupItem;
+        private manualCurrentItem;
         CurrentItem: any;
         ErrorTemplate: any;
+        DataFields: DataFieldsCollection;
+        HeaderVisibility: Visibility;
+        Header: ContentControl;
+        HeaderTemplate: DataTemplate;
+        SelectedIndex: number;
+        AutoCommit: boolean;
+        AutoGenerateFields: boolean;
         private CurrentItemValueChanged(args);
+        private OnDataFieldsChanged(e);
+        private OnHeaderTemplateChanged(e);
+        OnItemsSourceChanged(e: IDependencyPropertyChangedEventArgs): void;
         private m_labelSeparator;
         LabelSeparator: string;
+        private _mode;
+        Mode: DataFormMode;
         constructor();
         OnApplyTemplate(): void;
+        GoToStates(gotoFunc: (state: string) => boolean): void;
+        GoToStateMode(gotoFunc: (state: string) => boolean): boolean;
+        private DefaultCurrentItem();
         private CurrentItemChanged();
         private InvalidateForm();
         private DiscoverObject();
         private GetLabelTextBlock(name);
         private GetControlFromProperty(propertyName, binding);
-        private GenerateCheckBox(propertyName, binding);
-        private GenerateWaterMarkedTextBox(propertyName, binding);
-        private GenerateIntegerUpDow(propertyName, binding);
+        private QueryDataField(propertyName);
+        private handleFirstItemClick(sender, args);
+        private handleNextItemClick(sender, args);
+        private handlePreviousItemClick(sender, args);
+        private handleLastItemClick(sender, args);
+        private handleNewItemClick(sender, args);
+        private handleEditItemClick(sender, args);
+        private handleDeleteItemClick(sender, args);
+        private handleCommitClick(sender, args);
+        private handleCancelClick(sender, args);
+        private _OnSelectedIndexChanged(args);
+        private ReadOnlyMode();
+        private EditMode();
+        private TryCommit();
+        Commit(): void;
+        CancelCommit(): void;
         private GetProperties(obj);
+        private CloneObj(obj);
+        private CopyObj(src, dest);
+        private GenerateNewItem();
+    }
+    class DataFieldsCollection extends ObservableCollection<IDataField> {
+    }
+    class DataFormDataSource<T> extends ObservableCollection<T> {
+        private tCreator;
+        constructor(TCreator: {
+            new (): T;
+        });
+        GetNew(): T;
+        private activator<T>(type);
     }
 }
 declare module Fayde.Controls {
@@ -763,8 +901,6 @@ declare module Fayde.Controls {
         PreferredWidth: number;
         PreferredHeight: number;
     }
-}
-declare module Fayde.Controls {
 }
 declare module Fayde.Controls {
     class PropertyDisplayInfo {

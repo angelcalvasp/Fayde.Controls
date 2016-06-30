@@ -3563,12 +3563,221 @@ var Fayde;
 (function (Fayde) {
     var Controls;
     (function (Controls) {
+        var DataFormDataField = (function () {
+            function DataFormDataField(propertyName, binding, preferredWidth, preferredHeight) {
+                if (propertyName)
+                    this.PropertyName = propertyName;
+                if (binding)
+                    this.PropertyBinding = binding;
+                if (preferredWidth)
+                    this.PreferredWidth = preferredWidth;
+                if (preferredHeight)
+                    this.PreferredHeight = preferredHeight;
+            }
+            ;
+            DataFormDataField.prototype.GetEditControl = function (propertyName, binding) {
+                var txtBox = this.Content = new Controls.TextBox();
+                txtBox.Margin = new Thickness(0, 3, 18, 3);
+                txtBox.IsReadOnly = false;
+                txtBox.TextAlignment = Fayde.TextAlignment.Right;
+                if (this.PreferredWidth)
+                    txtBox.Width = this.PreferredWidth;
+                if (this.PreferredHeight)
+                    txtBox.Height = this.PreferredHeight;
+                txtBox.SetBinding(Controls.TextBox.TextProperty, binding);
+                return txtBox;
+            };
+            DataFormDataField.prototype.GetReadOnlyControl = function (propertyName, binding) {
+                var txtBox = this.Content = new Controls.TextBox();
+                txtBox.Margin = new Thickness(0, 3, 18, 3);
+                txtBox.IsReadOnly = true;
+                txtBox.TextAlignment = Fayde.TextAlignment.Right;
+                if (this.PreferredWidth)
+                    txtBox.Width = this.PreferredWidth;
+                if (this.PreferredHeight)
+                    txtBox.Height = this.PreferredHeight;
+                txtBox.SetBinding(Controls.TextBox.TextProperty, binding);
+                return txtBox;
+            };
+            return DataFormDataField;
+        }());
+        Controls.DataFormDataField = DataFormDataField;
+        var DataFormCheckBoxField = (function () {
+            function DataFormCheckBoxField(propertyName, binding, preferredWidth, preferredHeight) {
+                if (propertyName)
+                    this.PropertyName = propertyName;
+                if (binding)
+                    this.PropertyBinding = binding;
+                if (preferredWidth)
+                    this.PreferredWidth = preferredWidth;
+                if (preferredHeight)
+                    this.PreferredHeight = preferredHeight;
+            }
+            ;
+            DataFormCheckBoxField.prototype.GetEditControl = function (propertyName, binding) {
+                var checkBox = this.Content = new Controls.CheckBox();
+                checkBox.VerticalAlignment = Fayde.VerticalAlignment.Center;
+                checkBox.Margin = new Thickness(2, 4, 0, 4);
+                if (this.PreferredWidth)
+                    checkBox.Width = this.PreferredWidth;
+                if (this.PreferredHeight)
+                    checkBox.Height = this.PreferredHeight;
+                checkBox.IsEnabled = true;
+                checkBox.SetBinding(Controls.CheckBox.IsCheckedProperty, binding);
+                return checkBox;
+            };
+            DataFormCheckBoxField.prototype.GetReadOnlyControl = function (propertyName, binding) {
+                var checkBox = this.Content = new Controls.CheckBox();
+                checkBox.VerticalAlignment = Fayde.VerticalAlignment.Center;
+                checkBox.Margin = new Thickness(2, 4, 0, 4);
+                if (this.PreferredWidth)
+                    checkBox.Width = this.PreferredWidth;
+                if (this.PreferredHeight)
+                    checkBox.Height = this.PreferredHeight;
+                checkBox.IsEnabled = false;
+                checkBox.SetBinding(Controls.CheckBox.IsCheckedProperty, binding);
+                return checkBox;
+            };
+            return DataFormCheckBoxField;
+        }());
+        Controls.DataFormCheckBoxField = DataFormCheckBoxField;
+        var DataFormNumericField = (function () {
+            function DataFormNumericField(propertyName, binding, preferredWidth, preferredHeight) {
+                if (propertyName)
+                    this.PropertyName = propertyName;
+                if (binding)
+                    this.PropertyBinding = binding;
+                if (preferredWidth)
+                    this.PreferredWidth = preferredWidth;
+                if (preferredHeight)
+                    this.PreferredHeight = preferredHeight;
+            }
+            ;
+            DataFormNumericField.prototype.GetEditControl = function (propertyName, binding) {
+                var integerUpDown = this.Content = new Controls.Border();
+                integerUpDown.Opacity = 1.0;
+                integerUpDown.Margin = new Thickness(0, 3, 18, 3);
+                if (this.PreferredWidth)
+                    integerUpDown.Width = this.PreferredWidth;
+                if (this.PreferredHeight)
+                    integerUpDown.Height = this.PreferredHeight;
+                var n = new Controls.NumericUpDown();
+                integerUpDown.Child = n;
+                n.IsEnabled = true;
+                n.Maximum = Number.MAX_VALUE;
+                n.Minimum = Number.MIN_VALUE;
+                n.SetBinding(Controls.NumericUpDown.ValueProperty, binding);
+                return integerUpDown;
+            };
+            DataFormNumericField.prototype.GetReadOnlyControl = function (propertyName, binding) {
+                var txtBox = this.Content = new Controls.TextBox();
+                txtBox.Margin = new Thickness(0, 3, 18, 3);
+                txtBox.IsReadOnly = true;
+                txtBox.TextAlignment = Fayde.TextAlignment.Right;
+                if (this.PreferredWidth)
+                    txtBox.Width = this.PreferredWidth;
+                if (this.PreferredHeight)
+                    txtBox.Height = this.PreferredHeight;
+                txtBox.SetBinding(Controls.TextBox.TextProperty, binding);
+                return txtBox;
+            };
+            return DataFormNumericField;
+        }());
+        Controls.DataFormNumericField = DataFormNumericField;
+        var DataFormComboBoxField = (function (_super) {
+            __extends(DataFormComboBoxField, _super);
+            function DataFormComboBoxField(propertyName, binding, itemssource, preferredWidth, preferredHeight) {
+                _super.call(this);
+                if (propertyName)
+                    this.PropertyName = propertyName;
+                if (binding)
+                    this.PropertyBinding = binding;
+                if (preferredWidth)
+                    this.PreferredWidth = preferredWidth;
+                if (preferredHeight)
+                    this.PreferredHeight = preferredHeight;
+            }
+            ;
+            DataFormComboBoxField.prototype.OnItemsSourceChanged = function (e) {
+                var combo = this.Content;
+                if (combo) {
+                    combo.ItemsSource = e.NewValue;
+                }
+            };
+            DataFormComboBoxField.prototype.OnSelectedValuePathChanged = function (e) {
+                var combo = this.Content;
+                if (combo) {
+                    combo.SelectedValuePath = e.NewValue;
+                }
+            };
+            DataFormComboBoxField.prototype.OnDisplayMemberPathChanged = function (e) {
+                var combo = this.Content;
+                if (combo) {
+                    combo.DisplayMemberPath = e.NewValue;
+                }
+            };
+            DataFormComboBoxField.prototype.GetEditControl = function (propertyName, binding) {
+                var comboBox = this.Content = new Controls.ComboBox();
+                comboBox.Margin = new Thickness(0, 2, 18, 2);
+                comboBox.ItemsSource = this.ItemsSource;
+                comboBox.IsEnabled = true;
+                comboBox.DisplayMemberPath = this.DisplayMemberPath;
+                comboBox.SelectedValuePath = this.SelectedValuePath;
+                if (this.PreferredWidth)
+                    comboBox.Width = this.PreferredWidth;
+                if (this.PreferredHeight)
+                    comboBox.Height = this.PreferredHeight;
+                comboBox.SetBinding(Controls.ComboBox.SelectedValueProperty, binding);
+                return comboBox;
+            };
+            DataFormComboBoxField.prototype.GetReadOnlyControl = function (propertyName, binding) {
+                var comboBox = this.Content = new Controls.ComboBox();
+                comboBox.Margin = new Thickness(0, 2, 18, 2);
+                comboBox.ItemsSource = this.ItemsSource;
+                comboBox.IsEnabled = false;
+                comboBox.DisplayMemberPath = this.DisplayMemberPath;
+                comboBox.SelectedValuePath = this.SelectedValuePath;
+                if (this.PreferredWidth)
+                    comboBox.Width = this.PreferredWidth;
+                if (this.PreferredHeight)
+                    comboBox.Height = this.PreferredHeight;
+                comboBox.SetBinding(Controls.ComboBox.SelectedValueProperty, binding);
+                return comboBox;
+            };
+            DataFormComboBoxField.ItemsSourceProperty = DependencyProperty.RegisterFull("ItemsSource", function () { return nullstone.IEnumerable_; }, DataFormComboBoxField, null, function (d, args) { return d.OnItemsSourceChanged(args); });
+            DataFormComboBoxField.SelectedValuePathProperty = DependencyProperty.Register("SelectedValuePath", function () { return String; }, DataFormComboBoxField, "", function (d, args) { return d.OnSelectedValuePathChanged(args); });
+            DataFormComboBoxField.DisplayMemberPathProperty = DependencyProperty.Register("DisplayMemberPath", function () { return String; }, DataFormComboBoxField, null, function (d, args) { return d.OnDisplayMemberPathChanged(args); });
+            return DataFormComboBoxField;
+        }(Fayde.DependencyObject));
+        Controls.DataFormComboBoxField = DataFormComboBoxField;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (DataFormMode) {
+            DataFormMode[DataFormMode["AddNew"] = 0] = "AddNew";
+            DataFormMode[DataFormMode["Edit"] = 1] = "Edit";
+            DataFormMode[DataFormMode["ReadOnly"] = 2] = "ReadOnly";
+        })(Controls.DataFormMode || (Controls.DataFormMode = {}));
+        var DataFormMode = Controls.DataFormMode;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
         var GridUnitType = minerva.controls.grid.GridUnitType;
+        var DataFormDataField = Fayde.Controls.DataFormDataField;
+        var ObservableCollection = Fayde.Collections.ObservableCollection;
+        var DataFormMode = Fayde.Controls.DataFormMode;
         var DataForm = (function (_super) {
             __extends(DataForm, _super);
             function DataForm() {
                 _super.call(this);
                 this.m_labelSeparator = ":";
+                this._mode = DataFormMode.ReadOnly;
                 this.DefaultStyleKey = DataForm;
                 this.properties = [];
                 this.bindings = [];
@@ -3577,23 +3786,105 @@ var Fayde;
             DataForm.prototype.CurrentItemValueChanged = function (args) {
                 this.CurrentItemChanged();
             };
+            DataForm.prototype.OnDataFieldsChanged = function (e) {
+                this.InvalidateForm();
+            };
+            DataForm.prototype.OnHeaderTemplateChanged = function (e) {
+            };
+            DataForm.prototype.OnItemsSourceChanged = function (e) {
+                _super.prototype.OnItemsSourceChanged.call(this, e);
+                this.DefaultCurrentItem();
+            };
             Object.defineProperty(DataForm.prototype, "LabelSeparator", {
                 get: function () { return this.m_labelSeparator; },
                 set: function (value) { this.m_labelSeparator = value; },
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(DataForm.prototype, "Mode", {
+                get: function () { return this._mode; },
+                enumerable: true,
+                configurable: true
+            });
             DataForm.prototype.OnApplyTemplate = function () {
                 _super.prototype.OnApplyTemplate.call(this);
                 this.partGrid = this.GetTemplateChild("PART_Grid", Controls.Grid);
-                this.InvalidateForm();
+                this.firstItemButton = this.GetTemplateChild("FirstItemButton", Controls.Button);
+                this.previousItemButton = this.GetTemplateChild("PreviousItemButton", Controls.Button);
+                this.nextItemButton = this.GetTemplateChild("NextItemButton", Controls.Button);
+                this.lastItemButton = this.GetTemplateChild("LastItemButton", Controls.Button);
+                this.newButton = this.GetTemplateChild("NewItemButton", Controls.Button);
+                this.editButton = this.GetTemplateChild("EditButton", Controls.Button);
+                this.deleteButton = this.GetTemplateChild("DeleteItemButton", Controls.Button);
+                this.commitButton = this.GetTemplateChild("CommitButton", Controls.Button);
+                this.cancelButton = this.GetTemplateChild("CancelButton", Controls.Button);
+                if (this.firstItemButton) {
+                    this.firstItemButton.Click.on(this.handleFirstItemClick, this);
+                }
+                if (this.nextItemButton) {
+                    this.nextItemButton.Click.on(this.handleNextItemClick, this);
+                }
+                if (this.previousItemButton) {
+                    this.previousItemButton.Click.on(this.handlePreviousItemClick, this);
+                }
+                if (this.lastItemButton) {
+                    this.lastItemButton.Click.on(this.handleLastItemClick, this);
+                }
+                if (this.newButton) {
+                    this.newButton.Click.on(this.handleNewItemClick, this);
+                }
+                if (this.editButton) {
+                    this.editButton.Click.on(this.handleEditItemClick, this);
+                }
+                if (this.deleteButton) {
+                    this.deleteButton.Click.on(this.handleDeleteItemClick, this);
+                }
+                if (this.commitButton) {
+                    this.commitButton.Click.on(this.handleCommitClick, this);
+                }
+                if (this.cancelButton) {
+                    this.cancelButton.Click.on(this.handleCancelClick, this);
+                }
+                if (!this.DefaultCurrentItem())
+                    this.InvalidateForm();
+            };
+            DataForm.prototype.GoToStates = function (gotoFunc) {
+                _super.prototype.GoToStates.call(this, gotoFunc);
+                this.GoToStateMode(gotoFunc);
+            };
+            DataForm.prototype.GoToStateMode = function (gotoFunc) {
+                if (this.Mode == DataFormMode.ReadOnly) {
+                    return gotoFunc("ReadOnly");
+                }
+                if (this.Mode == DataFormMode.Edit) {
+                    return gotoFunc("Edit");
+                }
+                return gotoFunc("Empty");
+            };
+            DataForm.prototype.DefaultCurrentItem = function () {
+                if (this.ItemsSource) {
+                    var array = toArray(this.ItemsSource);
+                    if (!this.CurrentItem && array.length > 0) {
+                        this.CurrentItem = array[0];
+                        return true;
+                    }
+                }
+                return false;
             };
             DataForm.prototype.CurrentItemChanged = function () {
+                if (this.manualCurrentItem) {
+                    return;
+                }
+                if (this.CurrentItem) {
+                    this.SelectedIndex = this.Items.IndexOf(this.CurrentItem);
+                }
                 this.InvalidateForm();
             };
             DataForm.prototype.InvalidateForm = function () {
                 var _this = this;
                 if (this.partGrid) {
+                    if (!this.AutoGenerateFields)
+                        return;
                     this.partGrid.Children.Clear();
                     this.DiscoverObject();
                     var grid1 = new Controls.Grid();
@@ -3657,56 +3948,193 @@ var Fayde;
             DataForm.prototype.GetControlFromProperty = function (propertyName, binding) {
                 var control = null;
                 var propertyValue = this.CurrentItem[propertyName];
-                if (typeof propertyValue == 'boolean') {
-                    control = this.GenerateCheckBox(propertyName, binding);
+                var queryDataField = this.QueryDataField(propertyName);
+                if (!queryDataField) {
+                    if (typeof propertyValue == 'boolean') {
+                        queryDataField = new Controls.DataFormCheckBoxField(propertyName, binding);
+                    }
+                    else if (typeof propertyValue == 'string') {
+                        queryDataField = new DataFormDataField(propertyName, binding);
+                    }
+                    else if (typeof propertyValue == 'number') {
+                        queryDataField = new Controls.DataFormNumericField(propertyName, binding);
+                    }
+                    else {
+                        queryDataField = new DataFormDataField(propertyName, binding);
+                    }
                 }
-                else if (typeof propertyValue == 'string') {
-                    control = this.GenerateWaterMarkedTextBox(propertyName, binding);
+                if (this._mode == DataFormMode.ReadOnly) {
+                    return queryDataField.GetReadOnlyControl(propertyName, binding);
                 }
-                else if (typeof propertyValue == 'number') {
-                    control = this.GenerateIntegerUpDow(propertyName, binding);
+                else {
+                    return queryDataField.GetEditControl(propertyName, binding);
                 }
-                return control;
             };
-            DataForm.prototype.GenerateCheckBox = function (propertyName, binding) {
-                var checkBox = new Controls.CheckBox();
-                checkBox.VerticalAlignment = Fayde.VerticalAlignment.Center;
-                checkBox.Margin = new Thickness(2, 4, 0, 4);
-                checkBox.IsEnabled = true;
-                return checkBox;
+            DataForm.prototype.QueryDataField = function (propertyName) {
+                if (!this.DataFields)
+                    return null;
+                var length = this.DataFields.Count;
+                for (var index = 0; index < length; index++) {
+                    var element = this.DataFields.GetValueAt(index);
+                    if (element.PropertyName === propertyName) {
+                        return element;
+                    }
+                }
             };
-            DataForm.prototype.GenerateWaterMarkedTextBox = function (propertyName, binding) {
-                var txtBox = new Controls.TextBox();
-                txtBox.Margin = new Thickness(0, 3, 18, 3);
-                txtBox.IsReadOnly = false;
-                txtBox.TextAlignment = Fayde.TextAlignment.Right;
-                return txtBox;
+            DataForm.prototype.handleFirstItemClick = function (sender, args) {
+                this.TryCommit();
+                if (this.Items.Count > 0) {
+                    this.CurrentItem = this.Items.GetValueAt(0);
+                }
             };
-            DataForm.prototype.GenerateIntegerUpDow = function (propertyName, binding) {
-                var integerUpDown = new Controls.Border();
-                integerUpDown.Opacity = 1.0;
-                integerUpDown.Margin = new Thickness(0, 3, 18, 3);
-                var n = new Controls.NumericUpDown();
-                integerUpDown.Child = n;
-                n.IsEnabled = true;
-                n.Maximum = Number.MAX_VALUE;
-                n.Minimum = Number.MIN_VALUE;
-                return integerUpDown;
+            DataForm.prototype.handleNextItemClick = function (sender, args) {
+                this.TryCommit();
+                var nextIndex = this.SelectedIndex + 1;
+                if (nextIndex < this.Items.Count) {
+                    this.CurrentItem = this.Items.GetValueAt(nextIndex);
+                }
+            };
+            DataForm.prototype.handlePreviousItemClick = function (sender, args) {
+                this.TryCommit();
+                var nextIndex = this.SelectedIndex - 1;
+                if (nextIndex > -1) {
+                    this.CurrentItem = this.Items.GetValueAt(nextIndex);
+                }
+            };
+            DataForm.prototype.handleLastItemClick = function (sender, args) {
+                this.TryCommit();
+                if (this.Items.Count > 0) {
+                    this.CurrentItem = this.Items.GetValueAt(this.Items.Count - 1);
+                }
+            };
+            DataForm.prototype.handleNewItemClick = function (sender, args) {
+                this._mode = DataFormMode.AddNew;
+                var collection = this.ItemsSource;
+                if (collection) {
+                    var newItem = collection.GetNew();
+                    if (newItem) {
+                        this.CurrentItem = newItem;
+                        collection.Add(newItem);
+                    }
+                }
+                this.InvalidateForm();
+                this.UpdateVisualState();
+            };
+            DataForm.prototype.handleEditItemClick = function (sender, args) {
+                var copy = this.CloneObj(this.CurrentItem);
+                this.backupItem = copy;
+                this.EditMode();
+            };
+            DataForm.prototype.handleDeleteItemClick = function (sender, args) {
+            };
+            DataForm.prototype.handleCommitClick = function (sender, args) {
+                this.TryCommit();
+                this.ReadOnlyMode();
+            };
+            DataForm.prototype.handleCancelClick = function (sender, args) {
+                this.CancelCommit();
+                this.ReadOnlyMode();
+            };
+            DataForm.prototype._OnSelectedIndexChanged = function (args) {
+            };
+            DataForm.prototype.ReadOnlyMode = function () {
+                this._mode = DataFormMode.ReadOnly;
+                this.InvalidateForm();
+                this.UpdateVisualState();
+            };
+            DataForm.prototype.EditMode = function () {
+                this._mode = DataFormMode.Edit;
+                this.InvalidateForm();
+                this.UpdateVisualState();
+            };
+            DataForm.prototype.TryCommit = function () {
+                if (this.CurrentItem && this.AutoCommit) {
+                    this.Commit();
+                }
+                else {
+                    this.CancelCommit();
+                }
+                this.ReadOnlyMode();
+            };
+            DataForm.prototype.Commit = function () {
+            };
+            DataForm.prototype.CancelCommit = function () {
+                if (this.backupItem)
+                    this.CopyObj(this.backupItem, this.CurrentItem);
             };
             DataForm.prototype.GetProperties = function (obj) {
                 var properties = [];
                 for (var prop in obj) {
-                    if (typeof obj[prop] != 'function') {
-                        properties.push(prop);
+                    if (prop !== "PropertyChanged" && prop[0] !== "_") {
+                        if (typeof obj[prop] != 'function') {
+                            properties.push(prop);
+                        }
                     }
                 }
                 return properties;
             };
+            DataForm.prototype.CloneObj = function (obj) {
+                return Fayde.Clone(obj);
+            };
+            DataForm.prototype.CopyObj = function (src, dest) {
+                for (var prop in src) {
+                    dest[prop] = src[prop];
+                }
+            };
+            DataForm.prototype.GenerateNewItem = function () {
+                var thing = this.ItemsSource;
+                return null;
+            };
+            DataForm.HeaderProperty = DependencyProperty.Register("Header", function () { return Controls.ContentControl; }, DataForm, NaN);
             DataForm.ErrorTemplateProperty = DependencyProperty.Register("ErrorTemplate", function () { return Object; }, DataForm, NaN);
-            DataForm.CurrentItemProperty = DependencyProperty.Register("CurrentItem", function () { return Object; }, DataForm, NaN, function (d, args) { return d.CurrentItemValueChanged(args); });
+            DataForm.CurrentItemProperty = DependencyProperty.Register("CurrentItem", function () { return Object; }, DataForm, null, function (d, args) { return d.CurrentItemValueChanged(args); });
+            DataForm.DataFieldsProperty = DependencyProperty.Register("DataFields", function () { return DataFieldsCollection; }, DataForm);
+            DataForm.HeaderVisibilityProperty = DependencyProperty.Register("HeaderVisibility", function () { return new Fayde.Enum(Fayde.Visibility); }, Fayde.UIElement, Fayde.Visibility.Visible);
+            DataForm.HeaderTemplateProperty = DependencyProperty.Register("HeaderTemplate", function () { return Fayde.DataTemplate; }, DataForm, undefined, function (d, args) { return d.OnHeaderTemplateChanged(args); });
+            DataForm.SelectedIndexProperty = DependencyProperty.Register("SelectedIndex", function () { return Number; }, DataForm, -1, function (d, args) { return d._OnSelectedIndexChanged(args); });
+            DataForm.AutoCommitProperty = DependencyProperty.Register("AutoCommit", function () { return Boolean; }, DataForm);
+            DataForm.AutoGenerateFieldsProperty = DependencyProperty.Register("AutoGenerateFields", function () { return Boolean; }, DataForm);
             return DataForm;
-        }(Controls.Control));
+        }(Controls.ItemsControl));
         Controls.DataForm = DataForm;
+        function toArray(value) {
+            if (value instanceof Array)
+                return value;
+            var enu = nullstone.IEnumerable_.as(value);
+            if (enu) {
+                var arr = [];
+                for (var en = enu.getEnumerator(); en.moveNext();) {
+                    arr.push(en.current);
+                }
+                return arr;
+            }
+            return null;
+        }
+        Fayde.Controls.TemplateVisualStates(DataForm, { GroupName: "ModeStates", Name: "ReadOnly" }, { GroupName: "ModeStates", Name: "Empty" }, { GroupName: "ModeStates", Name: "Edit" });
+        var DataFieldsCollection = (function (_super) {
+            __extends(DataFieldsCollection, _super);
+            function DataFieldsCollection() {
+                _super.apply(this, arguments);
+            }
+            return DataFieldsCollection;
+        }(ObservableCollection));
+        Controls.DataFieldsCollection = DataFieldsCollection;
+        var DataFormDataSource = (function (_super) {
+            __extends(DataFormDataSource, _super);
+            function DataFormDataSource(TCreator) {
+                _super.call(this);
+                var temp = this.activator(TCreator);
+                this.tCreator = TCreator;
+            }
+            DataFormDataSource.prototype.GetNew = function () {
+                return this.activator(this.tCreator);
+            };
+            DataFormDataSource.prototype.activator = function (type) {
+                return new type();
+            };
+            return DataFormDataSource;
+        }(ObservableCollection));
+        Controls.DataFormDataSource = DataFormDataSource;
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
 var Fayde;

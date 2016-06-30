@@ -13,8 +13,11 @@
         </Grid.RowDefinitions>
         <TextBlock Text="Data time!" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center"/> 
         
-        <controls:DataForm CurrentItem="{Binding CurrentItem}" Grid.Row="1" Width="200" Height="500">
-           
+        <controls:DataForm Header="Students" 
+            CurrentItem="{Binding CurrentItem}" 
+            ItemsSource="{Binding Students}"
+            Foreground="Black"
+            Grid.Row="1" Width="400">
         </controls:DataForm>
     </Grid>
 </Page>
