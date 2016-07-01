@@ -4,7 +4,7 @@
       xmlns:viewmodels="ViewModels"
       Title="Dataform Demo">
     <Page.DataContext>
-        <viewmodels:DataFormViewModel />
+        <viewmodels:DataControlsViewModel />
     </Page.DataContext>
     <Grid x:Name="LayoutRoot">
         <Grid.RowDefinitions>

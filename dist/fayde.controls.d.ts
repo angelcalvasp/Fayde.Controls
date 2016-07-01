@@ -708,206 +708,20 @@ declare module Fayde.Controls.contextmenu {
     }
 }
 declare module Fayde.Controls {
-    class DataField {
-        Content: FrameworkElement;
-        Label: FrameworkElement;
+    interface IDataFormObject {
+        CreateItem(): any;
     }
 }
-declare module Fayde.Controls {
-    class Dictionary {
-        _keys: string[];
-        _values: any[];
-        constructor(init: {
-            key: string;
-            value: any;
-        }[]);
-        Add(key: string, value: any): void;
-        Remove(key: string): void;
-        Keys(): string[];
-        Values(): any[];
-        Clear(): void;
-        Count(): number;
-        ContainsKey(key: string): boolean;
-        ElementAt(index: number): void;
-    }
-}
-declare module Fayde.Controls {
-    interface IDataField {
-        PropertyName: string;
-        PropertyBinding: Fayde.Data.Binding;
-        PreferredWidth: number;
-        PreferredHeight: number;
-        Content: FrameworkElement;
-        GetEditControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
-        GetReadOnlyControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
-    }
-    class DataFormDataField implements Fayde.Controls.IDataField {
-        constructor();
-        constructor(propertyName: string, binding: Fayde.Data.Binding);
-        constructor(propertyName: string, binding: Fayde.Data.Binding, preferredWidth: number, preferredHeight: number);
-        PropertyName: string;
-        PropertyBinding: Fayde.Data.Binding;
-        PreferredWidth: number;
-        PreferredHeight: number;
-        Content: FrameworkElement;
-        GetEditControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
-        GetReadOnlyControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
-    }
-    class DataFormCheckBoxField implements Fayde.Controls.IDataField {
-        constructor();
-        constructor(propertyName: string, binding: Fayde.Data.Binding);
-        constructor(propertyName: string, binding: Fayde.Data.Binding, preferredWidth: number, preferredHeight: number);
-        PropertyName: string;
-        PropertyBinding: Fayde.Data.Binding;
-        PreferredWidth: number;
-        PreferredHeight: number;
-        Content: FrameworkElement;
-        GetEditControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
-        GetReadOnlyControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
-    }
-    class DataFormNumericField implements Fayde.Controls.IDataField {
-        constructor();
-        constructor(propertyName: string, binding: Fayde.Data.Binding);
-        constructor(propertyName: string, binding: Fayde.Data.Binding, preferredWidth: number, preferredHeight: number);
-        PropertyName: string;
-        PropertyBinding: Fayde.Data.Binding;
-        PreferredWidth: number;
-        PreferredHeight: number;
-        Content: FrameworkElement;
-        GetEditControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
-        GetReadOnlyControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
-    }
-    class DataFormComboBoxField extends DependencyObject implements Fayde.Controls.IDataField {
-        constructor();
-        constructor(propertyName: string, binding: Fayde.Data.Binding);
-        constructor(propertyName: string, binding: Fayde.Data.Binding, itemssource: nullstone.IEnumerable<any>);
-        constructor(propertyName: string, binding: Fayde.Data.Binding, itemssource: nullstone.IEnumerable<any>, preferredWidth: number, preferredHeight: number);
-        static ItemsSourceProperty: DependencyProperty;
-        static SelectedValuePathProperty: DependencyProperty;
-        static DisplayMemberPathProperty: DependencyProperty;
-        PropertyName: string;
-        PropertyBinding: Fayde.Data.Binding;
-        PreferredWidth: number;
-        PreferredHeight: number;
-        ItemsSource: nullstone.IEnumerable<any>;
-        SelectedValuePath: string;
-        DisplayMemberPath: string;
-        Content: FrameworkElement;
-        OnItemsSourceChanged(e: IDependencyPropertyChangedEventArgs): void;
-        OnSelectedValuePathChanged(e: IDependencyPropertyChangedEventArgs): void;
-        OnDisplayMemberPathChanged(e: IDependencyPropertyChangedEventArgs): void;
-        GetEditControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
-        GetReadOnlyControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
-    }
-}
-declare module Fayde.Controls {
-    enum DataFormMode {
-        AddNew = 0,
-        Edit = 1,
-        ReadOnly = 2,
-    }
-}
-declare module Fayde.Controls {
-    import IDataField = Fayde.Controls.IDataField;
+declare module Fayde.Controls.DataControls {
     import ObservableCollection = Fayde.Collections.ObservableCollection;
-    import DataFormMode = Fayde.Controls.DataFormMode;
-    class DataForm extends ItemsControl {
-        private partGrid;
-        private firstItemButton;
-        private previousItemButton;
-        private nextItemButton;
-        private lastItemButton;
-        private newButton;
-        private editButton;
-        private deleteButton;
-        private commitButton;
-        private cancelButton;
-        static HeaderProperty: DependencyProperty;
-        static ErrorTemplateProperty: DependencyProperty;
-        static CurrentItemProperty: DependencyProperty;
-        static DataFieldsProperty: DependencyProperty;
-        static HeaderVisibilityProperty: DependencyProperty;
-        static HeaderTemplateProperty: DependencyProperty;
-        static SelectedIndexProperty: DependencyProperty;
-        static AutoCommitProperty: DependencyProperty;
-        static AutoGenerateFieldsProperty: DependencyProperty;
-        private properties;
-        private bindings;
-        private controls;
-        private backupItem;
-        private manualCurrentItem;
-        CurrentItem: any;
-        ErrorTemplate: any;
-        DataFields: DataFieldsCollection;
-        HeaderVisibility: Visibility;
-        Header: ContentControl;
-        HeaderTemplate: DataTemplate;
-        SelectedIndex: number;
-        AutoCommit: boolean;
-        AutoGenerateFields: boolean;
-        private CurrentItemValueChanged(args);
-        private OnDataFieldsChanged(e);
-        private OnHeaderTemplateChanged(e);
-        OnItemsSourceChanged(e: IDependencyPropertyChangedEventArgs): void;
-        private m_labelSeparator;
-        LabelSeparator: string;
-        private _mode;
-        Mode: DataFormMode;
-        constructor();
-        OnApplyTemplate(): void;
-        GoToStates(gotoFunc: (state: string) => boolean): void;
-        GoToStateMode(gotoFunc: (state: string) => boolean): boolean;
-        private ProcessNavigationButtons();
-        private DefaultCurrentItem();
-        private CurrentItemChanged();
-        private InvalidateForm();
-        private DiscoverObject();
-        private GetLabelTextBlock(name);
-        private GetControlFromProperty(propertyName, binding);
-        private QueryDataField(propertyName);
-        private handleFirstItemClick(sender, args);
-        private handleNextItemClick(sender, args);
-        private handlePreviousItemClick(sender, args);
-        private handleLastItemClick(sender, args);
-        private handleNewItemClick(sender, args);
-        private handleEditItemClick(sender, args);
-        private handleDeleteItemClick(sender, args);
-        private handleCommitClick(sender, args);
-        private handleCancelClick(sender, args);
-        private _OnSelectedIndexChanged(args);
-        private ReadOnlyMode();
-        private EditMode();
-        private TryCommit();
-        Commit(): void;
-        CancelCommit(): void;
-        private GetProperties(obj);
-        private CloneObj(obj);
-        private CopyObj(src, dest);
-        private GenerateNewItem();
-    }
-    class DataFieldsCollection extends ObservableCollection<IDataField> {
-    }
-    class DataFormDataSource<T> extends ObservableCollection<T> {
+    import IDataFormObject = Fayde.Controls.DataControls.IDataFormObject;
+    class DataSourceCollection<T> extends ObservableCollection<IDataFormObject> {
         private tCreator;
         constructor(TCreator: {
             new (): T;
         });
         GetNew(): any;
         private activator<T>(type);
-    }
-    interface IDataFormObject {
-        CreateItem(): any;
-    }
-}
-declare module Fayde.Controls {
-    class DataFormInputTypes {
-        FormType: FormTypes;
-        PreferredWidth: number;
-        PreferredHeight: number;
-    }
-}
-declare module Fayde.Controls {
-    class PropertyDisplayInfo {
     }
 }
 declare module Fayde.Controls.Internal {
@@ -1256,34 +1070,6 @@ declare module Fayde.Controls.tabpanel {
         init(): void;
     }
 }
-declare module Fayde.Controls.viewbox.helpers {
-    function computeScaleFactor(availableSize: minerva.ISize, contentSize: minerva.ISize, stretch: Media.Stretch, stretchDirection: StretchDirection): Size;
-}
-declare module Fayde.Controls {
-    class Viewbox extends FrameworkElement {
-        CreateLayoutUpdater(): viewbox.ViewboxUpdater;
-        static ChildProperty: DependencyProperty;
-        static StretchProperty: DependencyProperty;
-        static StretchDirectionProperty: DependencyProperty;
-        Child: UIElement;
-        Stretch: Media.Stretch;
-        StretchDirection: StretchDirection;
-    }
-}
-declare module Fayde.Controls.viewbox {
-    interface IViewboxUpdaterAssets extends minerva.core.IUpdaterAssets, processdown.IInput {
-        stretch: Media.Stretch;
-        stretchDirection: StretchDirection;
-    }
-    class ViewboxUpdater extends minerva.anon.AnonymousUpdater {
-        tree: minerva.core.UpdaterTree;
-        assets: IViewboxUpdaterAssets;
-        init(): void;
-        measureOverride(availableSize: Size): Size;
-        arrangeOverride(finalSize: Size): Size;
-        private setViewXform(sx, sy);
-    }
-}
 declare module Fayde.Controls {
     function compareSummaryItems(item1: ValidationSummaryItem, item2: ValidationSummaryItem): number;
 }
@@ -1377,6 +1163,34 @@ declare module Fayde.Controls {
         Equals(other: any): boolean;
     }
 }
+declare module Fayde.Controls.viewbox.helpers {
+    function computeScaleFactor(availableSize: minerva.ISize, contentSize: minerva.ISize, stretch: Media.Stretch, stretchDirection: StretchDirection): Size;
+}
+declare module Fayde.Controls {
+    class Viewbox extends FrameworkElement {
+        CreateLayoutUpdater(): viewbox.ViewboxUpdater;
+        static ChildProperty: DependencyProperty;
+        static StretchProperty: DependencyProperty;
+        static StretchDirectionProperty: DependencyProperty;
+        Child: UIElement;
+        Stretch: Media.Stretch;
+        StretchDirection: StretchDirection;
+    }
+}
+declare module Fayde.Controls.viewbox {
+    interface IViewboxUpdaterAssets extends minerva.core.IUpdaterAssets, processdown.IInput {
+        stretch: Media.Stretch;
+        stretchDirection: StretchDirection;
+    }
+    class ViewboxUpdater extends minerva.anon.AnonymousUpdater {
+        tree: minerva.core.UpdaterTree;
+        assets: IViewboxUpdaterAssets;
+        init(): void;
+        measureOverride(availableSize: Size): Size;
+        arrangeOverride(finalSize: Size): Size;
+        private setViewXform(sx, sy);
+    }
+}
 declare module Fayde.Controls.wrappanel {
     module helpers {
         function coerceChildSize(child: minerva.core.Updater, itemWidth: number, itemHeight: number): void;
@@ -1401,6 +1215,189 @@ declare module Fayde.Controls.wrappanel {
         init(): void;
     }
 }
+declare module Fayde.Controls {
+    class DataField {
+        Content: FrameworkElement;
+        Label: FrameworkElement;
+    }
+}
+declare module Fayde.Controls {
+    interface IDataField {
+        PropertyName: string;
+        PropertyBinding: Fayde.Data.Binding;
+        PreferredWidth: number;
+        PreferredHeight: number;
+        Content: FrameworkElement;
+        GetEditControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+        GetReadOnlyControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+    }
+}
+declare module Fayde.Controls {
+    enum DataFormMode {
+        AddNew = 0,
+        Edit = 1,
+        ReadOnly = 2,
+    }
+}
+declare module Fayde.Controls {
+    import IDataField = Fayde.Controls.IDataField;
+    import ObservableCollection = Fayde.Collections.ObservableCollection;
+    import DataFormMode = Fayde.Controls.DataControls.DataFormMode;
+    class DataForm extends ItemsControl {
+        private partGrid;
+        private firstItemButton;
+        private previousItemButton;
+        private nextItemButton;
+        private lastItemButton;
+        private newButton;
+        private editButton;
+        private deleteButton;
+        private commitButton;
+        private cancelButton;
+        static HeaderProperty: DependencyProperty;
+        static ErrorTemplateProperty: DependencyProperty;
+        static CurrentItemProperty: DependencyProperty;
+        static DataFieldsProperty: DependencyProperty;
+        static HeaderVisibilityProperty: DependencyProperty;
+        static HeaderTemplateProperty: DependencyProperty;
+        static SelectedIndexProperty: DependencyProperty;
+        static AutoCommitProperty: DependencyProperty;
+        static AutoGenerateFieldsProperty: DependencyProperty;
+        private properties;
+        private bindings;
+        private controls;
+        private backupItem;
+        private manualCurrentItem;
+        CurrentItem: any;
+        ErrorTemplate: any;
+        DataFields: DataFieldsCollection;
+        HeaderVisibility: Visibility;
+        Header: ContentControl;
+        HeaderTemplate: DataTemplate;
+        SelectedIndex: number;
+        AutoCommit: boolean;
+        AutoGenerateFields: boolean;
+        private CurrentItemValueChanged(args);
+        private OnDataFieldsChanged(e);
+        private OnHeaderTemplateChanged(e);
+        OnItemsSourceChanged(e: IDependencyPropertyChangedEventArgs): void;
+        private m_labelSeparator;
+        LabelSeparator: string;
+        private _mode;
+        Mode: DataFormMode;
+        constructor();
+        OnApplyTemplate(): void;
+        GoToStates(gotoFunc: (state: string) => boolean): void;
+        GoToStateMode(gotoFunc: (state: string) => boolean): boolean;
+        private ProcessNavigationButtons();
+        private DefaultCurrentItem();
+        private CurrentItemChanged();
+        private InvalidateForm();
+        private DiscoverObject();
+        private GetLabelTextBlock(name);
+        private GetControlFromProperty(propertyName, binding);
+        private QueryDataField(propertyName);
+        private handleFirstItemClick(sender, args);
+        private handleNextItemClick(sender, args);
+        private handlePreviousItemClick(sender, args);
+        private handleLastItemClick(sender, args);
+        private handleNewItemClick(sender, args);
+        private handleEditItemClick(sender, args);
+        private handleDeleteItemClick(sender, args);
+        private handleCommitClick(sender, args);
+        private handleCancelClick(sender, args);
+        private _OnSelectedIndexChanged(args);
+        private ReadOnlyMode();
+        private EditMode();
+        private TryCommit();
+        Commit(): void;
+        CancelCommit(): void;
+        private GetProperties(obj);
+        private CloneObj(obj);
+        private CopyObj(src, dest);
+        private GenerateNewItem();
+    }
+    class DataFieldsCollection extends ObservableCollection<IDataField> {
+    }
+}
+declare module Fayde.Controls {
+    class DataFormInputTypes {
+        FormType: FormTypes;
+        PreferredWidth: number;
+        PreferredHeight: number;
+    }
+}
+declare module Fayde.Controls.DataControls {
+    class DataGrid {
+    }
+}
+declare module Fayde.Controls {
+    class DataGridColumn extends DependencyObject {
+        static HeaderProperty: DependencyProperty;
+        static HeaderStyleProperty: DependencyProperty;
+        static HeaderStringFormatProperty: DependencyProperty;
+        static HeaderTemplateProperty: DependencyProperty;
+        static HeaderTemplateSelectorProperty: DependencyProperty;
+        Header: ContentControl;
+        HeaderStyle: Style;
+        HeaderStringFormat: string;
+        HeaderTemplate: DataTemplate;
+        static CellStyleProperty: DependencyProperty;
+        static IsReadOnlyProperty: DependencyProperty;
+        CellStyle: Style;
+        IsReadOnly: boolean;
+        static WidthProperty: DependencyProperty;
+    }
+}
+declare module Fayde.Controls {
+    class DataGridLength {
+        EqualsTo(gl1: DataGridLength, gl2: DataGridLength): boolean;
+        Equals(obj: any): boolean;
+        IsAbsolute: DataGridLength;
+        IsAuto: DataGridLength;
+        IsStar: DataGridLength;
+        IsSizeToCells: DataGridLength;
+        IsSizeToHeader: DataGridLength;
+        Value: DataGridLength;
+        UnitType: DataGridLength;
+        Auto: DataGridLength;
+        SizeToCells: DataGridLength;
+        getSizeToHeaderAuto(): DataGridLength;
+        private _unitValue;
+        private _unitType;
+        private _desiredValue;
+        private _displayValue;
+        AutoValue: number;
+        private _auto;
+        private _sizeToCells;
+        private _sizeToHeader;
+    }
+}
+declare module Fayde.Controls {
+    enum DataGridLengthUnitType {
+        Auto = 0,
+        Pixel = 1,
+        SizeToCells = 2,
+        SizeToHeader = 3,
+        Star = 4,
+    }
+}
+declare module Fayde.Controls.tabpanel.arrange {
+    import panel = minerva.controls.panel;
+    interface IInput extends panel.arrange.IInput {
+        tabAlignment: Dock;
+        numRows: number;
+        numHeaders: number;
+        rowHeight: number;
+    }
+    interface IState extends panel.arrange.IState {
+    }
+    interface IOutput extends panel.arrange.IOutput {
+    }
+    class TabPanelArrangePipeDef extends minerva.controls.panel.arrange.PanelArrangePipeDef {
+        constructor();
+    }
+}
 declare module Fayde.Controls.tabpanel.measure {
     import panel = minerva.controls.panel;
     interface IInput extends panel.measure.IInput {
@@ -1421,22 +1418,6 @@ declare module Fayde.Controls.tabpanel.measure {
         createOutput(): IOutput;
         prepare(input: IInput, state: IState, output: IOutput): void;
         flush(input: IInput, state: IState, output: IOutput): void;
-    }
-}
-declare module Fayde.Controls.tabpanel.arrange {
-    import panel = minerva.controls.panel;
-    interface IInput extends panel.arrange.IInput {
-        tabAlignment: Dock;
-        numRows: number;
-        numHeaders: number;
-        rowHeight: number;
-    }
-    interface IState extends panel.arrange.IState {
-    }
-    interface IOutput extends panel.arrange.IOutput {
-    }
-    class TabPanelArrangePipeDef extends minerva.controls.panel.arrange.PanelArrangePipeDef {
-        constructor();
     }
 }
 declare module Fayde.Controls.viewbox.processdown {
@@ -1481,17 +1462,87 @@ declare module Fayde.Controls.wrappanel.measure {
         constructor();
     }
 }
-declare module Fayde.Controls.tabpanel.measure.tapins {
-    function doHorizontal(input: IInput, state: IState, output: IOutput, tree: minerva.core.IUpdaterTree, availableSize: minerva.Size): boolean;
+declare module Fayde.Controls {
+    import IDataField = Fayde.Controls.IDataField;
+    class DataFormCheckBoxField implements IDataField {
+        constructor();
+        constructor(propertyName: string, binding: Fayde.Data.Binding);
+        constructor(propertyName: string, binding: Fayde.Data.Binding, preferredWidth: number, preferredHeight: number);
+        PropertyName: string;
+        PropertyBinding: Fayde.Data.Binding;
+        PreferredWidth: number;
+        PreferredHeight: number;
+        Content: FrameworkElement;
+        GetEditControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+        GetReadOnlyControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+    }
 }
-declare module Fayde.Controls.tabpanel.measure.tapins {
-    function doVertical(input: IInput, state: IState, output: IOutput, tree: minerva.core.IUpdaterTree, availableSize: minerva.Size): boolean;
+declare module Fayde.Controls {
+    import IDataField = Fayde.Controls.IDataField;
+    class DataFormComboBoxField extends DependencyObject implements IDataField {
+        constructor();
+        constructor(propertyName: string, binding: Fayde.Data.Binding);
+        constructor(propertyName: string, binding: Fayde.Data.Binding, itemssource: nullstone.IEnumerable<any>);
+        constructor(propertyName: string, binding: Fayde.Data.Binding, itemssource: nullstone.IEnumerable<any>, preferredWidth: number, preferredHeight: number);
+        static ItemsSourceProperty: DependencyProperty;
+        static SelectedValuePathProperty: DependencyProperty;
+        static DisplayMemberPathProperty: DependencyProperty;
+        PropertyName: string;
+        PropertyBinding: Fayde.Data.Binding;
+        PreferredWidth: number;
+        PreferredHeight: number;
+        ItemsSource: nullstone.IEnumerable<any>;
+        SelectedValuePath: string;
+        DisplayMemberPath: string;
+        Content: FrameworkElement;
+        OnItemsSourceChanged(e: IDependencyPropertyChangedEventArgs): void;
+        OnSelectedValuePathChanged(e: IDependencyPropertyChangedEventArgs): void;
+        OnDisplayMemberPathChanged(e: IDependencyPropertyChangedEventArgs): void;
+        GetEditControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+        GetReadOnlyControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+    }
+}
+declare module Fayde.Controls {
+    import IDataField = Fayde.Controls.IDataField;
+    class DataFormDataField implements IDataField {
+        constructor();
+        constructor(propertyName: string, binding: Fayde.Data.Binding);
+        constructor(propertyName: string, binding: Fayde.Data.Binding, preferredWidth: number, preferredHeight: number);
+        PropertyName: string;
+        PropertyBinding: Fayde.Data.Binding;
+        PreferredWidth: number;
+        PreferredHeight: number;
+        Content: FrameworkElement;
+        GetEditControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+        GetReadOnlyControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+    }
+}
+declare module Fayde.Controls {
+    import IDataField = Fayde.Controls.IDataField;
+    class DataFormNumericField implements IDataField {
+        constructor();
+        constructor(propertyName: string, binding: Fayde.Data.Binding);
+        constructor(propertyName: string, binding: Fayde.Data.Binding, preferredWidth: number, preferredHeight: number);
+        PropertyName: string;
+        PropertyBinding: Fayde.Data.Binding;
+        PreferredWidth: number;
+        PreferredHeight: number;
+        Content: FrameworkElement;
+        GetEditControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+        GetReadOnlyControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+    }
 }
 declare module Fayde.Controls.tabpanel.arrange.tapins {
     function doHorizontal(input: IInput, state: IState, output: IOutput, tree: minerva.controls.panel.PanelUpdaterTree, finalRect: minerva.Rect): boolean;
 }
 declare module Fayde.Controls.tabpanel.arrange.tapins {
     function doVertical(input: IInput, state: IState, output: IOutput, tree: minerva.core.IUpdaterTree, finalRect: minerva.Rect): boolean;
+}
+declare module Fayde.Controls.tabpanel.measure.tapins {
+    function doHorizontal(input: IInput, state: IState, output: IOutput, tree: minerva.core.IUpdaterTree, availableSize: minerva.Size): boolean;
+}
+declare module Fayde.Controls.tabpanel.measure.tapins {
+    function doVertical(input: IInput, state: IState, output: IOutput, tree: minerva.core.IUpdaterTree, availableSize: minerva.Size): boolean;
 }
 declare module Fayde.Controls.wrappanel.arrange.tapins {
     import Rect = minerva.Rect;

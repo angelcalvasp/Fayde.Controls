@@ -1,11 +1,11 @@
 
-class DataFormViewModel extends Fayde.MVVM.ViewModelBase {
+class DataControlsViewModel extends Fayde.MVVM.ViewModelBase {
     CurrentItem: any;
 
     constructor(){
         super();
 
-        this.Students = new Fayde.Controls.DataFormDataSource<Student>(Student);
+        this.Students = new Fayde.Controls.DataSourceCollection<Student>(Student);
         this.Students.Add(new Student("Angel",25,"John Doe",true));
         this.Students.Add(new Student("Adrian",24,"Something",false));
         this.Students.Add(new Student("Louis",26,"Holy snap",true));
@@ -16,7 +16,7 @@ class DataFormViewModel extends Fayde.MVVM.ViewModelBase {
     }
 
     Types: Fayde.Collections.ObservableCollection<BaseItem>;
-    Students: Fayde.Controls.DataFormDataSource<Student>;
+    Students: Fayde.Controls.DataSourceCollection<Student>;
 
 }
 

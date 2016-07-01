@@ -1,13 +1,13 @@
-/// <reference path="Dictionary"/>
 /// <reference path="DataField"/>
-/// <reference path="DataFormDataFields"/>
+/// <reference path="DataFields/IDataField"/>
 /// <reference path="DataFormMode"/>
 module Fayde.Controls {
     import GridUnitType = minerva.controls.grid.GridUnitType;
     import IDataField = Fayde.Controls.IDataField;
     import DataFormDataField = Fayde.Controls.DataFormDataField;
     import ObservableCollection =  Fayde.Collections.ObservableCollection;
-    import DataFormMode = Fayde.Controls.DataFormMode;
+    import DataFormMode = Fayde.Controls.DataControls.DataFormMode;
+    import DataSourceCollection = Fayde.Controls.DataSourceCollection;
 
     export class DataForm extends ItemsControl  {
 
@@ -430,7 +430,7 @@ module Fayde.Controls {
         private handleNewItemClick(sender: Primitives.ButtonBase, args){
             this._mode = DataFormMode.AddNew;
 
-            var collection = <DataFormDataSource<any>>this.ItemsSource;
+            var collection = <DataSourceCollection<any>>this.ItemsSource;
             if(collection){
                 var newItem = collection.GetNew();
                 if(newItem){
@@ -455,7 +455,7 @@ module Fayde.Controls {
         private handleDeleteItemClick(sender: Primitives.ButtonBase, args){
             this.Mode = DataFormMode.ReadOnly;
             if(this.CurrentItem){
-                var collection = <DataFormDataSource<any>>this.ItemsSource;
+                var collection = <DataSourceCollection<any>>this.ItemsSource;
                 if(collection){
                     collection.Remove(this.CurrentItem);
                     if(this.Items.Count > 0){
@@ -525,7 +525,7 @@ module Fayde.Controls {
         public CancelCommit(): void {
 
             if(this.Mode == DataFormMode.AddNew){
-                var collection = <DataFormDataSource<any>>this.ItemsSource;
+                var collection = <DataSourceCollection<any>>this.ItemsSource;
                 if(collection){
                     collection.Remove(this.CurrentItem);
                     if(collection.Count>0 && collection.GetValueAt(0) != null){
@@ -600,35 +600,6 @@ module Fayde.Controls {
     export class DataFieldsCollection extends ObservableCollection<IDataField> {
 
     }
-
-    export class DataFormDataSource<T> extends ObservableCollection<T> {
-
-        private tCreator: any;
-
-        constructor(TCreator: { new (): T; }) {
-            super();
-            var temp = <T>this.activator(TCreator);
-            this.tCreator = TCreator;
-        }
-
-        public GetNew():any {
-            var item =  this.activator(this.tCreator);
-            var dataformObject = <IDataFormObject>item;
-            if(dataformObject)
-                return dataformObject.CreateItem();
-            return null;
-        }
-
-        private activator<T>(type: { new(): T ;} ): T {
-            return new type();
-        }
-
-    }                 
-
-    export interface IDataFormObject {
-        CreateItem():any;
-    }
-      
 
     
 }
