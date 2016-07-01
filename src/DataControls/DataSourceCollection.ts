@@ -1,5 +1,4 @@
 /// <reference path="IDataFormObject"/>
-module Fayde.Controls.DataControls {
 module Fayde.Controls {
 
     import ObservableCollection =  Fayde.Collections.ObservableCollection;
