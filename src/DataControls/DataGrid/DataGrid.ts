@@ -1,7 +1,7 @@
-module Fayde.Controls.DataControls {
+module Fayde.Controls {
 
     export class DataGrid {
-        
+
     }
 
 
