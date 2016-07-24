@@ -2,7 +2,7 @@
 module Fayde.Controls {
 
     import ObservableCollection =  Fayde.Collections.ObservableCollection;
-    import IDataFormObject = Fayde.Controls.DataControls.IDataFormObject;
+    import IDataFormObject = Fayde.Controls.IDataFormObject;
 
     export class DataSourceCollection<T> extends ObservableCollection<IDataFormObject> {
 

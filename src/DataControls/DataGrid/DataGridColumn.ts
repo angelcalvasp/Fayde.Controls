@@ -31,7 +31,7 @@ module Fayde.Controls {
 
         /* START WIDTH */
 
-        static WidthProperty = DependencyProperty.Register("Width", () => Object, DataForm, null, (d, args) => (<DataForm>d).CurrentItemValueChanged(args));
+        //static WidthProperty = DependencyProperty.Register("Width", () => Object, DataGridColumn, null, (d, args) => (<DataGridColumn>d).CurrentItemValueChanged(args));
 
         /* END WIDTH */
 

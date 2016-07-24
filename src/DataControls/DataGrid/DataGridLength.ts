@@ -1,4 +1,7 @@
 module Fayde.Controls {
+    /*
+    import DataGridLengthUnitType = Fayde.Controls.DataGridLengthUnitType;
+
     export class DataGridLength {
 
         public EqualsTo(gl1: DataGridLength,gl2: DataGridLength): boolean{
@@ -59,5 +62,5 @@ module Fayde.Controls {
 
 
     }
-
+*/
 }

@@ -3500,30 +3500,1379 @@ var Fayde;
 (function (Fayde) {
     var Controls;
     (function (Controls) {
-        var DataControls;
-        (function (DataControls) {
-            var ObservableCollection = Fayde.Collections.ObservableCollection;
-            var DataSourceCollection = (function (_super) {
-                __extends(DataSourceCollection, _super);
-                function DataSourceCollection(TCreator) {
-                    _super.call(this);
-                    var temp = this.activator(TCreator);
-                    this.tCreator = TCreator;
+        var _hasOwnProperty = Object.prototype.hasOwnProperty;
+        var has = function (obj, prop) {
+            return _hasOwnProperty.call(obj, prop);
+        };
+        function defaultCompare(a, b) {
+            if (a < b) {
+                return -1;
+            }
+            else if (a === b) {
+                return 0;
+            }
+            else {
+                return 1;
+            }
+        }
+        Controls.defaultCompare = defaultCompare;
+        function defaultEquals(a, b) {
+            return a === b;
+        }
+        Controls.defaultEquals = defaultEquals;
+        function defaultToString(item) {
+            if (item === null) {
+                return 'COLLECTION_NULL';
+            }
+            else if (Fayde.Controls.isUndefined(item)) {
+                return 'COLLECTION_UNDEFINED';
+            }
+            else if (Fayde.Controls.isString(item)) {
+                return '$s' + item;
+            }
+            else {
+                return '$o' + item.toString();
+            }
+        }
+        Controls.defaultToString = defaultToString;
+        function makeString(item, join) {
+            if (join === void 0) { join = ","; }
+            if (item === null) {
+                return 'COLLECTION_NULL';
+            }
+            else if (Fayde.Controls.isUndefined(item)) {
+                return 'COLLECTION_UNDEFINED';
+            }
+            else if (Fayde.Controls.isString(item)) {
+                return item.toString();
+            }
+            else {
+                var toret = "{";
+                var first = true;
+                for (var prop in item) {
+                    if (has(item, prop)) {
+                        if (first)
+                            first = false;
+                        else
+                            toret = toret + join;
+                        toret = toret + prop + ":" + item[prop];
+                    }
                 }
-                DataSourceCollection.prototype.GetNew = function () {
-                    var item = this.activator(this.tCreator);
-                    var dataformObject = item;
-                    if (dataformObject)
-                        return dataformObject.CreateItem();
+                return toret + "}";
+            }
+        }
+        Controls.makeString = makeString;
+        function isFunction(func) {
+            return (typeof func) === 'function';
+        }
+        Controls.isFunction = isFunction;
+        function isUndefined(obj) {
+            return (typeof obj) === 'undefined';
+        }
+        Controls.isUndefined = isUndefined;
+        function isString(obj) {
+            return Object.prototype.toString.call(obj) === '[object String]';
+        }
+        Controls.isString = isString;
+        function reverseCompareFunction(compareFunction) {
+            if (!Fayde.Controls.isFunction(compareFunction)) {
+                return function (a, b) {
+                    if (a < b) {
+                        return 1;
+                    }
+                    else if (a === b) {
+                        return 0;
+                    }
+                    else {
+                        return -1;
+                    }
+                };
+            }
+            else {
+                return function (d, v) {
+                    return compareFunction(d, v) * -1;
+                };
+            }
+        }
+        Controls.reverseCompareFunction = reverseCompareFunction;
+        function compareToEquals(compareFunction) {
+            return function (a, b) {
+                return compareFunction(a, b) === 0;
+            };
+        }
+        Controls.compareToEquals = compareToEquals;
+        var arrays;
+        (function (arrays) {
+            function indexOf(array, item, equalsFunction) {
+                var equals = equalsFunction || Fayde.Controls.defaultEquals;
+                var length = array.length;
+                for (var i = 0; i < length; i++) {
+                    if (equals(array[i], item)) {
+                        return i;
+                    }
+                }
+                return -1;
+            }
+            arrays.indexOf = indexOf;
+            function lastIndexOf(array, item, equalsFunction) {
+                var equals = equalsFunction || Fayde.Controls.defaultEquals;
+                var length = array.length;
+                for (var i = length - 1; i >= 0; i--) {
+                    if (equals(array[i], item)) {
+                        return i;
+                    }
+                }
+                return -1;
+            }
+            arrays.lastIndexOf = lastIndexOf;
+            function contains(array, item, equalsFunction) {
+                return arrays.indexOf(array, item, equalsFunction) >= 0;
+            }
+            arrays.contains = contains;
+            function remove(array, item, equalsFunction) {
+                var index = arrays.indexOf(array, item, equalsFunction);
+                if (index < 0) {
+                    return false;
+                }
+                array.splice(index, 1);
+                return true;
+            }
+            arrays.remove = remove;
+            function frequency(array, item, equalsFunction) {
+                var equals = equalsFunction || Fayde.Controls.defaultEquals;
+                var length = array.length;
+                var freq = 0;
+                for (var i = 0; i < length; i++) {
+                    if (equals(array[i], item)) {
+                        freq++;
+                    }
+                }
+                return freq;
+            }
+            arrays.frequency = frequency;
+            function equals(array1, array2, equalsFunction) {
+                var equals = equalsFunction || Fayde.Controls.defaultEquals;
+                if (array1.length !== array2.length) {
+                    return false;
+                }
+                var length = array1.length;
+                for (var i = 0; i < length; i++) {
+                    if (!equals(array1[i], array2[i])) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            arrays.equals = equals;
+            function copy(array) {
+                return array.concat();
+            }
+            arrays.copy = copy;
+            function swap(array, i, j) {
+                if (i < 0 || i >= array.length || j < 0 || j >= array.length) {
+                    return false;
+                }
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+                return true;
+            }
+            arrays.swap = swap;
+            function toString(array) {
+                return '[' + array.toString() + ']';
+            }
+            arrays.toString = toString;
+            function forEach(array, callback) {
+                var lenght = array.length;
+                for (var i = 0; i < lenght; i++) {
+                    if (callback(array[i]) === false) {
+                        return;
+                    }
+                }
+            }
+            arrays.forEach = forEach;
+        })(arrays = Controls.arrays || (Controls.arrays = {}));
+        var LinkedList = (function () {
+            function LinkedList() {
+                this.firstNode = null;
+                this.lastNode = null;
+                this.nElements = 0;
+            }
+            LinkedList.prototype.add = function (item, index) {
+                if (Fayde.Controls.isUndefined(index)) {
+                    index = this.nElements;
+                }
+                if (index < 0 || index > this.nElements || Fayde.Controls.isUndefined(item)) {
+                    return false;
+                }
+                var newNode = this.createNode(item);
+                if (this.nElements === 0) {
+                    this.firstNode = newNode;
+                    this.lastNode = newNode;
+                }
+                else if (index === this.nElements) {
+                    this.lastNode.next = newNode;
+                    this.lastNode = newNode;
+                }
+                else if (index === 0) {
+                    newNode.next = this.firstNode;
+                    this.firstNode = newNode;
+                }
+                else {
+                    var prev = this.nodeAtIndex(index - 1);
+                    newNode.next = prev.next;
+                    prev.next = newNode;
+                }
+                this.nElements++;
+                return true;
+            };
+            LinkedList.prototype.first = function () {
+                if (this.firstNode !== null) {
+                    return this.firstNode.element;
+                }
+                return undefined;
+            };
+            LinkedList.prototype.last = function () {
+                if (this.lastNode !== null) {
+                    return this.lastNode.element;
+                }
+                return undefined;
+            };
+            LinkedList.prototype.elementAtIndex = function (index) {
+                var node = this.nodeAtIndex(index);
+                if (node === null) {
+                    return undefined;
+                }
+                return node.element;
+            };
+            LinkedList.prototype.indexOf = function (item, equalsFunction) {
+                var equalsF = equalsFunction || Fayde.Controls.defaultEquals;
+                if (Fayde.Controls.isUndefined(item)) {
+                    return -1;
+                }
+                var currentNode = this.firstNode;
+                var index = 0;
+                while (currentNode !== null) {
+                    if (equalsF(currentNode.element, item)) {
+                        return index;
+                    }
+                    index++;
+                    currentNode = currentNode.next;
+                }
+                return -1;
+            };
+            LinkedList.prototype.contains = function (item, equalsFunction) {
+                return (this.indexOf(item, equalsFunction) >= 0);
+            };
+            LinkedList.prototype.remove = function (item, equalsFunction) {
+                var equalsF = equalsFunction || Fayde.Controls.defaultEquals;
+                if (this.nElements < 1 || Fayde.Controls.isUndefined(item)) {
+                    return false;
+                }
+                var previous = null;
+                var currentNode = this.firstNode;
+                while (currentNode !== null) {
+                    if (equalsF(currentNode.element, item)) {
+                        if (currentNode === this.firstNode) {
+                            this.firstNode = this.firstNode.next;
+                            if (currentNode === this.lastNode) {
+                                this.lastNode = null;
+                            }
+                        }
+                        else if (currentNode === this.lastNode) {
+                            this.lastNode = previous;
+                            previous.next = currentNode.next;
+                            currentNode.next = null;
+                        }
+                        else {
+                            previous.next = currentNode.next;
+                            currentNode.next = null;
+                        }
+                        this.nElements--;
+                        return true;
+                    }
+                    previous = currentNode;
+                    currentNode = currentNode.next;
+                }
+                return false;
+            };
+            LinkedList.prototype.clear = function () {
+                this.firstNode = null;
+                this.lastNode = null;
+                this.nElements = 0;
+            };
+            LinkedList.prototype.equals = function (other, equalsFunction) {
+                var eqF = equalsFunction || Fayde.Controls.defaultEquals;
+                if (!(other instanceof Fayde.Controls.LinkedList)) {
+                    return false;
+                }
+                if (this.size() !== other.size()) {
+                    return false;
+                }
+                return this.equalsAux(this.firstNode, other.firstNode, eqF);
+            };
+            LinkedList.prototype.equalsAux = function (n1, n2, eqF) {
+                while (n1 !== null) {
+                    if (!eqF(n1.element, n2.element)) {
+                        return false;
+                    }
+                    n1 = n1.next;
+                    n2 = n2.next;
+                }
+                return true;
+            };
+            LinkedList.prototype.removeElementAtIndex = function (index) {
+                if (index < 0 || index >= this.nElements) {
+                    return undefined;
+                }
+                var element;
+                if (this.nElements === 1) {
+                    element = this.firstNode.element;
+                    this.firstNode = null;
+                    this.lastNode = null;
+                }
+                else {
+                    var previous = this.nodeAtIndex(index - 1);
+                    if (previous === null) {
+                        element = this.firstNode.element;
+                        this.firstNode = this.firstNode.next;
+                    }
+                    else if (previous.next === this.lastNode) {
+                        element = this.lastNode.element;
+                        this.lastNode = previous;
+                    }
+                    if (previous !== null) {
+                        element = previous.next.element;
+                        previous.next = previous.next.next;
+                    }
+                }
+                this.nElements--;
+                return element;
+            };
+            LinkedList.prototype.forEach = function (callback) {
+                var currentNode = this.firstNode;
+                while (currentNode !== null) {
+                    if (callback(currentNode.element) === false) {
+                        break;
+                    }
+                    currentNode = currentNode.next;
+                }
+            };
+            LinkedList.prototype.reverse = function () {
+                var previous = null;
+                var current = this.firstNode;
+                var temp = null;
+                while (current !== null) {
+                    temp = current.next;
+                    current.next = previous;
+                    previous = current;
+                    current = temp;
+                }
+                temp = this.firstNode;
+                this.firstNode = this.lastNode;
+                this.lastNode = temp;
+            };
+            LinkedList.prototype.toArray = function () {
+                var array = [];
+                var currentNode = this.firstNode;
+                while (currentNode !== null) {
+                    array.push(currentNode.element);
+                    currentNode = currentNode.next;
+                }
+                return array;
+            };
+            LinkedList.prototype.size = function () {
+                return this.nElements;
+            };
+            LinkedList.prototype.isEmpty = function () {
+                return this.nElements <= 0;
+            };
+            LinkedList.prototype.toString = function () {
+                return Fayde.Controls.arrays.toString(this.toArray());
+            };
+            LinkedList.prototype.nodeAtIndex = function (index) {
+                if (index < 0 || index >= this.nElements) {
                     return null;
+                }
+                if (index === (this.nElements - 1)) {
+                    return this.lastNode;
+                }
+                var node = this.firstNode;
+                for (var i = 0; i < index; i++) {
+                    node = node.next;
+                }
+                return node;
+            };
+            LinkedList.prototype.createNode = function (item) {
+                return {
+                    element: item,
+                    next: null
                 };
-                DataSourceCollection.prototype.activator = function (type) {
-                    return new type();
+            };
+            return LinkedList;
+        }());
+        Controls.LinkedList = LinkedList;
+        var Dictionary = (function () {
+            function Dictionary(toStrFunction) {
+                this.table = {};
+                this.nElements = 0;
+                this.toStr = toStrFunction || Fayde.Controls.defaultToString;
+            }
+            Dictionary.prototype.getValue = function (key) {
+                var pair = this.table['$' + this.toStr(key)];
+                if (Fayde.Controls.isUndefined(pair)) {
+                    return undefined;
+                }
+                return pair.value;
+            };
+            Dictionary.prototype.setValue = function (key, value) {
+                if (Fayde.Controls.isUndefined(key) || Fayde.Controls.isUndefined(value)) {
+                    return undefined;
+                }
+                var ret;
+                var k = '$' + this.toStr(key);
+                var previousElement = this.table[k];
+                if (Fayde.Controls.isUndefined(previousElement)) {
+                    this.nElements++;
+                    ret = undefined;
+                }
+                else {
+                    ret = previousElement.value;
+                }
+                this.table[k] = {
+                    key: key,
+                    value: value
                 };
-                return DataSourceCollection;
-            }(ObservableCollection));
-            DataControls.DataSourceCollection = DataSourceCollection;
-        })(DataControls = Controls.DataControls || (Controls.DataControls = {}));
+                return ret;
+            };
+            Dictionary.prototype.remove = function (key) {
+                var k = '$' + this.toStr(key);
+                var previousElement = this.table[k];
+                if (!Fayde.Controls.isUndefined(previousElement)) {
+                    delete this.table[k];
+                    this.nElements--;
+                    return previousElement.value;
+                }
+                return undefined;
+            };
+            Dictionary.prototype.keys = function () {
+                var array = [];
+                for (var name in this.table) {
+                    if (has(this.table, name)) {
+                        var pair = this.table[name];
+                        array.push(pair.key);
+                    }
+                }
+                return array;
+            };
+            Dictionary.prototype.values = function () {
+                var array = [];
+                for (var name in this.table) {
+                    if (has(this.table, name)) {
+                        var pair = this.table[name];
+                        array.push(pair.value);
+                    }
+                }
+                return array;
+            };
+            Dictionary.prototype.forEach = function (callback) {
+                for (var name in this.table) {
+                    if (has(this.table, name)) {
+                        var pair = this.table[name];
+                        var ret = callback(pair.key, pair.value);
+                        if (ret === false) {
+                            return;
+                        }
+                    }
+                }
+            };
+            Dictionary.prototype.containsKey = function (key) {
+                return !Fayde.Controls.isUndefined(this.getValue(key));
+            };
+            Dictionary.prototype.clear = function () {
+                this.table = {};
+                this.nElements = 0;
+            };
+            Dictionary.prototype.size = function () {
+                return this.nElements;
+            };
+            Dictionary.prototype.isEmpty = function () {
+                return this.nElements <= 0;
+            };
+            Dictionary.prototype.toString = function () {
+                var toret = "{";
+                this.forEach(function (k, v) {
+                    toret = toret + "\n\t" + k.toString() + " : " + v.toString();
+                });
+                return toret + "\n}";
+            };
+            return Dictionary;
+        }());
+        Controls.Dictionary = Dictionary;
+        var LinkedDictionaryPair = (function () {
+            function LinkedDictionaryPair(key, value) {
+                this.key = key;
+                this.value = value;
+            }
+            LinkedDictionaryPair.prototype.unlink = function () {
+                this.prev.next = this.next;
+                this.next.prev = this.prev;
+            };
+            return LinkedDictionaryPair;
+        }());
+        var LinkedDictionary = (function (_super) {
+            __extends(LinkedDictionary, _super);
+            function LinkedDictionary(toStrFunction) {
+                _super.call(this, toStrFunction);
+                this.head = new LinkedDictionaryPair(null, null);
+                this.tail = new LinkedDictionaryPair(null, null);
+                this.head.next = this.tail;
+                this.tail.prev = this.head;
+            }
+            LinkedDictionary.prototype.appendToTail = function (entry) {
+                var lastNode = this.tail.prev;
+                lastNode.next = entry;
+                entry.prev = lastNode;
+                entry.next = this.tail;
+                this.tail.prev = entry;
+            };
+            LinkedDictionary.prototype.getLinkedDictionaryPair = function (key) {
+                if (Fayde.Controls.isUndefined(key)) {
+                    return undefined;
+                }
+                var k = '$' + this.toStr(key);
+                var pair = (this.table[k]);
+                return pair;
+            };
+            LinkedDictionary.prototype.getValue = function (key) {
+                var pair = this.getLinkedDictionaryPair(key);
+                if (!Fayde.Controls.isUndefined(pair)) {
+                    return pair.value;
+                }
+                return undefined;
+            };
+            LinkedDictionary.prototype.remove = function (key) {
+                var pair = this.getLinkedDictionaryPair(key);
+                if (!Fayde.Controls.isUndefined(pair)) {
+                    _super.prototype.remove.call(this, key);
+                    pair.unlink();
+                    return pair.value;
+                }
+                return undefined;
+            };
+            LinkedDictionary.prototype.clear = function () {
+                _super.prototype.clear.call(this);
+                this.head.next = this.tail;
+                this.tail.prev = this.head;
+            };
+            LinkedDictionary.prototype.replace = function (oldPair, newPair) {
+                var k = '$' + this.toStr(newPair.key);
+                newPair.next = oldPair.next;
+                newPair.prev = oldPair.prev;
+                this.remove(oldPair.key);
+                newPair.prev.next = newPair;
+                newPair.next.prev = newPair;
+                this.table[k] = newPair;
+                ++this.nElements;
+            };
+            LinkedDictionary.prototype.setValue = function (key, value) {
+                if (Fayde.Controls.isUndefined(key) || Fayde.Controls.isUndefined(value)) {
+                    return undefined;
+                }
+                var existingPair = this.getLinkedDictionaryPair(key);
+                var newPair = new LinkedDictionaryPair(key, value);
+                var k = '$' + this.toStr(key);
+                if (!Fayde.Controls.isUndefined(existingPair)) {
+                    this.replace(existingPair, newPair);
+                    return existingPair.value;
+                }
+                else {
+                    this.appendToTail(newPair);
+                    this.table[k] = newPair;
+                    ++this.nElements;
+                    return undefined;
+                }
+            };
+            LinkedDictionary.prototype.keys = function () {
+                var array = [];
+                this.forEach(function (key, value) {
+                    array.push(key);
+                });
+                return array;
+            };
+            LinkedDictionary.prototype.values = function () {
+                var array = [];
+                this.forEach(function (key, value) {
+                    array.push(value);
+                });
+                return array;
+            };
+            LinkedDictionary.prototype.forEach = function (callback) {
+                var crawlNode = this.head.next;
+                while (crawlNode.next != null) {
+                    var ret = callback(crawlNode.key, crawlNode.value);
+                    if (ret === false) {
+                        return;
+                    }
+                    crawlNode = crawlNode.next;
+                }
+            };
+            return LinkedDictionary;
+        }(Dictionary));
+        Controls.LinkedDictionary = LinkedDictionary;
+        var MultiDictionary = (function () {
+            function MultiDictionary(toStrFunction, valuesEqualsFunction, allowDuplicateValues) {
+                if (allowDuplicateValues === void 0) { allowDuplicateValues = false; }
+                this.dict = new Dictionary(toStrFunction);
+                this.equalsF = valuesEqualsFunction || Fayde.Controls.defaultEquals;
+                this.allowDuplicate = allowDuplicateValues;
+            }
+            MultiDictionary.prototype.getValue = function (key) {
+                var values = this.dict.getValue(key);
+                if (Fayde.Controls.isUndefined(values)) {
+                    return [];
+                }
+                return Fayde.Controls.arrays.copy(values);
+            };
+            MultiDictionary.prototype.setValue = function (key, value) {
+                if (Fayde.Controls.isUndefined(key) || Fayde.Controls.isUndefined(value)) {
+                    return false;
+                }
+                if (!this.containsKey(key)) {
+                    this.dict.setValue(key, [value]);
+                    return true;
+                }
+                var array = this.dict.getValue(key);
+                if (!this.allowDuplicate) {
+                    if (Fayde.Controls.arrays.contains(array, value, this.equalsF)) {
+                        return false;
+                    }
+                }
+                array.push(value);
+                return true;
+            };
+            MultiDictionary.prototype.remove = function (key, value) {
+                if (Fayde.Controls.isUndefined(value)) {
+                    var v = this.dict.remove(key);
+                    return !Fayde.Controls.isUndefined(v);
+                }
+                var array = this.dict.getValue(key);
+                if (Fayde.Controls.arrays.remove(array, value, this.equalsF)) {
+                    if (array.length === 0) {
+                        this.dict.remove(key);
+                    }
+                    return true;
+                }
+                return false;
+            };
+            MultiDictionary.prototype.keys = function () {
+                return this.dict.keys();
+            };
+            MultiDictionary.prototype.values = function () {
+                var values = this.dict.values();
+                var array = [];
+                for (var i = 0; i < values.length; i++) {
+                    var v = values[i];
+                    for (var j = 0; j < v.length; j++) {
+                        array.push(v[j]);
+                    }
+                }
+                return array;
+            };
+            MultiDictionary.prototype.containsKey = function (key) {
+                return this.dict.containsKey(key);
+            };
+            MultiDictionary.prototype.clear = function () {
+                this.dict.clear();
+            };
+            MultiDictionary.prototype.size = function () {
+                return this.dict.size();
+            };
+            MultiDictionary.prototype.isEmpty = function () {
+                return this.dict.isEmpty();
+            };
+            return MultiDictionary;
+        }());
+        Controls.MultiDictionary = MultiDictionary;
+        var Heap = (function () {
+            function Heap(compareFunction) {
+                this.data = [];
+                this.compare = compareFunction || Fayde.Controls.defaultCompare;
+            }
+            Heap.prototype.leftChildIndex = function (nodeIndex) {
+                return (2 * nodeIndex) + 1;
+            };
+            Heap.prototype.rightChildIndex = function (nodeIndex) {
+                return (2 * nodeIndex) + 2;
+            };
+            Heap.prototype.parentIndex = function (nodeIndex) {
+                return Math.floor((nodeIndex - 1) / 2);
+            };
+            Heap.prototype.minIndex = function (leftChild, rightChild) {
+                if (rightChild >= this.data.length) {
+                    if (leftChild >= this.data.length) {
+                        return -1;
+                    }
+                    else {
+                        return leftChild;
+                    }
+                }
+                else {
+                    if (this.compare(this.data[leftChild], this.data[rightChild]) <= 0) {
+                        return leftChild;
+                    }
+                    else {
+                        return rightChild;
+                    }
+                }
+            };
+            Heap.prototype.siftUp = function (index) {
+                var parent = this.parentIndex(index);
+                while (index > 0 && this.compare(this.data[parent], this.data[index]) > 0) {
+                    Fayde.Controls.arrays.swap(this.data, parent, index);
+                    index = parent;
+                    parent = this.parentIndex(index);
+                }
+            };
+            Heap.prototype.siftDown = function (nodeIndex) {
+                var min = this.minIndex(this.leftChildIndex(nodeIndex), this.rightChildIndex(nodeIndex));
+                while (min >= 0 && this.compare(this.data[nodeIndex], this.data[min]) > 0) {
+                    Fayde.Controls.arrays.swap(this.data, min, nodeIndex);
+                    nodeIndex = min;
+                    min = this.minIndex(this.leftChildIndex(nodeIndex), this.rightChildIndex(nodeIndex));
+                }
+            };
+            Heap.prototype.peek = function () {
+                if (this.data.length > 0) {
+                    return this.data[0];
+                }
+                else {
+                    return undefined;
+                }
+            };
+            Heap.prototype.add = function (element) {
+                if (Fayde.Controls.isUndefined(element)) {
+                    return undefined;
+                }
+                this.data.push(element);
+                this.siftUp(this.data.length - 1);
+                return true;
+            };
+            Heap.prototype.removeRoot = function () {
+                if (this.data.length > 0) {
+                    var obj = this.data[0];
+                    this.data[0] = this.data[this.data.length - 1];
+                    this.data.splice(this.data.length - 1, 1);
+                    if (this.data.length > 0) {
+                        this.siftDown(0);
+                    }
+                    return obj;
+                }
+                return undefined;
+            };
+            Heap.prototype.contains = function (element) {
+                var equF = Fayde.Controls.compareToEquals(this.compare);
+                return Fayde.Controls.arrays.contains(this.data, element, equF);
+            };
+            Heap.prototype.size = function () {
+                return this.data.length;
+            };
+            Heap.prototype.isEmpty = function () {
+                return this.data.length <= 0;
+            };
+            Heap.prototype.clear = function () {
+                this.data.length = 0;
+            };
+            Heap.prototype.forEach = function (callback) {
+                Fayde.Controls.arrays.forEach(this.data, callback);
+            };
+            return Heap;
+        }());
+        Controls.Heap = Heap;
+        var Stack = (function () {
+            function Stack() {
+                this.list = new LinkedList();
+            }
+            Stack.prototype.push = function (elem) {
+                return this.list.add(elem, 0);
+            };
+            Stack.prototype.add = function (elem) {
+                return this.list.add(elem, 0);
+            };
+            Stack.prototype.pop = function () {
+                return this.list.removeElementAtIndex(0);
+            };
+            Stack.prototype.peek = function () {
+                return this.list.first();
+            };
+            Stack.prototype.size = function () {
+                return this.list.size();
+            };
+            Stack.prototype.contains = function (elem, equalsFunction) {
+                return this.list.contains(elem, equalsFunction);
+            };
+            Stack.prototype.isEmpty = function () {
+                return this.list.isEmpty();
+            };
+            Stack.prototype.clear = function () {
+                this.list.clear();
+            };
+            Stack.prototype.forEach = function (callback) {
+                this.list.forEach(callback);
+            };
+            return Stack;
+        }());
+        Controls.Stack = Stack;
+        var Queue = (function () {
+            function Queue() {
+                this.list = new LinkedList();
+            }
+            Queue.prototype.enqueue = function (elem) {
+                return this.list.add(elem);
+            };
+            Queue.prototype.add = function (elem) {
+                return this.list.add(elem);
+            };
+            Queue.prototype.dequeue = function () {
+                if (this.list.size() !== 0) {
+                    var el = this.list.first();
+                    this.list.removeElementAtIndex(0);
+                    return el;
+                }
+                return undefined;
+            };
+            Queue.prototype.peek = function () {
+                if (this.list.size() !== 0) {
+                    return this.list.first();
+                }
+                return undefined;
+            };
+            Queue.prototype.size = function () {
+                return this.list.size();
+            };
+            Queue.prototype.contains = function (elem, equalsFunction) {
+                return this.list.contains(elem, equalsFunction);
+            };
+            Queue.prototype.isEmpty = function () {
+                return this.list.size() <= 0;
+            };
+            Queue.prototype.clear = function () {
+                this.list.clear();
+            };
+            Queue.prototype.forEach = function (callback) {
+                this.list.forEach(callback);
+            };
+            return Queue;
+        }());
+        Controls.Queue = Queue;
+        var PriorityQueue = (function () {
+            function PriorityQueue(compareFunction) {
+                this.heap = new Heap(Fayde.Controls.reverseCompareFunction(compareFunction));
+            }
+            PriorityQueue.prototype.enqueue = function (element) {
+                return this.heap.add(element);
+            };
+            PriorityQueue.prototype.add = function (element) {
+                return this.heap.add(element);
+            };
+            PriorityQueue.prototype.dequeue = function () {
+                if (this.heap.size() !== 0) {
+                    var el = this.heap.peek();
+                    this.heap.removeRoot();
+                    return el;
+                }
+                return undefined;
+            };
+            PriorityQueue.prototype.peek = function () {
+                return this.heap.peek();
+            };
+            PriorityQueue.prototype.contains = function (element) {
+                return this.heap.contains(element);
+            };
+            PriorityQueue.prototype.isEmpty = function () {
+                return this.heap.isEmpty();
+            };
+            PriorityQueue.prototype.size = function () {
+                return this.heap.size();
+            };
+            PriorityQueue.prototype.clear = function () {
+                this.heap.clear();
+            };
+            PriorityQueue.prototype.forEach = function (callback) {
+                this.heap.forEach(callback);
+            };
+            return PriorityQueue;
+        }());
+        Controls.PriorityQueue = PriorityQueue;
+        var Set = (function () {
+            function Set(toStringFunction) {
+                this.dictionary = new Dictionary(toStringFunction);
+            }
+            Set.prototype.contains = function (element) {
+                return this.dictionary.containsKey(element);
+            };
+            Set.prototype.add = function (element) {
+                if (this.contains(element) || Fayde.Controls.isUndefined(element)) {
+                    return false;
+                }
+                else {
+                    this.dictionary.setValue(element, element);
+                    return true;
+                }
+            };
+            Set.prototype.intersection = function (otherSet) {
+                var set = this;
+                this.forEach(function (element) {
+                    if (!otherSet.contains(element)) {
+                        set.remove(element);
+                    }
+                    return true;
+                });
+            };
+            Set.prototype.union = function (otherSet) {
+                var set = this;
+                otherSet.forEach(function (element) {
+                    set.add(element);
+                    return true;
+                });
+            };
+            Set.prototype.difference = function (otherSet) {
+                var set = this;
+                otherSet.forEach(function (element) {
+                    set.remove(element);
+                    return true;
+                });
+            };
+            Set.prototype.isSubsetOf = function (otherSet) {
+                if (this.size() > otherSet.size()) {
+                    return false;
+                }
+                var isSub = true;
+                this.forEach(function (element) {
+                    if (!otherSet.contains(element)) {
+                        isSub = false;
+                        return false;
+                    }
+                    return true;
+                });
+                return isSub;
+            };
+            Set.prototype.remove = function (element) {
+                if (!this.contains(element)) {
+                    return false;
+                }
+                else {
+                    this.dictionary.remove(element);
+                    return true;
+                }
+            };
+            Set.prototype.forEach = function (callback) {
+                this.dictionary.forEach(function (k, v) {
+                    return callback(v);
+                });
+            };
+            Set.prototype.toArray = function () {
+                return this.dictionary.values();
+            };
+            Set.prototype.isEmpty = function () {
+                return this.dictionary.isEmpty();
+            };
+            Set.prototype.size = function () {
+                return this.dictionary.size();
+            };
+            Set.prototype.clear = function () {
+                this.dictionary.clear();
+            };
+            Set.prototype.toString = function () {
+                return Fayde.Controls.arrays.toString(this.toArray());
+            };
+            return Set;
+        }());
+        Controls.Set = Set;
+        var Bag = (function () {
+            function Bag(toStrFunction) {
+                this.toStrF = toStrFunction || Fayde.Controls.defaultToString;
+                this.dictionary = new Dictionary(this.toStrF);
+                this.nElements = 0;
+            }
+            Bag.prototype.add = function (element, nCopies) {
+                if (nCopies === void 0) { nCopies = 1; }
+                if (Fayde.Controls.isUndefined(element) || nCopies <= 0) {
+                    return false;
+                }
+                if (!this.contains(element)) {
+                    var node = {
+                        value: element,
+                        copies: nCopies
+                    };
+                    this.dictionary.setValue(element, node);
+                }
+                else {
+                    this.dictionary.getValue(element).copies += nCopies;
+                }
+                this.nElements += nCopies;
+                return true;
+            };
+            Bag.prototype.count = function (element) {
+                if (!this.contains(element)) {
+                    return 0;
+                }
+                else {
+                    return this.dictionary.getValue(element).copies;
+                }
+            };
+            Bag.prototype.contains = function (element) {
+                return this.dictionary.containsKey(element);
+            };
+            Bag.prototype.remove = function (element, nCopies) {
+                if (nCopies === void 0) { nCopies = 1; }
+                if (Fayde.Controls.isUndefined(element) || nCopies <= 0) {
+                    return false;
+                }
+                if (!this.contains(element)) {
+                    return false;
+                }
+                else {
+                    var node = this.dictionary.getValue(element);
+                    if (nCopies > node.copies) {
+                        this.nElements -= node.copies;
+                    }
+                    else {
+                        this.nElements -= nCopies;
+                    }
+                    node.copies -= nCopies;
+                    if (node.copies <= 0) {
+                        this.dictionary.remove(element);
+                    }
+                    return true;
+                }
+            };
+            Bag.prototype.toArray = function () {
+                var a = [];
+                var values = this.dictionary.values();
+                var vl = values.length;
+                for (var i = 0; i < vl; i++) {
+                    var node = values[i];
+                    var element = node.value;
+                    var copies = node.copies;
+                    for (var j = 0; j < copies; j++) {
+                        a.push(element);
+                    }
+                }
+                return a;
+            };
+            Bag.prototype.toSet = function () {
+                var toret = new Set(this.toStrF);
+                var elements = this.dictionary.values();
+                var l = elements.length;
+                for (var i = 0; i < l; i++) {
+                    var value = elements[i].value;
+                    toret.add(value);
+                }
+                return toret;
+            };
+            Bag.prototype.forEach = function (callback) {
+                this.dictionary.forEach(function (k, v) {
+                    var value = v.value;
+                    var copies = v.copies;
+                    for (var i = 0; i < copies; i++) {
+                        if (callback(value) === false) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+            };
+            Bag.prototype.size = function () {
+                return this.nElements;
+            };
+            Bag.prototype.isEmpty = function () {
+                return this.nElements === 0;
+            };
+            Bag.prototype.clear = function () {
+                this.nElements = 0;
+                this.dictionary.clear();
+            };
+            return Bag;
+        }());
+        Controls.Bag = Bag;
+        var BSTree = (function () {
+            function BSTree(compareFunction) {
+                this.root = null;
+                this.compare = compareFunction || Fayde.Controls.defaultCompare;
+                this.nElements = 0;
+            }
+            BSTree.prototype.add = function (element) {
+                if (Fayde.Controls.isUndefined(element)) {
+                    return false;
+                }
+                if (this.insertNode(this.createNode(element)) !== null) {
+                    this.nElements++;
+                    return true;
+                }
+                return false;
+            };
+            BSTree.prototype.clear = function () {
+                this.root = null;
+                this.nElements = 0;
+            };
+            BSTree.prototype.isEmpty = function () {
+                return this.nElements === 0;
+            };
+            BSTree.prototype.size = function () {
+                return this.nElements;
+            };
+            BSTree.prototype.contains = function (element) {
+                if (Fayde.Controls.isUndefined(element)) {
+                    return false;
+                }
+                return this.searchNode(this.root, element) !== null;
+            };
+            BSTree.prototype.remove = function (element) {
+                var node = this.searchNode(this.root, element);
+                if (node === null) {
+                    return false;
+                }
+                this.removeNode(node);
+                this.nElements--;
+                return true;
+            };
+            BSTree.prototype.inorderTraversal = function (callback) {
+                this.inorderTraversalAux(this.root, callback, {
+                    stop: false
+                });
+            };
+            BSTree.prototype.preorderTraversal = function (callback) {
+                this.preorderTraversalAux(this.root, callback, {
+                    stop: false
+                });
+            };
+            BSTree.prototype.postorderTraversal = function (callback) {
+                this.postorderTraversalAux(this.root, callback, {
+                    stop: false
+                });
+            };
+            BSTree.prototype.levelTraversal = function (callback) {
+                this.levelTraversalAux(this.root, callback);
+            };
+            BSTree.prototype.minimum = function () {
+                if (this.isEmpty()) {
+                    return undefined;
+                }
+                return this.minimumAux(this.root).element;
+            };
+            BSTree.prototype.maximum = function () {
+                if (this.isEmpty()) {
+                    return undefined;
+                }
+                return this.maximumAux(this.root).element;
+            };
+            BSTree.prototype.forEach = function (callback) {
+                this.inorderTraversal(callback);
+            };
+            BSTree.prototype.toArray = function () {
+                var array = [];
+                this.inorderTraversal(function (element) {
+                    array.push(element);
+                    return true;
+                });
+                return array;
+            };
+            BSTree.prototype.height = function () {
+                return this.heightAux(this.root);
+            };
+            BSTree.prototype.searchNode = function (node, element) {
+                var cmp = null;
+                while (node !== null && cmp !== 0) {
+                    cmp = this.compare(element, node.element);
+                    if (cmp < 0) {
+                        node = node.leftCh;
+                    }
+                    else if (cmp > 0) {
+                        node = node.rightCh;
+                    }
+                }
+                return node;
+            };
+            BSTree.prototype.transplant = function (n1, n2) {
+                if (n1.parent === null) {
+                    this.root = n2;
+                }
+                else if (n1 === n1.parent.leftCh) {
+                    n1.parent.leftCh = n2;
+                }
+                else {
+                    n1.parent.rightCh = n2;
+                }
+                if (n2 !== null) {
+                    n2.parent = n1.parent;
+                }
+            };
+            BSTree.prototype.removeNode = function (node) {
+                if (node.leftCh === null) {
+                    this.transplant(node, node.rightCh);
+                }
+                else if (node.rightCh === null) {
+                    this.transplant(node, node.leftCh);
+                }
+                else {
+                    var y = this.minimumAux(node.rightCh);
+                    if (y.parent !== node) {
+                        this.transplant(y, y.rightCh);
+                        y.rightCh = node.rightCh;
+                        y.rightCh.parent = y;
+                    }
+                    this.transplant(node, y);
+                    y.leftCh = node.leftCh;
+                    y.leftCh.parent = y;
+                }
+            };
+            BSTree.prototype.inorderTraversalAux = function (node, callback, signal) {
+                if (node === null || signal.stop) {
+                    return;
+                }
+                this.inorderTraversalAux(node.leftCh, callback, signal);
+                if (signal.stop) {
+                    return;
+                }
+                signal.stop = callback(node.element) === false;
+                if (signal.stop) {
+                    return;
+                }
+                this.inorderTraversalAux(node.rightCh, callback, signal);
+            };
+            BSTree.prototype.levelTraversalAux = function (node, callback) {
+                var queue = new Queue();
+                if (node !== null) {
+                    queue.enqueue(node);
+                }
+                while (!queue.isEmpty()) {
+                    node = queue.dequeue();
+                    if (callback(node.element) === false) {
+                        return;
+                    }
+                    if (node.leftCh !== null) {
+                        queue.enqueue(node.leftCh);
+                    }
+                    if (node.rightCh !== null) {
+                        queue.enqueue(node.rightCh);
+                    }
+                }
+            };
+            BSTree.prototype.preorderTraversalAux = function (node, callback, signal) {
+                if (node === null || signal.stop) {
+                    return;
+                }
+                signal.stop = callback(node.element) === false;
+                if (signal.stop) {
+                    return;
+                }
+                this.preorderTraversalAux(node.leftCh, callback, signal);
+                if (signal.stop) {
+                    return;
+                }
+                this.preorderTraversalAux(node.rightCh, callback, signal);
+            };
+            BSTree.prototype.postorderTraversalAux = function (node, callback, signal) {
+                if (node === null || signal.stop) {
+                    return;
+                }
+                this.postorderTraversalAux(node.leftCh, callback, signal);
+                if (signal.stop) {
+                    return;
+                }
+                this.postorderTraversalAux(node.rightCh, callback, signal);
+                if (signal.stop) {
+                    return;
+                }
+                signal.stop = callback(node.element) === false;
+            };
+            BSTree.prototype.minimumAux = function (node) {
+                while (node.leftCh !== null) {
+                    node = node.leftCh;
+                }
+                return node;
+            };
+            BSTree.prototype.maximumAux = function (node) {
+                while (node.rightCh !== null) {
+                    node = node.rightCh;
+                }
+                return node;
+            };
+            BSTree.prototype.heightAux = function (node) {
+                if (node === null) {
+                    return -1;
+                }
+                return Math.max(this.heightAux(node.leftCh), this.heightAux(node.rightCh)) + 1;
+            };
+            BSTree.prototype.insertNode = function (node) {
+                var parent = null;
+                var position = this.root;
+                var cmp = null;
+                while (position !== null) {
+                    cmp = this.compare(node.element, position.element);
+                    if (cmp === 0) {
+                        return null;
+                    }
+                    else if (cmp < 0) {
+                        parent = position;
+                        position = position.leftCh;
+                    }
+                    else {
+                        parent = position;
+                        position = position.rightCh;
+                    }
+                }
+                node.parent = parent;
+                if (parent === null) {
+                    this.root = node;
+                }
+                else if (this.compare(node.element, parent.element) < 0) {
+                    parent.leftCh = node;
+                }
+                else {
+                    parent.rightCh = node;
+                }
+                return node;
+            };
+            BSTree.prototype.createNode = function (element) {
+                return {
+                    element: element,
+                    leftCh: null,
+                    rightCh: null,
+                    parent: null
+                };
+            };
+            return BSTree;
+        }());
+        Controls.BSTree = BSTree;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var ObservableCollection = Fayde.Collections.ObservableCollection;
+        var DataSourceCollection = (function (_super) {
+            __extends(DataSourceCollection, _super);
+            function DataSourceCollection(TCreator) {
+                _super.call(this);
+                var temp = this.activator(TCreator);
+                this.tCreator = TCreator;
+            }
+            DataSourceCollection.prototype.GetNew = function () {
+                var item = this.activator(this.tCreator);
+                var dataformObject = item;
+                if (dataformObject)
+                    return dataformObject.CreateItem();
+                return null;
+            };
+            DataSourceCollection.prototype.activator = function (type) {
+                return new type();
+            };
+            return DataSourceCollection;
+        }(ObservableCollection));
+        Controls.DataSourceCollection = DataSourceCollection;
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
 var Fayde;
@@ -4799,242 +6148,6 @@ var Fayde;
 (function (Fayde) {
     var Controls;
     (function (Controls) {
-        var tabpanel;
-        (function (tabpanel) {
-            var Size = minerva.Size;
-            var Visibility = minerva.Visibility;
-            var helpers;
-            (function (helpers) {
-                function getDesiredSizeWithoutMargin(upd) {
-                    var timargin = getTabItemMargin(upd);
-                    var size = new Size();
-                    Size.copyTo(upd.assets.desiredSize, size);
-                    var margin = upd.assets.margin;
-                    size.height = Math.max(0.0, size.height - margin.top - margin.bottom);
-                    size.width = Math.max(0.0, size.width - margin.left - margin.right + timargin);
-                    return size;
-                }
-                helpers.getDesiredSizeWithoutMargin = getDesiredSizeWithoutMargin;
-                function getTabItemMargin(upd) {
-                    var node = upd.getAttachedValue("$node");
-                    var ti = node ? node.XObject : null;
-                    if (!(ti instanceof Controls.TabItem) || ti.IsSelected)
-                        return 0;
-                    var panel = ti.GetTemplate(ti.IsSelected, ti.TabStripPlacement);
-                    if (!(panel instanceof Controls.Panel) || panel.Children.Count <= 0)
-                        return 0;
-                    var fe = panel.Children.GetValueAt(0);
-                    if (!(fe instanceof Fayde.FrameworkElement) || !fe.Margin)
-                        return 0;
-                    return Math.abs(fe.Margin.left + fe.Margin.right);
-                }
-                function getHeadersSize(tree) {
-                    var arr = [];
-                    for (var walker = tree.walk(); walker.step();) {
-                        var child = walker.current;
-                        var width = child.assets.visibility === Visibility.Collapsed ? 0.0 : getDesiredSizeWithoutMargin(child).width;
-                        arr.push(width);
-                    }
-                    return arr;
-                }
-                helpers.getHeadersSize = getHeadersSize;
-                function setTabItemZ(upd) {
-                    var node = upd.getAttachedValue("$node");
-                    var ti = node ? node.XObject : null;
-                    if (!(ti instanceof Controls.TabItem))
-                        return;
-                    var zi = ti.IsSelected ? 1 : 0;
-                    ti.SetCurrentValue(Controls.Canvas.ZIndexProperty, zi);
-                }
-                helpers.setTabItemZ = setTabItemZ;
-                function getTabItemIsSelected(upd) {
-                    var node = upd.getAttachedValue("$node");
-                    var ti = node ? node.XObject : null;
-                    if (!(ti instanceof Controls.TabItem))
-                        return;
-                    return ti.IsSelected === true;
-                }
-                function getActiveRow(tree, solution, isDockTop) {
-                    var index = 0;
-                    var num = 0;
-                    if (solution.length > 0) {
-                        for (var walker = tree.walk(); walker.step();) {
-                            var child = walker.current;
-                            if (getTabItemIsSelected(child))
-                                return index;
-                            if (index < solution.length && solution[index] === num)
-                                ++index;
-                            ++num;
-                        }
-                    }
-                    if (isDockTop)
-                        index = this._NumberOfRows - 1;
-                    return index;
-                }
-                helpers.getActiveRow = getActiveRow;
-                function calculateHeaderDistribution(tree, rowWidthLimit, headerWidth) {
-                    var num1 = 0.0;
-                    var length1 = headerWidth.length;
-                    var length2 = this._NumberOfRows - 1;
-                    var num2 = 0.0;
-                    var num3 = 0;
-                    var numArray1 = new Array(length2);
-                    var numArray2 = new Array(length2);
-                    var numArray3 = new Array(this._NumberOfRows);
-                    var numArray4 = numArray3.slice(0);
-                    var numArray5 = numArray3.slice(0);
-                    var numArray6 = numArray3.slice(0);
-                    var index1 = 0;
-                    for (var index2 = 0; index2 < length1; ++index2) {
-                        if (num2 + headerWidth[index2] > rowWidthLimit && num3 > 0) {
-                            numArray4[index1] = num2;
-                            numArray3[index1] = num3;
-                            var num4 = Math.max(0.0, (rowWidthLimit - num2) / num3);
-                            numArray5[index1] = num4;
-                            numArray1[index1] = index2 - 1;
-                            if (num1 < num4)
-                                num1 = num4;
-                            ++index1;
-                            num2 = headerWidth[index2];
-                            num3 = 1;
-                        }
-                        else {
-                            num2 += headerWidth[index2];
-                            if (headerWidth[index2] != 0.0)
-                                ++num3;
-                        }
-                    }
-                    if (index1 === 0)
-                        return [];
-                    numArray4[index1] = num2;
-                    numArray3[index1] = num3;
-                    var num5 = (rowWidthLimit - num2) / num3;
-                    numArray5[index1] = num5;
-                    if (num1 < num5)
-                        num1 = num5;
-                    numArray2 = numArray1.slice(0);
-                    numArray6 = numArray5.slice(0);
-                    while (true) {
-                        var num4 = 0;
-                        do {
-                            var num6 = 0;
-                            var num7 = 0.0;
-                            for (var index2 = 0; index2 < this._NumberOfRows; ++index2) {
-                                if (num7 < numArray5[index2]) {
-                                    num7 = numArray5[index2];
-                                    num6 = index2;
-                                }
-                            }
-                            if (num6 != 0) {
-                                var index2 = num6;
-                                var index3 = index2 - 1;
-                                var index4 = numArray1[index3];
-                                var num8 = headerWidth[index4];
-                                numArray4[index2] += num8;
-                                if (numArray4[index2] <= rowWidthLimit) {
-                                    --numArray1[index3];
-                                    ++numArray3[index2];
-                                    numArray4[index3] -= num8;
-                                    --numArray3[index3];
-                                    numArray5[index3] = (rowWidthLimit - numArray4[index3]) / numArray3[index3];
-                                    numArray5[index2] = (rowWidthLimit - numArray4[index2]) / numArray3[index2];
-                                    num4 = 0.0;
-                                    for (var index5 = 0; index5 < this._NumberOfRows; ++index5) {
-                                        if (num4 < numArray5[index5])
-                                            num4 = numArray5[index5];
-                                    }
-                                }
-                                else
-                                    break;
-                            }
-                            else
-                                break;
-                        } while (num4 >= num1);
-                        num1 = num4;
-                        numArray2 = numArray1.slice(0);
-                        numArray6 = numArray5.slice(0);
-                    }
-                    var index6 = 0;
-                    var index7 = 0;
-                    for (var walker = tree.walk(); walker.step();) {
-                        var child = walker.current;
-                        if (child.assets.visibility === Visibility.Visible)
-                            headerWidth[index7] += numArray6[index6];
-                        if (index6 < length2 && numArray2[index6] == index7)
-                            ++index6;
-                        ++index7;
-                    }
-                    return numArray2;
-                }
-                helpers.calculateHeaderDistribution = calculateHeaderDistribution;
-            })(helpers = tabpanel.helpers || (tabpanel.helpers = {}));
-        })(tabpanel = Controls.tabpanel || (Controls.tabpanel = {}));
-    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
-})(Fayde || (Fayde = {}));
-var Fayde;
-(function (Fayde) {
-    var Controls;
-    (function (Controls) {
-        var TabPanel = (function (_super) {
-            __extends(TabPanel, _super);
-            function TabPanel() {
-                _super.apply(this, arguments);
-            }
-            TabPanel.prototype.CreateLayoutUpdater = function () {
-                return new Controls.tabpanel.TabPanelUpdater();
-            };
-            Object.defineProperty(TabPanel.prototype, "TabAlignment", {
-                get: function () {
-                    var tabControlParent = Fayde.VisualTreeHelper.GetParentOfType(this, Controls.TabControl);
-                    if (tabControlParent != null)
-                        return tabControlParent.TabStripPlacement;
-                    return Controls.Dock.Top;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            TabPanel.setTabAlignment = function (tp, alignment) {
-                if (!tp)
-                    return;
-                var upd = tp.XamlNode.LayoutUpdater;
-                upd.assets.tabAlignment = alignment;
-            };
-            return TabPanel;
-        }(Controls.Panel));
-        Controls.TabPanel = TabPanel;
-    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
-})(Fayde || (Fayde = {}));
-var Fayde;
-(function (Fayde) {
-    var Controls;
-    (function (Controls) {
-        var tabpanel;
-        (function (tabpanel) {
-            var TabPanelUpdater = (function (_super) {
-                __extends(TabPanelUpdater, _super);
-                function TabPanelUpdater() {
-                    _super.apply(this, arguments);
-                }
-                TabPanelUpdater.prototype.init = function () {
-                    this.setMeasurePipe(minerva.singleton(tabpanel.measure.TabPanelMeasurePipeDef))
-                        .setArrangePipe(minerva.singleton(tabpanel.arrange.TabPanelArrangePipeDef));
-                    var assets = this.assets;
-                    assets.tabAlignment = Controls.Dock.Top;
-                    assets.numRows = 1;
-                    assets.numHeaders = 0;
-                    assets.rowHeight = 0.0;
-                    _super.prototype.init.call(this);
-                };
-                return TabPanelUpdater;
-            }(minerva.controls.panel.PanelUpdater));
-            tabpanel.TabPanelUpdater = TabPanelUpdater;
-        })(tabpanel = Controls.tabpanel || (Controls.tabpanel = {}));
-    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
-})(Fayde || (Fayde = {}));
-var Fayde;
-(function (Fayde) {
-    var Controls;
-    (function (Controls) {
         function compareSummaryItems(item1, item2) {
             var refs = compareRefs(item1, item2);
             if (refs != null)
@@ -5629,6 +6742,242 @@ var Fayde;
 (function (Fayde) {
     var Controls;
     (function (Controls) {
+        var tabpanel;
+        (function (tabpanel) {
+            var Size = minerva.Size;
+            var Visibility = minerva.Visibility;
+            var helpers;
+            (function (helpers) {
+                function getDesiredSizeWithoutMargin(upd) {
+                    var timargin = getTabItemMargin(upd);
+                    var size = new Size();
+                    Size.copyTo(upd.assets.desiredSize, size);
+                    var margin = upd.assets.margin;
+                    size.height = Math.max(0.0, size.height - margin.top - margin.bottom);
+                    size.width = Math.max(0.0, size.width - margin.left - margin.right + timargin);
+                    return size;
+                }
+                helpers.getDesiredSizeWithoutMargin = getDesiredSizeWithoutMargin;
+                function getTabItemMargin(upd) {
+                    var node = upd.getAttachedValue("$node");
+                    var ti = node ? node.XObject : null;
+                    if (!(ti instanceof Controls.TabItem) || ti.IsSelected)
+                        return 0;
+                    var panel = ti.GetTemplate(ti.IsSelected, ti.TabStripPlacement);
+                    if (!(panel instanceof Controls.Panel) || panel.Children.Count <= 0)
+                        return 0;
+                    var fe = panel.Children.GetValueAt(0);
+                    if (!(fe instanceof Fayde.FrameworkElement) || !fe.Margin)
+                        return 0;
+                    return Math.abs(fe.Margin.left + fe.Margin.right);
+                }
+                function getHeadersSize(tree) {
+                    var arr = [];
+                    for (var walker = tree.walk(); walker.step();) {
+                        var child = walker.current;
+                        var width = child.assets.visibility === Visibility.Collapsed ? 0.0 : getDesiredSizeWithoutMargin(child).width;
+                        arr.push(width);
+                    }
+                    return arr;
+                }
+                helpers.getHeadersSize = getHeadersSize;
+                function setTabItemZ(upd) {
+                    var node = upd.getAttachedValue("$node");
+                    var ti = node ? node.XObject : null;
+                    if (!(ti instanceof Controls.TabItem))
+                        return;
+                    var zi = ti.IsSelected ? 1 : 0;
+                    ti.SetCurrentValue(Controls.Canvas.ZIndexProperty, zi);
+                }
+                helpers.setTabItemZ = setTabItemZ;
+                function getTabItemIsSelected(upd) {
+                    var node = upd.getAttachedValue("$node");
+                    var ti = node ? node.XObject : null;
+                    if (!(ti instanceof Controls.TabItem))
+                        return;
+                    return ti.IsSelected === true;
+                }
+                function getActiveRow(tree, solution, isDockTop) {
+                    var index = 0;
+                    var num = 0;
+                    if (solution.length > 0) {
+                        for (var walker = tree.walk(); walker.step();) {
+                            var child = walker.current;
+                            if (getTabItemIsSelected(child))
+                                return index;
+                            if (index < solution.length && solution[index] === num)
+                                ++index;
+                            ++num;
+                        }
+                    }
+                    if (isDockTop)
+                        index = this._NumberOfRows - 1;
+                    return index;
+                }
+                helpers.getActiveRow = getActiveRow;
+                function calculateHeaderDistribution(tree, rowWidthLimit, headerWidth) {
+                    var num1 = 0.0;
+                    var length1 = headerWidth.length;
+                    var length2 = this._NumberOfRows - 1;
+                    var num2 = 0.0;
+                    var num3 = 0;
+                    var numArray1 = new Array(length2);
+                    var numArray2 = new Array(length2);
+                    var numArray3 = new Array(this._NumberOfRows);
+                    var numArray4 = numArray3.slice(0);
+                    var numArray5 = numArray3.slice(0);
+                    var numArray6 = numArray3.slice(0);
+                    var index1 = 0;
+                    for (var index2 = 0; index2 < length1; ++index2) {
+                        if (num2 + headerWidth[index2] > rowWidthLimit && num3 > 0) {
+                            numArray4[index1] = num2;
+                            numArray3[index1] = num3;
+                            var num4 = Math.max(0.0, (rowWidthLimit - num2) / num3);
+                            numArray5[index1] = num4;
+                            numArray1[index1] = index2 - 1;
+                            if (num1 < num4)
+                                num1 = num4;
+                            ++index1;
+                            num2 = headerWidth[index2];
+                            num3 = 1;
+                        }
+                        else {
+                            num2 += headerWidth[index2];
+                            if (headerWidth[index2] != 0.0)
+                                ++num3;
+                        }
+                    }
+                    if (index1 === 0)
+                        return [];
+                    numArray4[index1] = num2;
+                    numArray3[index1] = num3;
+                    var num5 = (rowWidthLimit - num2) / num3;
+                    numArray5[index1] = num5;
+                    if (num1 < num5)
+                        num1 = num5;
+                    numArray2 = numArray1.slice(0);
+                    numArray6 = numArray5.slice(0);
+                    while (true) {
+                        var num4 = 0;
+                        do {
+                            var num6 = 0;
+                            var num7 = 0.0;
+                            for (var index2 = 0; index2 < this._NumberOfRows; ++index2) {
+                                if (num7 < numArray5[index2]) {
+                                    num7 = numArray5[index2];
+                                    num6 = index2;
+                                }
+                            }
+                            if (num6 != 0) {
+                                var index2 = num6;
+                                var index3 = index2 - 1;
+                                var index4 = numArray1[index3];
+                                var num8 = headerWidth[index4];
+                                numArray4[index2] += num8;
+                                if (numArray4[index2] <= rowWidthLimit) {
+                                    --numArray1[index3];
+                                    ++numArray3[index2];
+                                    numArray4[index3] -= num8;
+                                    --numArray3[index3];
+                                    numArray5[index3] = (rowWidthLimit - numArray4[index3]) / numArray3[index3];
+                                    numArray5[index2] = (rowWidthLimit - numArray4[index2]) / numArray3[index2];
+                                    num4 = 0.0;
+                                    for (var index5 = 0; index5 < this._NumberOfRows; ++index5) {
+                                        if (num4 < numArray5[index5])
+                                            num4 = numArray5[index5];
+                                    }
+                                }
+                                else
+                                    break;
+                            }
+                            else
+                                break;
+                        } while (num4 >= num1);
+                        num1 = num4;
+                        numArray2 = numArray1.slice(0);
+                        numArray6 = numArray5.slice(0);
+                    }
+                    var index6 = 0;
+                    var index7 = 0;
+                    for (var walker = tree.walk(); walker.step();) {
+                        var child = walker.current;
+                        if (child.assets.visibility === Visibility.Visible)
+                            headerWidth[index7] += numArray6[index6];
+                        if (index6 < length2 && numArray2[index6] == index7)
+                            ++index6;
+                        ++index7;
+                    }
+                    return numArray2;
+                }
+                helpers.calculateHeaderDistribution = calculateHeaderDistribution;
+            })(helpers = tabpanel.helpers || (tabpanel.helpers = {}));
+        })(tabpanel = Controls.tabpanel || (Controls.tabpanel = {}));
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var TabPanel = (function (_super) {
+            __extends(TabPanel, _super);
+            function TabPanel() {
+                _super.apply(this, arguments);
+            }
+            TabPanel.prototype.CreateLayoutUpdater = function () {
+                return new Controls.tabpanel.TabPanelUpdater();
+            };
+            Object.defineProperty(TabPanel.prototype, "TabAlignment", {
+                get: function () {
+                    var tabControlParent = Fayde.VisualTreeHelper.GetParentOfType(this, Controls.TabControl);
+                    if (tabControlParent != null)
+                        return tabControlParent.TabStripPlacement;
+                    return Controls.Dock.Top;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            TabPanel.setTabAlignment = function (tp, alignment) {
+                if (!tp)
+                    return;
+                var upd = tp.XamlNode.LayoutUpdater;
+                upd.assets.tabAlignment = alignment;
+            };
+            return TabPanel;
+        }(Controls.Panel));
+        Controls.TabPanel = TabPanel;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var tabpanel;
+        (function (tabpanel) {
+            var TabPanelUpdater = (function (_super) {
+                __extends(TabPanelUpdater, _super);
+                function TabPanelUpdater() {
+                    _super.apply(this, arguments);
+                }
+                TabPanelUpdater.prototype.init = function () {
+                    this.setMeasurePipe(minerva.singleton(tabpanel.measure.TabPanelMeasurePipeDef))
+                        .setArrangePipe(minerva.singleton(tabpanel.arrange.TabPanelArrangePipeDef));
+                    var assets = this.assets;
+                    assets.tabAlignment = Controls.Dock.Top;
+                    assets.numRows = 1;
+                    assets.numHeaders = 0;
+                    assets.rowHeight = 0.0;
+                    _super.prototype.init.call(this);
+                };
+                return TabPanelUpdater;
+            }(minerva.controls.panel.PanelUpdater));
+            tabpanel.TabPanelUpdater = TabPanelUpdater;
+        })(tabpanel = Controls.tabpanel || (Controls.tabpanel = {}));
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
         var wrappanel;
         (function (wrappanel) {
             var helpers;
@@ -5704,6 +7053,196 @@ var Fayde;
 (function (Fayde) {
     var Controls;
     (function (Controls) {
+        var DataItem = (function () {
+            function DataItem(data, isLoaded) {
+                if (isLoaded == null) {
+                    isLoaded = false;
+                }
+                this.m_isLoaded = isLoaded;
+                this.m_data = data;
+                if (isLoaded) {
+                }
+                else {
+                }
+            }
+            DataItem.prototype.Equals = function (obj) {
+                if (obj == this)
+                    return true;
+                if ((obj == null) || (!this.m_isLoaded) || (this.m_data == null))
+                    return false;
+                var dataItem = obj;
+                if ((dataItem == null) || (!dataItem.m_isLoaded) || (dataItem.m_data == null))
+                    return false;
+                return this.m_data.Equals(dataItem.m_data);
+            };
+            Object.defineProperty(DataItem.prototype, "IsLoaded", {
+                get: function () { return this.m_isLoaded; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataItem.prototype, "Data", {
+                get: function () { return this.m_data; },
+                enumerable: true,
+                configurable: true
+            });
+            return DataItem;
+        }());
+        Controls.DataItem = DataItem;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var DataItem = Fayde.Controls.DataItem;
+        var DataPath = (function (_super) {
+            __extends(DataPath, _super);
+            function DataPath(rootItem, children, length, useClientArray, objectPath, obj) {
+                _super.call(this);
+                if (obj != null) {
+                    this.m_path = new Array();
+                    this.m_path.push(obj);
+                }
+                else {
+                    if (!useClientArray) {
+                        var newPath = new DataItem[length];
+                        objectPath.forEach(function (element) {
+                            newPath.push(element);
+                        });
+                        this.m_path = newPath;
+                    }
+                    else {
+                        this.m_path = objectPath;
+                    }
+                }
+            }
+            Object.defineProperty(DataPath, "Empty", {
+                get: function () {
+                    var array = [];
+                    var dataItem = new DataItem(array, false);
+                    var dataPath = new DataPath(dataItem, null, 0, false, null, null);
+                    return dataPath;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataPath.prototype, "ParentPath", {
+                get: function () {
+                    if (this.m_path.length == 1)
+                        return null;
+                    var ret = new DataItem[this.m_path.length - 1];
+                    this.m_path.forEach(function (element) {
+                        ret.push(element);
+                    });
+                    return new DataPath(null, null, 0, true, ret, null);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataPath.prototype, "LastChild", {
+                get: function () {
+                    return this.m_path[this.m_path.length - 1];
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataPath.prototype, "Depth", {
+                get: function () {
+                    return this.m_path.length;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataPath.prototype, "Path", {
+                get: function () {
+                    return this.m_path;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            DataPath.prototype.getItem = function (index) {
+                return this.m_path[index];
+            };
+            DataPath.prototype.setItem = function (index, value) {
+                this.m_path[index] = value;
+            };
+            DataPath.prototype.CreateChildPath = function (child) {
+                return new DataPath(null, null, 0, false, this.m_path, child);
+            };
+            DataPath.prototype.CreateChildPathEx = function (childPath, startIndex, length) {
+                var childDepth = childPath.Depth;
+                var newArray = new DataItem[this.Depth + length];
+                this.m_path.forEach(function (element) {
+                    newArray.push(element);
+                });
+                childPath.m_path.forEach(function (element) {
+                    newArray.push(element);
+                });
+                return new DataPath(newArray, null, 0, true, null, null);
+            };
+            DataPath.prototype.CreateAncestorPath = function (depth) {
+                return this.CreateAncestorOrSamePath(depth);
+            };
+            DataPath.prototype.CreateAncestorOrSamePath = function (depth) {
+                var newArray = new DataItem[depth];
+                this.m_path.forEach(function (element) {
+                    newArray.push(element);
+                });
+                var newPath = new DataPath(newArray, null, 0, true, null, null);
+                return newPath;
+            };
+            DataPath.prototype.IsAncestorOf = function (childPath) {
+                if (this.m_path.length < childPath.m_path.length) {
+                    return DataPath.AreSameItems(this.m_path, childPath.m_path, this.m_path.length);
+                }
+                return false;
+            };
+            DataPath.prototype.IsAncestorOfEx = function (arrayPath, validDepth) {
+                if (this.m_path.length < validDepth) {
+                    return DataPath.AreSameItems(this.m_path, arrayPath, this.m_path.length);
+                }
+                return false;
+            };
+            DataPath.prototype.ToArray = function () {
+                var newArray = new DataItem[this.Depth];
+                this.m_path.forEach(function (element) {
+                    newArray.push(element);
+                });
+                return newArray;
+            };
+            DataPath.prototype.IsDescendantOf = function (parentPath) {
+                return parentPath.IsAncestorOf(this);
+            };
+            DataPath.prototype.Equals = function (obj) {
+                var nodePath = obj;
+                if ((nodePath == null) || this.m_path.length != nodePath.m_path.length)
+                    return false;
+                return DataPath.AreSameItems(this.m_path, nodePath.m_path, this.m_path.length);
+            };
+            DataPath.AreSameItems = function (array1, array2, len) {
+                for (var i = 0; i < len; i++) {
+                    if (!nullstone.equals(array1[i], array2[i])) {
+                        return false;
+                    }
+                }
+                return true;
+            };
+            DataPath.prototype.GetEnumerator = function () {
+                var result = [];
+                this.m_path.forEach(function (dgi) {
+                    result.push(dgi);
+                });
+                return IEnumerator_.fromArray(result);
+            };
+            return DataPath;
+        }(IEnumerable));
+        Controls.DataPath = DataPath;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
         var DataField = (function () {
             function DataField() {
             }
@@ -5731,7 +7270,7 @@ var Fayde;
         var GridUnitType = minerva.controls.grid.GridUnitType;
         var DataFormDataField = Fayde.Controls.DataFormDataField;
         var ObservableCollection = Fayde.Collections.ObservableCollection;
-        var DataFormMode = Fayde.Controls.DataControls.DataFormMode;
+        var DataFormMode = Fayde.Controls.DataFormMode;
         var DataForm = (function (_super) {
             __extends(DataForm, _super);
             function DataForm() {
@@ -6062,8 +7601,8 @@ var Fayde;
                             var nextIndex = 0;
                             if (this.SelectedIndex != 0) {
                                 nextIndex = this.SelectedIndex + 1;
-                                if (nextIndex > this.Items.Count) {
-                                    nextIndex = this.Items.Count;
+                                if (nextIndex >= this.Items.Count) {
+                                    nextIndex = this.Items.Count - 1;
                                 }
                             }
                             this.CurrentItem = this.Items.GetValueAt(nextIndex);
@@ -6201,15 +7740,65 @@ var Fayde;
 (function (Fayde) {
     var Controls;
     (function (Controls) {
-        var DataControls;
-        (function (DataControls) {
-            var DataGrid = (function () {
-                function DataGrid() {
-                }
-                return DataGrid;
-            }());
-            DataControls.DataGrid = DataGrid;
-        })(DataControls = Controls.DataControls || (Controls.DataControls = {}));
+        var DataGrid = (function (_super) {
+            __extends(DataGrid, _super);
+            function DataGrid() {
+                _super.call(this);
+                this.DefaultStyleKey = DataGrid;
+            }
+            Object.defineProperty(DataGrid.prototype, "DefaultTopLevelGroupZIndex", {
+                get: function () { return 100; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataGrid.prototype, "DefaultHeaderGroupByControlPosition", {
+                get: function () { return 0; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataGrid.prototype, "DefaultHeaderFilterRowPosition", {
+                get: function () { return 1; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataGrid.prototype, "DefaultHeaderColumnManagerRowPosition", {
+                get: function () { return 2; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataGrid.prototype, "DefaultHeaderInsertionRowPosition", {
+                get: function () { return 3; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataGrid.prototype, "DefaultFooterNotificationControlPosition", {
+                get: function () { return 0; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataGrid.prototype, "DefaultGroupSublevelIndent", {
+                get: function () { return 7; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataGrid.prototype, "AllowGroupNavigationPropertyName", {
+                get: function () { return "AllowGroupNavigation"; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataGrid.prototype, "GroupNavigationModesPropertyName", {
+                get: function () { return "GroupNavigationModes"; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataGrid.prototype, "AllowGroupCollapsingPropertyName", {
+                get: function () { return "AllowGroupCollapsing"; },
+                enumerable: true,
+                configurable: true
+            });
+            return DataGrid;
+        }(Controls.ContentControlBase));
+        Controls.DataGrid = DataGrid;
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
 var Fayde;
@@ -6228,91 +7817,9 @@ var Fayde;
             DataGridColumn.HeaderTemplateSelectorProperty = DependencyProperty.Register("HeaderTemplateSelector", function () { return Fayde.DataTemplate; }, DataGridColumn);
             DataGridColumn.CellStyleProperty = DependencyProperty.Register("CellStyle", function () { return Fayde.Style; }, DataGridColumn);
             DataGridColumn.IsReadOnlyProperty = DependencyProperty.Register("IsReadOnly", function () { return Boolean; }, DataGridColumn);
-            DataGridColumn.WidthProperty = DependencyProperty.Register("Width", function () { return Object; }, Controls.DataForm, null, function (d, args) { return d.CurrentItemValueChanged(args); });
             return DataGridColumn;
         }(Fayde.DependencyObject));
         Controls.DataGridColumn = DataGridColumn;
-    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
-})(Fayde || (Fayde = {}));
-var Fayde;
-(function (Fayde) {
-    var Controls;
-    (function (Controls) {
-        var DataGridLength = (function () {
-            function DataGridLength() {
-                this._auto = new DataGridLength();
-                this._sizeToCells = new DataGridLength();
-                this._sizeToHeader = new DataGridLength();
-            }
-            DataGridLength.prototype.EqualsTo = function (gl1, gl2) {
-                return gl1.UnitType == gl2.UnitType
-                    && gl1.Value == gl2.Value
-                    && gl1.DesiredValue == gl2.DesiredValue
-                    && gl1.DisplayValue == gl2.DisplayValue;
-            };
-            DataGridLength.prototype.Equals = function (obj) {
-                if (obj) {
-                    var l = obj;
-                    return this == l;
-                }
-                else {
-                    return false;
-                }
-            };
-            Object.defineProperty(DataGridLength.prototype, "IsAbsolute", {
-                get: function () { return this._unitType == Controls.DataGridLengthUnitType.Pixel; },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(DataGridLength.prototype, "IsAuto", {
-                get: function () { return this._unitType == Controls.DataGridLengthUnitType.Auto; },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(DataGridLength.prototype, "IsStar", {
-                get: function () { return this._unitType == Controls.DataGridLengthUnitType.Star; },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(DataGridLength.prototype, "IsSizeToCells", {
-                get: function () { return this._unitType == Controls.DataGridLengthUnitType.SizeToCells; },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(DataGridLength.prototype, "IsSizeToHeader", {
-                get: function () { return this._unitType == Controls.DataGridLengthUnitType.SizeToHeader; },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(DataGridLength.prototype, "Value", {
-                get: function () { return (this._unitType == Controls.DataGridLengthUnitType.Auto) ? AutoValue : this._unitValue; },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(DataGridLength.prototype, "UnitType", {
-                get: function () { return this._unitType; },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(DataGridLength.prototype, "Auto", {
-                get: function () { return this._auto; },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(DataGridLength.prototype, "SizeToCells", {
-                get: function () { return this._sizeToCells; },
-                enumerable: true,
-                configurable: true
-            });
-            DataGridLength.prototype.getSizeToHeaderAuto = function () { return this._sizeToHeader; };
-            Object.defineProperty(DataGridLength.prototype, "AutoValue", {
-                get: function () { return 1.0; },
-                enumerable: true,
-                configurable: true
-            });
-            return DataGridLength;
-        }());
-        Controls.DataGridLength = DataGridLength;
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
 var Fayde;
@@ -6327,6 +7834,37 @@ var Fayde;
             DataGridLengthUnitType[DataGridLengthUnitType["Star"] = 4] = "Star";
         })(Controls.DataGridLengthUnitType || (Controls.DataGridLengthUnitType = {}));
         var DataGridLengthUnitType = Controls.DataGridLengthUnitType;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var viewbox;
+        (function (viewbox) {
+            var processdown;
+            (function (processdown) {
+                var ViewboxProcessDownPipeDef = (function (_super) {
+                    __extends(ViewboxProcessDownPipeDef, _super);
+                    function ViewboxProcessDownPipeDef() {
+                        _super.call(this);
+                        this.addTapinAfter('calcRenderXform', 'applyViewXform', tapins.applyViewXform);
+                    }
+                    return ViewboxProcessDownPipeDef;
+                }(minerva.core.processdown.ProcessDownPipeDef));
+                processdown.ViewboxProcessDownPipeDef = ViewboxProcessDownPipeDef;
+                var tapins;
+                (function (tapins) {
+                    function applyViewXform(input, state, output, vpinput, tree) {
+                        if ((input.dirtyFlags & minerva.DirtyFlags.Transform) === 0)
+                            return true;
+                        mat3.preapply(output.renderXform, input.viewXform);
+                        return true;
+                    }
+                    tapins.applyViewXform = applyViewXform;
+                })(tapins || (tapins = {}));
+            })(processdown = viewbox.processdown || (viewbox.processdown = {}));
+        })(viewbox = Controls.viewbox || (Controls.viewbox = {}));
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
 var Fayde;
@@ -6393,37 +7931,6 @@ var Fayde;
                 measure.TabPanelMeasurePipeDef = TabPanelMeasurePipeDef;
             })(measure = tabpanel.measure || (tabpanel.measure = {}));
         })(tabpanel = Controls.tabpanel || (Controls.tabpanel = {}));
-    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
-})(Fayde || (Fayde = {}));
-var Fayde;
-(function (Fayde) {
-    var Controls;
-    (function (Controls) {
-        var viewbox;
-        (function (viewbox) {
-            var processdown;
-            (function (processdown) {
-                var ViewboxProcessDownPipeDef = (function (_super) {
-                    __extends(ViewboxProcessDownPipeDef, _super);
-                    function ViewboxProcessDownPipeDef() {
-                        _super.call(this);
-                        this.addTapinAfter('calcRenderXform', 'applyViewXform', tapins.applyViewXform);
-                    }
-                    return ViewboxProcessDownPipeDef;
-                }(minerva.core.processdown.ProcessDownPipeDef));
-                processdown.ViewboxProcessDownPipeDef = ViewboxProcessDownPipeDef;
-                var tapins;
-                (function (tapins) {
-                    function applyViewXform(input, state, output, vpinput, tree) {
-                        if ((input.dirtyFlags & minerva.DirtyFlags.Transform) === 0)
-                            return true;
-                        mat3.preapply(output.renderXform, input.viewXform);
-                        return true;
-                    }
-                    tapins.applyViewXform = applyViewXform;
-                })(tapins || (tapins = {}));
-            })(processdown = viewbox.processdown || (viewbox.processdown = {}));
-        })(viewbox = Controls.viewbox || (Controls.viewbox = {}));
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
 var Fayde;
@@ -6683,6 +8190,1709 @@ var Fayde;
             return DataFormNumericField;
         }());
         Controls.DataFormNumericField = DataFormNumericField;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var ArrangeLimit = (function () {
+            function ArrangeLimit() {
+            }
+            return ArrangeLimit;
+        }());
+        Controls.ArrangeLimit = ArrangeLimit;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Controls;
+(function (Controls) {
+    var Fayde;
+    (function (Fayde) {
+        var OffsetLimits = (function () {
+            function OffsetLimits(lowerLimit, upperLimit) {
+                this.LowerLimit = lowerLimit;
+                this.UpperLimit = upperLimit;
+            }
+            return OffsetLimits;
+        }());
+        Fayde.OffsetLimits = OffsetLimits;
+    })(Fayde = Controls.Fayde || (Controls.Fayde = {}));
+})(Controls || (Controls = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var ArrangeParameters = (function () {
+            function ArrangeParameters(arrangePosition, visibleBounds, visualArrangeLimits, offsetLimits, layoutParams) {
+                this.VisibleBounds = visibleBounds;
+                this.ArrangePosition = arrangePosition;
+                this.VisualArrangeLimits = visualArrangeLimits;
+                this.OffsetLimits = offsetLimits;
+                this.LayoutParameters = layoutParams;
+            }
+            return ArrangeParameters;
+        }());
+        Controls.ArrangeParameters = ArrangeParameters;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var Size = minerva.Size;
+        var CustomBorder = (function (_super) {
+            __extends(CustomBorder, _super);
+            function CustomBorder() {
+                _super.call(this);
+            }
+            Object.defineProperty(CustomBorder.prototype, "Child", {
+                get: function () { return this.m_child; },
+                set: function (value) {
+                    if (value == this.m_child)
+                        return;
+                    this.m_child = value;
+                    this.SetChildren();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            CustomBorder.prototype.SetChildren = function () {
+                if (this.m_child != null) {
+                    var count = this.Children.Count;
+                    if (count != 0) {
+                        this.Children[0] = this.m_child;
+                    }
+                    else {
+                        this.Children.Add(this.m_child);
+                    }
+                }
+                else {
+                    this.Children.Clear();
+                }
+            };
+            CustomBorder.prototype.MeasureOverride = function (availableSize) {
+                var child = this.Child;
+                var desiredSize;
+                if (child != null) {
+                    child.Measure(availableSize);
+                    desiredSize = child.DesiredSize;
+                }
+                else {
+                    desiredSize = new Size(0, 0);
+                }
+                return desiredSize;
+            };
+            CustomBorder.prototype.ArrangeOverride = function (finalSize) {
+                var child = this.Child;
+                if (child != null) {
+                    var point = new Point(0, 0);
+                    child.Arrange(new Rect(point.x, point.y, finalSize.width, finalSize.height));
+                }
+                return finalSize;
+            };
+            CustomBorder.ChildProperty = DependencyProperty.Register("Child", function () { return Fayde.FrameworkElement; }, CustomBorder);
+            return CustomBorder;
+        }(Controls.Panel));
+        Controls.CustomBorder = CustomBorder;
+        Fayde.Markup.Content(CustomBorder, CustomBorder.ChildProperty);
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var CustomBorder = Fayde.Controls.CustomBorder;
+        var WrapperBase = (function (_super) {
+            __extends(WrapperBase, _super);
+            function WrapperBase(child) {
+                _super.call(this);
+                this.Child = child;
+                this.RenderTransform = new TranslateTransform();
+            }
+            Object.defineProperty(WrapperBase.prototype, "IsRecycled", {
+                get: function () { return this.Visibility == Fayde.Visibility.Collapsed; },
+                set: function (value) {
+                    if (this.IsRecycled != value) {
+                        this.Visibility = (value) ? Fayde.Visibility.Collapsed : Fayde.Visibility.Visible;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(WrapperBase.prototype, "RecycleKey", {
+                get: function () { return this.Child; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(WrapperBase.prototype, "TranslateTransform", {
+                get: function () {
+                    return this.RenderTransform;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            WrapperBase.prototype.CalculatePositionX = function () {
+                return this.AnimationX;
+            };
+            WrapperBase.prototype.CalculatePositionY = function () {
+                return this.AnimationY;
+            };
+            WrapperBase.prototype.UpdatePositionX = function () {
+                this.TranslateTransform.X = this.CalculatePositionX();
+            };
+            WrapperBase.prototype.UpdatePositionY = function () {
+                this.TranslateTransform.Y = this.CalculatePositionY();
+            };
+            WrapperBase.prototype.OnAnimationXChanged = function (args) {
+                this.UpdatePositionX();
+            };
+            WrapperBase.prototype.OnAnimationYChanged = function (args) {
+                this.UpdatePositionY();
+            };
+            WrapperBase.prototype.PrepareBitmapCache = function () {
+            };
+            WrapperBase.prototype.ClearBitmapCache = function () {
+            };
+            WrapperBase.prototype.LayoutMeasure = function (availableSize) {
+                this.Measure(availableSize);
+            };
+            WrapperBase.prototype.LayoutArrange = function (parameters) {
+                var arrangeRect = parameters.ArrangePosition;
+                if (parameters.LayoutParameters != null) {
+                    LayoutTransitionHelper.ArrangeAnimation(this, parameters.LayoutParameters.TransitionContext, parameters.ArrangePosition);
+                }
+                this.LastArrangeRect = arrangeRect;
+                if (!(Number.NaN != this.Width)) {
+                    arrangeRect.Width = this.Width;
+                }
+                if (!(this.Height == Number.NaN)) {
+                    arrangeRect.Height = this.Height;
+                }
+                this.Arrange(arrangeRect);
+            };
+            WrapperBase.prototype.Accept = function (visitor) {
+                visitor.Visit(this);
+            };
+            WrapperBase.prototype.Measure = function (availableSize) {
+                this.LayoutMeasure(availableSize);
+            };
+            WrapperBase.prototype.Arrange = function (parameters) {
+                this.LayoutArrange(parameters);
+            };
+            WrapperBase.AnimationXProperty = DependencyProperty.Register("AnimationX", function () { return Number; }, WrapperBase, 0, function (d, args) { return d.OnAnimationXChanged(args); });
+            WrapperBase.AnimationYProperty = DependencyProperty.Register("AnimationY", function () { return Number; }, WrapperBase, 0, function (d, args) { return d.OnAnimationYChanged(args); });
+            return WrapperBase;
+        }(CustomBorder));
+        Controls.WrapperBase = WrapperBase;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var WrapperBase = Fayde.Controls.WrapperBase;
+        var ColumnElementWrapper = (function (_super) {
+            __extends(ColumnElementWrapper, _super);
+            function ColumnElementWrapper(child) {
+                _super.call(this, child);
+            }
+            Object.defineProperty(ColumnElementWrapper.prototype, "ColumnOffset", {
+                get: function () { return this.m_offset; },
+                set: function (value) {
+                    if (this.m_offset != value) {
+                        this.m_offset = value;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ColumnElementWrapper.prototype, "ColumnWidth", {
+                get: function () { return this.m_width; },
+                set: function (value) {
+                    if (this.m_width != value) {
+                        this.m_width = value;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ColumnElementWrapper.prototype, "ColumnElement", {
+                get: function () {
+                    return this.Child;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ColumnElementWrapper.prototype, "Column", {
+                get: function () {
+                    return this.ColumnElement.ParentColumnContainer.Column;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ColumnElementWrapper.prototype.MeasureOverride = function (availableSize) {
+                var measureSize = _super.prototype.MeasureOverride.call(this, availableSize);
+                measureSize.width = 0;
+                return measureSize;
+            };
+            return ColumnElementWrapper;
+        }(WrapperBase));
+        Controls.ColumnElementWrapper = ColumnElementWrapper;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (ColumnPosition) {
+            ColumnPosition[ColumnPosition["Scrollable"] = 0] = "Scrollable";
+            ColumnPosition[ColumnPosition["LeftFixed"] = 1] = "LeftFixed";
+            ColumnPosition[ColumnPosition["RightFixed"] = 2] = "RightFixed";
+        })(Controls.ColumnPosition || (Controls.ColumnPosition = {}));
+        var ColumnPosition = Controls.ColumnPosition;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var BindingMode = Fayde.Data.BindingMode;
+        var DataGridBindingInfo = (function () {
+            function DataGridBindingInfo(path, readOnly, autoGenerated) {
+                if (readOnly != null) {
+                    this.ReadOnly = readOnly;
+                    this.m_autoGenerated = autoGenerated;
+                }
+            }
+            Object.defineProperty(DataGridBindingInfo.prototype, "IsAutoGenerated", {
+                get: function () { return this.m_autoGenerated; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataGridBindingInfo.prototype, "BindsDirectlyToSource", {
+                get: function () { return this.m_autoGenerated; },
+                set: function (value) {
+                    this.m_autoGenerated = false;
+                    this.m_binding.BindsDirectlyToSource = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataGridBindingInfo.prototype, "Converter", {
+                get: function () { return this.m_binding.Converter; },
+                set: function (value) {
+                    this.m_autoGenerated = false;
+                    this.m_binding.Converter = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataGridBindingInfo.prototype, "ConverterCulture", {
+                get: function () { return this.m_binding.ConverterCulture; },
+                set: function (value) {
+                    this.m_autoGenerated = false;
+                    this.m_binding.ConverterCulture = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataGridBindingInfo.prototype, "ConverterParameter", {
+                get: function () { return this.m_binding.ConverterParameter; },
+                set: function (value) {
+                    this.m_autoGenerated = false;
+                    this.m_binding.ConverterParameter = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataGridBindingInfo.prototype, "ElementName", {
+                get: function () { return this.m_binding.ElementName; },
+                set: function (value) {
+                    this.m_autoGenerated = false;
+                    this.m_binding.ElementName = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataGridBindingInfo.prototype, "FallbackValue", {
+                get: function () { return this.m_binding.FallbackValue; },
+                set: function (value) {
+                    this.m_autoGenerated = false;
+                    this.m_binding.FallbackValue = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataGridBindingInfo.prototype, "Path", {
+                get: function () { return this.m_binding.FallbackValue; },
+                set: function (value) {
+                    this.m_autoGenerated = false;
+                    this.m_binding.FallbackValue = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataGridBindingInfo.prototype, "ReadOnly", {
+                get: function () { return this.m_binding.Mode == BindingMode.OneWay; },
+                set: function (value) {
+                    this.m_autoGenerated = false;
+                    if (value) {
+                        this.m_binding.Mode = BindingMode.OneWay;
+                    }
+                    else {
+                        this.m_binding.Mode = BindingMode.TwoWay;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataGridBindingInfo.prototype, "StringFormat", {
+                get: function () { return this.m_binding.StringFormat; },
+                set: function (value) {
+                    this.m_autoGenerated = false;
+                    this.m_binding.StringFormat = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DataGridBindingInfo.prototype, "TargetNullValue", {
+                get: function () { return this.m_binding.TargetNullValue; },
+                set: function (value) {
+                    this.m_autoGenerated = false;
+                    this.m_binding.TargetNullValue = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            DataGridBindingInfo.prototype.GetBinding = function () {
+                return this.m_binding;
+            };
+            return DataGridBindingInfo;
+        }());
+        Controls.DataGridBindingInfo = DataGridBindingInfo;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var ColumnElementsInnerHost = (function (_super) {
+            __extends(ColumnElementsInnerHost, _super);
+            function ColumnElementsInnerHost() {
+                _super.call(this);
+            }
+            Object.defineProperty(ColumnElementsInnerHost.prototype, "CellsIndent", {
+                get: function () {
+                    return this.m_cellsIndent;
+                },
+                set: function (value) {
+                    if (this.m_cellsIndent != value) {
+                        this.m_cellsIndent = value;
+                        this.InvalidateMeasure();
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ColumnElementsInnerHost.prototype.MeasureOverride = function (availableSize) {
+                var desiredHeight = 0;
+                var desiredWidth = this.CellsIndent;
+                for (var index = 0; index < this.Children.Count; index++) {
+                    var child = this.Children.GetValueAt(index);
+                    var colElement = child;
+                    if (!colElement.IsRecycled) {
+                        availableSize.width = colElement.ColumnWidth;
+                        desiredWidth += colElement.ColumnWidth;
+                        child.Measure(availableSize);
+                        if (desiredHeight > child.DesiredSize.height) {
+                            desiredHeight = desiredHeight;
+                        }
+                        else {
+                            desiredHeight = child.DesiredSize.height;
+                        }
+                    }
+                }
+                return new Size(desiredWidth, desiredHeight);
+            };
+            ColumnElementsInnerHost.prototype.ArrangeOverride = function (finalSize) {
+                var indent = this.CellsIndent;
+                for (var index = 0; index < this.Children.Count; index++) {
+                    var element = this.Children.GetValueAt(index);
+                    var colElement = element;
+                    if (!colElement.IsRecycled) {
+                        var r = new Rect(colElement.ColumnOffset + indent, 0, colElement.ColumnWidth, finalSize.height);
+                        colElement.Arrange(new Controls.ArrangeParameters(r, null));
+                    }
+                }
+                return finalSize;
+            };
+            return ColumnElementsInnerHost;
+        }(Controls.Panel));
+        Controls.ColumnElementsInnerHost = ColumnElementsInnerHost;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var ColumnElementsInnerHost = Fayde.Controls.ColumnElementsInnerHost;
+        var ColumnElementsHost = (function (_super) {
+            __extends(ColumnElementsHost, _super);
+            function ColumnElementsHost() {
+                _super.call(this);
+                this.m_leftFixedPanel = new ColumnElementsInnerHost();
+                this.m_rightFixedPanel = new ColumnElementsInnerHost();
+                this.m_scrollablePanel = new ColumnElementsInnerHost();
+                this.Children.Add(this.m_leftFixedPanel);
+                this.Children.Add(this.m_rightFixedPanel);
+                this.Children.Add(this.m_scrollablePanel);
+            }
+            Object.defineProperty(ColumnElementsHost.prototype, "Elements", {
+                get: function () {
+                    var elements = [];
+                    var array = nullstone.IEnumerable_.toArray(this.UIElements);
+                    array.forEach(function (element) {
+                        elements.push(element);
+                    });
+                    return nullstone.IEnumerable_.fromArray(elements);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ColumnElementsHost.prototype, "CellsIndent", {
+                get: function () {
+                    return this.m_leftFixedPanel.CellsIndent;
+                },
+                set: function (value) {
+                    this.m_leftFixedPanel.CellsIndent = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ColumnElementsHost.prototype, "UIElements", {
+                get: function () {
+                    var scrollable = nullstone.IEnumerable_.toArray(this.m_scrollablePanel.Children);
+                    var left = nullstone.IEnumerable_.toArray(this.m_leftFixedPanel.Children);
+                    var right = nullstone.IEnumerable_.toArray(this.m_rightFixedPanel.Children);
+                    var concat = scrollable.concat(left);
+                    concat = concat.concat(right);
+                    return nullstone.IEnumerable_.fromArray(concat);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ColumnElementsHost.prototype.TransfertCells = function (cellsHost) {
+                cellsHost.CellsIndent = this.CellsIndent;
+                this.TransferCells(this.m_leftFixedPanel, cellsHost.m_leftFixedPanel);
+                this.TransferCells(this.m_rightFixedPanel, cellsHost.m_rightFixedPanel);
+                this.TransferCells(this.m_scrollablePanel, cellsHost.m_scrollablePanel);
+            };
+            ColumnElementsHost.prototype.TransferCells = function (fromPanel, toPanel) {
+                var cells = fromPanel.Children;
+                fromPanel.Children.Clear();
+                for (var index = 0; index < cells.Count; index++) {
+                    var cell = cells.GetValueAt(index);
+                    toPanel.Children.Add(cell);
+                }
+            };
+            ColumnElementsHost.prototype.AddColumnElement = function (element) {
+                var position = element.ColumnElement.ParentColumnContainer.ColumnPosition;
+                var castedElement = element;
+                if (position == Controls.ColumnPosition.Scrollable) {
+                    this.m_scrollablePanel.Children.Add(castedElement);
+                }
+                else if (position == Controls.ColumnPosition.LeftFixed) {
+                    this.m_leftFixedPanel.Children.Add(castedElement);
+                }
+                else {
+                    this.m_rightFixedPanel.Children.Add(castedElement);
+                }
+            };
+            ColumnElementsHost.prototype.RemoveColumnElement = function (element) {
+                var castedElement = element;
+                if (!(this.m_scrollablePanel.Children.Remove(castedElement))) {
+                    if (!(this.m_leftFixedPanel.Children.Remove(castedElement))) {
+                        this.m_rightFixedPanel.Children.Remove(castedElement);
+                    }
+                }
+            };
+            ColumnElementsHost.prototype.SetElementPosition = function (element, position) {
+                if (position == Controls.ColumnPosition.Scrollable) {
+                    this.SetElementPanel(element, this.m_scrollablePanel, this.m_leftFixedPanel, this.m_rightFixedPanel);
+                }
+                else if (position == Controls.ColumnPosition.LeftFixed) {
+                    this.SetElementPanel(element, this.m_leftFixedPanel, this.m_scrollablePanel, this.m_rightFixedPanel);
+                }
+                else {
+                    this.SetElementPanel(element, this.m_rightFixedPanel, this.m_scrollablePanel, this.m_leftFixedPanel);
+                }
+            };
+            ColumnElementsHost.prototype.SetElementPanel = function (element, targetPanel, otherPanel1, otherPanel2) {
+                var sourcePanel = null;
+                var castedElement = element;
+                if (otherPanel1.Children.Remove(castedElement)) {
+                    sourcePanel = otherPanel1;
+                }
+                else if (otherPanel2.Children.Remove(castedElement)) {
+                    sourcePanel = otherPanel2;
+                }
+                if (sourcePanel != null) {
+                    targetPanel.Children.Add(castedElement);
+                }
+            };
+            ColumnElementsHost.prototype.MeasureOverride = function (availableSize) {
+                this.m_leftFixedPanel.Measure(availableSize);
+                this.m_rightFixedPanel.Measure(availableSize);
+                this.m_scrollablePanel.Measure(availableSize);
+                var leftSize = this.m_leftFixedPanel.DesiredSize;
+                var rightSize = this.m_rightFixedPanel.DesiredSize;
+                var scrollSize = this.m_scrollablePanel.DesiredSize;
+                var height = 0;
+                if (leftSize.height > rightSize.height) {
+                    height = leftSize.height;
+                }
+                else {
+                    height = rightSize.height;
+                }
+                return new Size(0, height);
+            };
+            ColumnElementsHost.prototype.ArrangeOverride = function (finalSize) {
+                var leftSize = this.m_leftFixedPanel.DesiredSize;
+                var rightSize = this.m_rightFixedPanel.DesiredSize;
+                var scrollSize = this.m_scrollablePanel.DesiredSize;
+                var remainingWidth = finalSize.width;
+                var leftWidth = 0;
+                if (remainingWidth < leftSize.width) {
+                    leftWidth = remainingWidth;
+                }
+                else {
+                    leftWidth = leftSize.width;
+                }
+                if (0 > (remainingWidth - leftWidth)) {
+                    remainingWidth = 0;
+                }
+                else {
+                    remainingWidth = (remainingWidth - leftWidth);
+                }
+                var rightWidth = Math.min(remainingWidth, rightSize.width);
+                remainingWidth = Math.max(0, remainingWidth - rightWidth);
+                var scrollWidth = Math.min(remainingWidth, scrollSize.width);
+                this.m_leftFixedPanel.Arrange(new Rect(0, 0, leftWidth, finalSize.height));
+                this.m_rightFixedPanel.Arrange(new Rect(finalSize.width - rightWidth, 0, rightWidth, finalSize.height));
+                this.m_scrollablePanel.Arrange(new Rect(leftWidth, 0, scrollWidth, finalSize.height));
+                return finalSize;
+            };
+            ColumnElementsHost.prototype.InvalidateColumnArrange = function () {
+                this.InvalidateArrange();
+                this.m_leftFixedPanel.InvalidateArrange();
+                this.m_rightFixedPanel.InvalidateArrange();
+                this.m_scrollablePanel.InvalidateArrange();
+            };
+            ColumnElementsHost.prototype.InvalidateColumnMeasure = function () {
+                this.InvalidateMeasure();
+                this.m_leftFixedPanel.InvalidateMeasure();
+                this.m_rightFixedPanel.InvalidateMeasure();
+                this.m_scrollablePanel.InvalidateMeasure();
+            };
+            return ColumnElementsHost;
+        }(Controls.Panel));
+        Controls.ColumnElementsHost = ColumnElementsHost;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var ControlBase = (function (_super) {
+            __extends(ControlBase, _super);
+            function ControlBase() {
+                _super.apply(this, arguments);
+            }
+            Object.defineProperty(ControlBase.prototype, "EventManager", {
+                get: function () {
+                    return this.m_eventHelper;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            return ControlBase;
+        }(Controls.Control));
+        Controls.ControlBase = ControlBase;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var ColumnElementsHost = Fayde.Controls.ColumnElementsHost;
+        var ControlBase = Fayde.Controls.ControlBase;
+        var Row = (function (_super) {
+            __extends(Row, _super);
+            function Row() {
+                _super.call(this);
+                this.OnMouseEnterRowEvent = new Controls.DataGridRoutedEvent();
+                this.OnMouseLeaveRowEvent = new Controls.DataGridRoutedEvent();
+                this.RowMouseLeftButtonDownEvent = new Controls.DataGridRoutedEvent();
+                this.RowMouseLeftButtonUpEvent = new Controls.DataGridRoutedEvent();
+                this.OnRowCellStyleChangedEvent = new Controls.DataGridRoutedEvent();
+                this.m_cellsHost = new ColumnElementsHost();
+                this.PropertyChanged = new nullstone.Event();
+                this.DefaultStyleKey = Row;
+                this.DataContext = null;
+            }
+            Object.defineProperty(Row.prototype, "CurrentStateCurrent", {
+                get: function () { return "Current"; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Row.prototype, "CurrentStateNotCurrent", {
+                get: function () { return "NotCurrent"; },
+                enumerable: true,
+                configurable: true
+            });
+            Row.prototype.OnApplyTemplate = function () {
+                _super.prototype.OnApplyTemplate.call(this);
+                var cellsHost = this.GetTemplateChild("CellsHost", ColumnElementsHost);
+                if (cellsHost == null) {
+                    cellsHost = new ColumnElementsHost();
+                }
+                this.m_cellsHost.TransfertCells(cellsHost);
+                this.m_cellsHost = cellsHost;
+                this.UpdateVisualState();
+            };
+            Row.prototype.OnCellStyleChanged = function (args) {
+                this.OnPropertyChanged("CellStyle");
+            };
+            Object.defineProperty(Row.prototype, "Visual", {
+                get: function () { return this; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Row.prototype, "CellsHost", {
+                get: function () { return this.m_cellsHost; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Row.prototype, "Elements", {
+                get: function () { return this.m_cellsHost.Elements; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Row.prototype, "RenderedElements", {
+                get: function () {
+                    var filtered = [];
+                    var array = nullstone.IEnumerable_.toArray(this.m_cellsHost.Elements);
+                    array.forEach(function (element) {
+                        if (!element.ColumnElement.ParentColumnContainer.IsRecycled) {
+                            filtered.push(element);
+                        }
+                    });
+                    return nullstone.IEnumerable_.fromArray(filtered);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Row.prototype, "RenderedCells", {
+                get: function () {
+                    var filtered = [];
+                    var array = nullstone.IEnumerable_.toArray(this.m_cellsHost.Elements);
+                    array.forEach(function (element) {
+                        filtered.push(element.ColumnElement);
+                    });
+                    return nullstone.IEnumerable_.fromArray(filtered);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Row.prototype, "CellsOffset", {
+                get: function () { return this.m_cellsHost.CellsIndent; },
+                set: function (value) {
+                    if (this.m_cellsHost.CellsIndent != value) {
+                        this.m_cellsHost.CellsIndent = value;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            Row.prototype.InvalidateColumnArrange = function () {
+                this.m_cellsHost.InvalidateColumnArrange();
+            };
+            Row.prototype.InvalidateColumnMeasure = function () {
+                this.m_cellsHost.InvalidateColumnMeasure();
+            };
+            Row.prototype.AddColumnElement = function (element) {
+                this.m_cellsHost.AddColumnElement(element);
+            };
+            Row.prototype.RemoveColumnElement = function (element) {
+                this.m_cellsHost.RemoveColumnElement(element);
+            };
+            Row.prototype.SetElementPosition = function (element, position) {
+                this.m_cellsHost.SetElementPosition(element, position);
+            };
+            Object.defineProperty(Row.prototype, "Path", {
+                get: function () { return this.m_path; },
+                enumerable: true,
+                configurable: true
+            });
+            Row.prototype.SetDataPath = function (path) {
+                this.m_path = path;
+            };
+            Row.prototype.Accept = function (visitor) {
+                visitor.Visit(this);
+            };
+            Row.prototype.OnPropertyChanged = function (propertyName) {
+                this.PropertyChanged.raise(this, new Fayde.PropertyChangedEventArgs(propertyName));
+            };
+            Row.CellStyleProperty = DependencyProperty.Register("CellStyle", function () { return Fayde.Style; }, Row, null, function (d, args) { return d.OnCellStyleChanged(args); });
+            return Row;
+        }(ControlBase));
+        Controls.Row = Row;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (CellEditorDisplayConditions) {
+            CellEditorDisplayConditions[CellEditorDisplayConditions["None"] = 0] = "None";
+            CellEditorDisplayConditions[CellEditorDisplayConditions["RowIsBeingEdited"] = 1] = "RowIsBeingEdited";
+            CellEditorDisplayConditions[CellEditorDisplayConditions["MouseOverCell"] = 2] = "MouseOverCell";
+            CellEditorDisplayConditions[CellEditorDisplayConditions["MouseOverRow"] = 4] = "MouseOverRow";
+            CellEditorDisplayConditions[CellEditorDisplayConditions["RowIsCurrent"] = 8] = "RowIsCurrent";
+            CellEditorDisplayConditions[CellEditorDisplayConditions["CellIsCurrent"] = 16] = "CellIsCurrent";
+            CellEditorDisplayConditions[CellEditorDisplayConditions["Always"] = 32] = "Always";
+        })(Controls.CellEditorDisplayConditions || (Controls.CellEditorDisplayConditions = {}));
+        var CellEditorDisplayConditions = Controls.CellEditorDisplayConditions;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (EditTriggers) {
+            EditTriggers[EditTriggers["None"] = 0] = "None";
+            EditTriggers[EditTriggers["ClickOnCurrentCell"] = 2] = "ClickOnCurrentCell";
+            EditTriggers[EditTriggers["CellIsCurrent"] = 8] = "CellIsCurrent";
+            EditTriggers[EditTriggers["RowIsCurrent"] = 32] = "RowIsCurrent";
+        })(Controls.EditTriggers || (Controls.EditTriggers = {}));
+        var EditTriggers = Controls.EditTriggers;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (SortDirection) {
+            SortDirection[SortDirection["Nonde"] = 0] = "Nonde";
+            SortDirection[SortDirection["Ascending"] = 1] = "Ascending";
+            SortDirection[SortDirection["Descending"] = 2] = "Descending";
+        })(Controls.SortDirection || (Controls.SortDirection = {}));
+        var SortDirection = Controls.SortDirection;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var CellEditorDisplayConditions = Fayde.Controls.CellEditorDisplayConditions;
+        var EditTriggers = Fayde.Controls.EditTriggers;
+        var DataGridBindingInfo = Fayde.Controls.DataGridBindingInfo;
+        var SortDirection = Fayde.Controls.SortDirection;
+        var Column = (function (_super) {
+            __extends(Column, _super);
+            function Column() {
+                _super.apply(this, arguments);
+                this.PropertyChanged = new nullstone.Event();
+            }
+            Object.defineProperty(Column.prototype, "ActualWidth", {
+                get: function () { return this.m_actualWidth; },
+                set: function (value) {
+                    if (this.m_actualWidth == value)
+                        return;
+                    this.m_actualWidth = value;
+                    this.OnPropertyChanged("ActualWidth");
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            Column.prototype.OnAllowFilterChanged = function (args) {
+                this.OnPropertyChanged("AllowFilter");
+            };
+            Column.prototype.OnAllowGroupChanged = function (args) {
+                this.OnPropertyChanged("AllowGroup");
+            };
+            Column.prototype.OnAllowColumnResizeChanged = function (args) {
+                this.OnPropertyChanged("AllowResize");
+            };
+            Column.prototype.OnCellContentTemplateChanged = function (args) {
+                this.OnPropertyChanged("CellContentTemplate");
+            };
+            Column.prototype.OnCellContentStyleChanged = function (args) {
+                this.OnPropertyChanged("CellContentStyle");
+            };
+            Column.prototype.OnCellEditorDisplayConditionsChanged = function (args) {
+                this.OnPropertyChanged("CellEditorDisplayConditions");
+            };
+            Column.prototype.OnEditTriggersChanged = function (args) {
+                this.OnPropertyChanged("EditTriggers");
+            };
+            Column.prototype.OnCellHorizontalContentAlignmentChanged = function (args) {
+                this.OnPropertyChanged("CellHorizontalContentAlignment");
+            };
+            Column.prototype.OnCellVerticalContentAlignmentChanged = function (args) {
+                this.OnPropertyChanged("CellHorizontalContentAlignment");
+            };
+            Column.prototype.OnCellStyleChanged = function (args) {
+                this.OnPropertyChanged("CellStyle");
+            };
+            Column.prototype.OnColumnManagerCellStyleChanged = function (args) {
+                this.OnPropertyChanged("ColumnManagerCellStyle");
+            };
+            Column.prototype.OnFilterCellStyleChanged = function (args) {
+                this.OnPropertyChanged("FilterCellStyle");
+            };
+            Column.prototype.OnInsertionCellStyleChanged = function (args) {
+                this.OnPropertyChanged("InsertionCellStyle");
+            };
+            Object.defineProperty(Column.prototype, "DisplayMemberBindingInfo", {
+                get: function () { return this.m_displayMemberBindingInfo; },
+                set: function (value) {
+                    if (value == this.m_displayMemberBindingInfo)
+                        return;
+                    var oldValue = this.m_displayMemberBindingInfo;
+                    this.m_displayMemberBindingInfo = value;
+                    this.m_displayMemberBinding = this.m_displayMemberBindingInfo.GetBinding();
+                    if (this.SortBindingInfo == null) {
+                        this.OnPropertyChanged("SortFieldName");
+                    }
+                    this.OnPropertyChanged("DisplayMemberBindingInfo");
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Column.prototype, "DisplayMemberBinding", {
+                get: function () { return this.m_displayMemberBinding; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Column.prototype, "DisplayTitle", {
+                get: function () { return (this.Title != null) ? this.Title : this.FieldName; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Column.prototype, "FieldName", {
+                get: function () { return this.m_fieldName; },
+                set: function (value) {
+                    if (value != this.m_fieldName) {
+                        var oldFieldName = this.m_fieldName;
+                        this.m_fieldName = value;
+                        if (((this.DisplayMemberBindingInfo == null) || (this.DisplayMemberBindingInfo.IsAutoGenerated))
+                            && (!(!this.m_fieldName))) {
+                            this.DisplayMemberBindingInfo = new DataGridBindingInfo(this.m_fieldName, true, true);
+                        }
+                        this.RaiseDisplayTitleChanged();
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Column.prototype, "MinWidth", {
+                get: function () { return this.m_minWidth; },
+                set: function (value) {
+                    this.m_minWidth = value;
+                    this.OnPropertyChanged("MinWidth");
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Column.prototype, "MaxWidth", {
+                get: function () { return this.m_maxWidth; },
+                set: function (value) {
+                    this.m_maxWidth = value;
+                    this.OnPropertyChanged("MaxWidth");
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Column.prototype.OnReadOnlyChanged = function (args) {
+                this.OnPropertyChanged("ReadOnly");
+            };
+            Column.prototype.OnSortBindingInfoChanged = function (args) {
+                this.OnPropertyChanged("SortBindingInfo");
+            };
+            Column.prototype.OnSortDirectionChanged = function (args) {
+                this.OnPropertyChanged("SortDirection");
+            };
+            Object.defineProperty(Column.prototype, "SortFieldName", {
+                get: function () {
+                    return this.ResolveSortFieldName(this.DisplayMemberBindingInfo, this.SortBindingInfo);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Column.prototype.OnTitleChanged = function (args) {
+                this.RaiseDisplayTitleChanged();
+            };
+            Column.prototype.OnTitleTemplateChanged = function (args) {
+                this.OnPropertyChanged("TitleTemplate");
+            };
+            Column.prototype.OnCellEditorTemplateChanged = function (args) {
+                this.OnPropertyChanged("CellEditorTemplate");
+            };
+            Column.prototype.OnCellEditorStyleChanged = function (args) {
+                this.OnPropertyChanged("CellEditorStyle");
+            };
+            Column.prototype.OnVisibleChanged = function (args) {
+                this.OnPropertyChanged("Visible");
+            };
+            Column.prototype.OnVisiblePositionChanged = function (args) {
+                this.OnPropertyChanged("VisiblePosition");
+            };
+            Column.prototype.OnWidthChanged = function (args) {
+                this.OnPropertyChanged("Width");
+            };
+            Column.prototype.OnTextTrimmingPropertyChanged = function (args) {
+                this.OnPropertyChanged("TextTrimming");
+            };
+            Column.prototype.RaiseDisplayTitleChanged = function () {
+                this.OnPropertyChanged("DisplayTitle");
+            };
+            Column.prototype.ResolveSortFieldName = function (bindingInfo, sortBindingInfo) {
+                if (sortBindingInfo != null)
+                    return sortBindingInfo;
+                if (bindingInfo == null)
+                    return null;
+                return bindingInfo.Path.Path;
+            };
+            Column.prototype.OnPropertyChanged = function (propertyName) {
+                this.PropertyChanged.raise(this, new Fayde.PropertyChangedEventArgs(propertyName));
+            };
+            Column.AllowFilterProperty = DependencyProperty.Register("AllowFilter", function () { return Boolean; }, Column, null, function (d, args) { return d.OnAllowFilterChanged(args); });
+            Column.AllowGroupProperty = DependencyProperty.Register("AllowGroup", function () { return Boolean; }, Column, null, function (d, args) { return d.OnAllowGroupChanged(args); });
+            Column.AllowResizeProperty = DependencyProperty.Register("AllowResize", function () { return Boolean; }, Column, null, function (d, args) { return d.OnAllowColumnResizeChanged(args); });
+            Column.AllowSortProperty = DependencyProperty.Register("AllowSort", function () { return Boolean; }, Column, null);
+            Column.CellContentTemplateProperty = DependencyProperty.Register("CellContentTemplate", function () { return Fayde.DataTemplate; }, Column, null, function (d, args) { return d.OnCellContentTemplateChanged(args); });
+            Column.CellContentStyleProperty = DependencyProperty.Register("CellContentStyle", function () { return Fayde.Style; }, Column, null, function (d, args) { return d.OnCellContentStyleChanged(args); });
+            Column.CellEditorDisplayConditionsProperty = DependencyProperty.Register("CellEditorDisplayConditions", function () { return CellEditorDisplayConditions; }, Column, null, function (d, args) { return d.OnCellEditorDisplayConditionsChanged(args); });
+            Column.EditTriggersProperty = DependencyProperty.Register("EditTriggers", function () { return EditTriggers; }, Column, null, function (d, args) { return d.OnEditTriggersChanged(args); });
+            Column.CellHorizontalContentAlignmentProperty = DependencyProperty.Register("CellHorizontalContentAlignment", function () { return Fayde.HorizontalAlignment; }, Column, null, function (d, args) { return d.OnCellHorizontalContentAlignmentChanged(args); });
+            Column.CellVerticalContentAlignmentProperty = DependencyProperty.Register("CellVerticalContentAlignment", function () { return Fayde.VerticalAlignment; }, Column, null, function (d, args) { return d.OnCellVerticalContentAlignmentChanged(args); });
+            Column.CellStyleProperty = DependencyProperty.Register("CellStyle", function () { return Fayde.Style; }, Column, null, function (d, args) { return d.OnCellStyleChanged(args); });
+            Column.ColumnManagerCellStyleProperty = DependencyProperty.Register("CellEditorDisplayConditions", function () { return Fayde.Style; }, Column, null, function (d, args) { return d.OnColumnManagerCellStyleChanged(args); });
+            Column.FilterCellStyleProperty = DependencyProperty.Register("FilterCellStyle", function () { return Fayde.Style; }, Column, null, function (d, args) { return d.OnFilterCellStyleChanged(args); });
+            Column.InsertionCellStyleProperty = DependencyProperty.Register("InsertionCellStyle", function () { return Fayde.Style; }, Column, null, function (d, args) { return d.OnInsertionCellStyleChanged(args); });
+            Column.ReadOnlyProperty = DependencyProperty.Register("ReadOnly", function () { return Boolean; }, Column, null, function (d, args) { return d.OnReadOnlyChanged(args); });
+            Column.SortBindingInfoProperty = DependencyProperty.Register("SortBindingInfo", function () { return String; }, Column, null, function (d, args) { return d.OnSortBindingInfoChanged(args); });
+            Column.SortDirectionProperty = DependencyProperty.Register("SortDirection", function () { return SortDirection; }, Column, null, function (d, args) { return d.OnSortDirectionChanged(args); });
+            Column.TitleProperty = DependencyProperty.Register("Title", function () { return Object; }, Column, null, function (d, args) { return d.OnTitleChanged(args); });
+            Column.TitleTemplateProperty = DependencyProperty.Register("TitleTemplate", function () { return Fayde.DataTemplate; }, Column, null, function (d, args) { return d.OnTitleTemplateChanged(args); });
+            Column.CellEditorTemplateProperty = DependencyProperty.Register("CellEditorTemplate", function () { return Fayde.DataTemplate; }, Column, null, function (d, args) { return d.OnCellEditorTemplateChanged(args); });
+            Column.CellEditorStyleProperty = DependencyProperty.Register("CellEditorStyle", function () { return Fayde.Style; }, Column, null, function (d, args) { return d.OnCellEditorStyleChanged(args); });
+            Column.VisibleProperty = DependencyProperty.Register("Visible", function () { return Boolean; }, Column, null, function (d, args) { return d.OnVisibleChanged(args); });
+            Column.VisiblePositionProperty = DependencyProperty.Register("VisiblePosition", function () { return Number; }, Column, null, function (d, args) { return d.OnVisiblePositionChanged(args); });
+            Column.WidthProperty = DependencyProperty.Register("Width", function () { return Number; }, Column, null, function (d, args) { return d.OnWidthChanged(args); });
+            Column.TextTrimmingProperty = DependencyProperty.Register("Width", function () { return Controls.TextTrimming; }, Column, Controls.TextTrimming.WordEllipsis, function (d, args) { return d.OnTextTrimmingPropertyChanged(args); });
+            return Column;
+        }(Fayde.DependencyObject));
+        Controls.Column = Column;
+        Fayde.MVVM.NotifyProperties(Column, ["CurrentItem"]);
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var ColumnPosition = Fayde.Controls.ColumnPosition;
+        var Cell = Fayde.Controls.Cell;
+        var ObservableCollection = Fayde.Collections.ObservableCollection;
+        var ColumnContainer = (function (_super) {
+            __extends(ColumnContainer, _super);
+            function ColumnContainer() {
+                _super.apply(this, arguments);
+                this.m_columnWidth = 100;
+                this.m_columnOffset = 0;
+                this.m_elements = new ObservableCollection();
+                this.m_position = ColumnPosition.Scrollable;
+            }
+            Object.defineProperty(ColumnContainer.prototype, "ReferenceItem", {
+                get: function () {
+                    return this.Column;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ColumnContainer.prototype, "IsRecycled", {
+                get: function () {
+                    return this.m_isRecycled;
+                },
+                set: function (value) {
+                    if (this.m_isRecycled != value) {
+                        this.m_isRecycled = value;
+                        this.ApplyToAllChildren(this.UpdateIsRecycled);
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ColumnContainer.prototype, "RecycleKey", {
+                get: function () {
+                    return this.Column;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ColumnContainer.prototype, "ColumnPosition", {
+                get: function () {
+                    return this.m_position;
+                },
+                set: function (value) {
+                    if (this.m_position != value) {
+                        this.m_position = value;
+                        for (var index = 0; index < this.Wrappers.Count; index++) {
+                            var wrapper = this.Wrappers.GetValueAt(index);
+                            wrapper.ColumnElement.ParentHost.SetElementPosition(wrapper, value);
+                        }
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ColumnContainer.prototype, "Wrappers", {
+                get: function () {
+                    return this.m_elements;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ColumnContainer.prototype, "Elements", {
+                get: function () {
+                    var result = new ObservableCollection();
+                    for (var index = 0; index < this.m_elements.Count; index++) {
+                        var element = this.m_elements.GetValueAt(index);
+                        var result = new ObservableCollection();
+                        result.Add(element.ColumnElement);
+                    }
+                    return result;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ColumnContainer.prototype, "Cells", {
+                get: function () {
+                    var array = this.m_elements.ToArray();
+                    var result = [];
+                    for (var index = 0; index < array.length; index++) {
+                        var element = array[index];
+                        var cell = element.ColumnElement;
+                        if (cell) {
+                            result.push(cell);
+                        }
+                    }
+                    return nullstone.IEnumerable_.fromArray(result);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ColumnContainer.prototype, "ColumnOffset", {
+                get: function () {
+                    return this.m_columnOffset;
+                },
+                set: function (value) {
+                    if (this.m_columnOffset != value) {
+                        this.m_columnOffset = value;
+                        this.ApplyToAllChildren(this.UpdateColumnOffset);
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ColumnContainer.prototype, "ColumnWidth", {
+                get: function () {
+                    return this.m_columnOffset;
+                },
+                set: function (value) {
+                    if (this.m_columnOffset != value) {
+                        this.m_columnOffset = value;
+                        this.ApplyToAllChildren(this.UpdateColumnWidth);
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ColumnContainer.prototype, "IsDragged", {
+                get: function () {
+                    return this.m_isDragged;
+                },
+                set: function (value) {
+                    var array = nullstone.IEnumerable_.toArray(this.Cells);
+                    if (value != this.m_isDragged) {
+                        this.m_isDragged = value;
+                        for (var index = 0; index < array.length; index++) {
+                            var cell = array[index];
+                            cell.SetCommonState(this.IsDragged ? Cell.CommonStateDragged : Cell.CommonStateNormal, true);
+                        }
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ColumnContainer.prototype, "IsDragPaused", {
+                get: function () {
+                    return this.m_isDragged;
+                },
+                set: function (value) {
+                    if (value != this.m_isDragPaused) {
+                        this.m_isDragPaused = value;
+                        var array = nullstone.IEnumerable_.toArray(this.Cells);
+                        for (var index = 0; index < array.length; index++) {
+                            var cell = array[index];
+                            cell.OnColumnIsDragPausedChanged();
+                        }
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ColumnContainer.prototype, "DesiredSize", {
+                get: function () {
+                    return new Size(this.ColumnWidth, 0);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ColumnContainer.prototype.Add = function (element) {
+                this.m_elements.Add(element);
+                this.UpdateWidth(element);
+                this.UpdateOpacity(element);
+                this.UpdateColumnWidth(element);
+                this.UpdateColumnOffset(element);
+                this.UpdateAnimationX(element);
+                this.UpdateAnimationY(element);
+                this.UpdateIsRecycled(element);
+            };
+            ColumnContainer.prototype.Remove = function (element) {
+                this.m_elements.Remove(element);
+            };
+            ColumnContainer.prototype.Contains = function (element) {
+                return this.m_elements.Contains(element);
+            };
+            ColumnContainer.prototype.UpdateColumnOffset = function (elem) {
+                elem.ColumnOffset = this.ColumnOffset;
+            };
+            ColumnContainer.prototype.UpdateColumnWidth = function (elem) {
+                elem.ColumnWidth = this.ColumnWidth;
+            };
+            ColumnContainer.prototype.UpdateWidth = function (elem) {
+                elem.Width = this.Width;
+            };
+            ColumnContainer.prototype.UpdateOpacity = function (elem) {
+                elem.Opacity = this.Opacity;
+            };
+            ColumnContainer.prototype.UpdateProjection = function (elem) {
+            };
+            ColumnContainer.prototype.UpdateAnimationX = function (elem) {
+                elem.AnimationX = this.AnimationX;
+            };
+            ColumnContainer.prototype.UpdateAnimationY = function (elem) {
+                elem.AnimationY = this.AnimationY;
+            };
+            ColumnContainer.prototype.UpdateIsRecycled = function (elem) {
+                elem.IsRecycled = this.IsRecycled;
+            };
+            ColumnContainer.prototype.OnWidthChanged = function (obj, args) {
+                obj.ApplyToAllChildren(obj.UpdateWidth);
+            };
+            ColumnContainer.prototype.OnAnimationXChanged = function (obj, args) {
+                obj.ApplyToAllChildren(obj.UpdateAnimationX);
+            };
+            ColumnContainer.prototype.OnAnimationYChanged = function (obj, args) {
+                obj.ApplyToAllChildren(obj.UpdateAnimationY);
+            };
+            ColumnContainer.prototype.OnOpacityChanged = function (obj, args) {
+                obj.ApplyToAllChildren(obj.UpdateOpacity);
+            };
+            ColumnContainer.prototype.OnProjectionChanged = function (obj, args) {
+                obj.ApplyToAllChildren(obj.UpdateProjection);
+            };
+            ColumnContainer.prototype.ApplyToAllChildren = function (action) {
+                for (var index = 0; index < this.m_elements.Count; index++) {
+                    var elem = this.m_elements.GetValueAt(index);
+                    action(elem);
+                }
+            };
+            ColumnContainer.prototype.PrepareBitmapCache = function () {
+            };
+            ColumnContainer.prototype.ClearBitmapCache = function () {
+            };
+            ColumnContainer.prototype.Measure = function (availableSize) {
+            };
+            ColumnContainer.prototype.Arrange = function (arrangeParameters) {
+            };
+            ColumnContainer.AnimationXProperty = DependencyProperty.Register("AnimationX", function () { return Number; }, ColumnContainer, 0, function (d, args) { return d.OnAnimationXChanged(d, args); });
+            ColumnContainer.AnimationYProperty = DependencyProperty.Register("AnimationY", function () { return Number; }, ColumnContainer, 0, function (d, args) { return d.OnAnimationYChanged(d, args); });
+            ColumnContainer.WidthProperty = DependencyProperty.Register("Width", function () { return Number; }, ColumnContainer, Number.NaN, function (d, args) { return d.OnWidthChanged(d, args); });
+            ColumnContainer.OpacityProperty = DependencyProperty.Register("Opacity", function () { return Number; }, ColumnContainer, 1.0, function (d, args) { return d.OnOpacityChanged(d, args); });
+            ColumnContainer.ProjectionProperty = DependencyProperty.Register("Projection", function () { return Fayde.Media.Projection; }, ColumnContainer, null, function (d, args) { return d.OnProjectionChanged(d, args); });
+            return ColumnContainer;
+        }(Fayde.DependencyObject));
+        Controls.ColumnContainer = ColumnContainer;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var ContentControlBase = (function (_super) {
+            __extends(ContentControlBase, _super);
+            function ContentControlBase() {
+                _super.apply(this, arguments);
+            }
+            Object.defineProperty(ContentControlBase.prototype, "EventManager", {
+                get: function () {
+                    return this.m_eventHelper;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            return ContentControlBase;
+        }(Controls.ContentControl));
+        Controls.ContentControlBase = ContentControlBase;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var ContentControlBase = Fayde.Controls.ContentControlBase;
+        var Cell = (function (_super) {
+            __extends(Cell, _super);
+            function Cell() {
+                _super.call(this);
+                this.OnMouseEnterCellEvent = new Controls.DataGridRoutedEvent();
+                this.OnMouseLeaveCellEvent = new Controls.DataGridRoutedEvent();
+                this.CellMouseLeftButtonDownEvent = new Controls.DataGridRoutedEvent();
+                this.CellMouseLeftButtonUpEvent = new Controls.DataGridRoutedEvent();
+                this.PropertyChanged = new nullstone.Event();
+                this.DefaultStyleKey = Cell;
+            }
+            Object.defineProperty(Cell, "CommonStateNormal", {
+                get: function () { return "Normal"; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Cell, "CommonStatePressed", {
+                get: function () { return "Pressed"; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Cell, "CommonStateDragged", {
+                get: function () { return "Dragged"; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Cell, "CommonStateMouseOver", {
+                get: function () { return "MouseOver"; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Cell, "CurrentStateCurrent", {
+                get: function () { return "Current"; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Cell, "CurrentStateNotCurrent", {
+                get: function () { return "NotCurrent"; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Cell.prototype, "ParentRow", {
+                get: function () {
+                    var row = this.ParentHost;
+                    return row;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Cell.prototype, "ParentColumn", {
+                get: function () {
+                    return (this.ParentColumnContainer != null)
+                        ? this.ParentColumnContainer.Column
+                        : null;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Cell.prototype.OnMouseEnter = function (e) {
+                _super.prototype.OnMouseEnter.call(this, e);
+                this.UpdateVisualState();
+            };
+            Cell.prototype.OnMouseLeave = function (e) {
+                _super.prototype.OnMouseLeave.call(this, e);
+                this.UpdateVisualState();
+            };
+            Cell.prototype.OnMouseMove = function (e) {
+                _super.prototype.OnMouseMove.call(this, e);
+            };
+            Cell.prototype.OnMouseLeftButtonDown = function (e) {
+                _super.prototype.OnMouseLeftButtonDown.call(this, e);
+            };
+            Cell.prototype.OnMouseLeftButtonUp = function (e) {
+                _super.prototype.OnMouseLeftButtonDown.call(this, e);
+            };
+            Cell.prototype.SetContentAlignment = function (dp, newValue) {
+                var oldValue = this.ReadLocalValue(dp);
+                var hasOldValue = (oldValue != DependencyProperty.UnsetValue);
+                if (newValue.HasValue) {
+                    var value = newValue.Value;
+                    if (!hasOldValue || (!nullstone.equals(oldValue, value))) {
+                        this.SetValue(dp, value);
+                    }
+                }
+                else if (hasOldValue) {
+                    this.ClearValue(dp);
+                }
+            };
+            Cell.prototype.SetParentColumnContainer = function (columnContainer) {
+                this.ParentColumnContainer = columnContainer;
+            };
+            Cell.prototype.SetParentHost = function (parentHost) {
+                this.ParentHost = parentHost;
+            };
+            Cell.prototype.SetCommonState = function (state, useTransitions) {
+            };
+            Cell.prototype.SetCurrentState = function (isCurrent, useTransitions) {
+                var state = (isCurrent) ? Cell.CurrentStateCurrent : Cell.CurrentStateNotCurrent;
+            };
+            Cell.prototype.OnColumnIsDragPausedChanged = function () {
+            };
+            Cell.prototype.OnPropertyChanged = function (propertyName) {
+                this.PropertyChanged.raise(this, new Fayde.PropertyChangedEventArgs(propertyName));
+            };
+            return Cell;
+        }(ContentControlBase));
+        Controls.Cell = Cell;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (ColumnPosition) {
+            ColumnPosition[ColumnPosition["Unchanged"] = 0] = "Unchanged";
+            ColumnPosition[ColumnPosition["Editing"] = 1] = "Editing";
+            ColumnPosition[ColumnPosition["Edited"] = 2] = "Edited";
+            ColumnPosition[ColumnPosition["Committing"] = 3] = "Committing";
+            ColumnPosition[ColumnPosition["Canceling"] = 4] = "Canceling";
+        })(Controls.ColumnPosition || (Controls.ColumnPosition = {}));
+        var ColumnPosition = Controls.ColumnPosition;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (ContainerType) {
+            ContainerType[ContainerType["Cell"] = 0] = "Cell";
+            ContainerType[ContainerType["Row"] = 1] = "Row";
+        })(Controls.ContainerType || (Controls.ContainerType = {}));
+        var ContainerType = Controls.ContainerType;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (DataGridClipboardCopyMode) {
+            DataGridClipboardCopyMode[DataGridClipboardCopyMode["None"] = 0] = "None";
+            DataGridClipboardCopyMode[DataGridClipboardCopyMode["ExcludeHeader"] = 1] = "ExcludeHeader";
+            DataGridClipboardCopyMode[DataGridClipboardCopyMode["IncludeHeader"] = 2] = "IncludeHeader";
+        })(Controls.DataGridClipboardCopyMode || (Controls.DataGridClipboardCopyMode = {}));
+        var DataGridClipboardCopyMode = Controls.DataGridClipboardCopyMode;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (EditableCellContentElementType) {
+            EditableCellContentElementType[EditableCellContentElementType["Viewer"] = 0] = "Viewer";
+            EditableCellContentElementType[EditableCellContentElementType["Editor"] = 1] = "Editor";
+        })(Controls.EditableCellContentElementType || (Controls.EditableCellContentElementType = {}));
+        var EditableCellContentElementType = Controls.EditableCellContentElementType;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (FetchDirection) {
+            FetchDirection[FetchDirection["Forward"] = 0] = "Forward";
+            FetchDirection[FetchDirection["Backward"] = 1] = "Backward";
+        })(Controls.FetchDirection || (Controls.FetchDirection = {}));
+        var FetchDirection = Controls.FetchDirection;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (FixedColumnToggleButtonVisibility) {
+            FixedColumnToggleButtonVisibility[FixedColumnToggleButtonVisibility["Auto"] = 0] = "Auto";
+            FixedColumnToggleButtonVisibility[FixedColumnToggleButtonVisibility["Always"] = 1] = "Always";
+            FixedColumnToggleButtonVisibility[FixedColumnToggleButtonVisibility["Never"] = 2] = "Never";
+        })(Controls.FixedColumnToggleButtonVisibility || (Controls.FixedColumnToggleButtonVisibility = {}));
+        var FixedColumnToggleButtonVisibility = Controls.FixedColumnToggleButtonVisibility;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (GroupNavigationModes) {
+            GroupNavigationModes[GroupNavigationModes["None"] = 0] = "None";
+            GroupNavigationModes[GroupNavigationModes["NavigationButtons"] = 1] = "NavigationButtons";
+            GroupNavigationModes[GroupNavigationModes["SearchBox"] = 2] = "SearchBox";
+            GroupNavigationModes[GroupNavigationModes["All"] = 3] = "All";
+        })(Controls.GroupNavigationModes || (Controls.GroupNavigationModes = {}));
+        var GroupNavigationModes = Controls.GroupNavigationModes;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (HeaderFooterTypes) {
+            HeaderFooterTypes[HeaderFooterTypes["None"] = 0] = "None";
+            HeaderFooterTypes[HeaderFooterTypes["GroupByControl"] = 1] = "GroupByControl";
+            HeaderFooterTypes[HeaderFooterTypes["ColumnManagerRow"] = 2] = "ColumnManagerRow";
+            HeaderFooterTypes[HeaderFooterTypes["FilterRow"] = 4] = "FilterRow";
+            HeaderFooterTypes[HeaderFooterTypes["InsertionRow"] = 8] = "InsertionRow";
+            HeaderFooterTypes[HeaderFooterTypes["NotificationControl"] = 16] = "NotificationControl";
+            HeaderFooterTypes[HeaderFooterTypes["All"] = 31] = "All";
+        })(Controls.HeaderFooterTypes || (Controls.HeaderFooterTypes = {}));
+        var HeaderFooterTypes = Controls.HeaderFooterTypes;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (ItemScrollingBehavior) {
+            ItemScrollingBehavior[ItemScrollingBehavior["Deferred"] = 0] = "Deferred";
+            ItemScrollingBehavior[ItemScrollingBehavior["Immediate"] = 1] = "Immediate";
+        })(Controls.ItemScrollingBehavior || (Controls.ItemScrollingBehavior = {}));
+        var ItemScrollingBehavior = Controls.ItemScrollingBehavior;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (LocationState) {
+            LocationState[LocationState["GridHeader"] = 0] = "GridHeader";
+            LocationState[LocationState["GridFooter"] = 1] = "GridFooter";
+            LocationState[LocationState["GroupHeader"] = 2] = "GroupHeader";
+            LocationState[LocationState["GroupFooter"] = 3] = "GroupFooter";
+        })(Controls.LocationState || (Controls.LocationState = {}));
+        var LocationState = Controls.LocationState;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (NotificationSource) {
+            NotificationSource[NotificationSource["Grouping"] = 0] = "Grouping";
+            NotificationSource[NotificationSource["Filtering"] = 1] = "Filtering";
+            NotificationSource[NotificationSource["Navigation"] = 2] = "Navigation";
+            NotificationSource[NotificationSource["Selection"] = 3] = "Selection";
+        })(Controls.NotificationSource || (Controls.NotificationSource = {}));
+        var NotificationSource = Controls.NotificationSource;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (NotificationType) {
+            NotificationType[NotificationType["GroupingCanceled"] = 0] = "GroupingCanceled";
+            NotificationType[NotificationType["FilteringCanceled"] = 1] = "FilteringCanceled";
+            NotificationType[NotificationType["NavigationIncomplete"] = 2] = "NavigationIncomplete";
+        })(Controls.NotificationType || (Controls.NotificationType = {}));
+        var NotificationType = Controls.NotificationType;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (NotifyInternalCollectionChangedAction) {
+            NotifyInternalCollectionChangedAction[NotifyInternalCollectionChangedAction["Add"] = 0] = "Add";
+            NotifyInternalCollectionChangedAction[NotifyInternalCollectionChangedAction["Remove"] = 1] = "Remove";
+            NotifyInternalCollectionChangedAction[NotifyInternalCollectionChangedAction["Replace"] = 2] = "Replace";
+            NotifyInternalCollectionChangedAction[NotifyInternalCollectionChangedAction["Move"] = 3] = "Move";
+            NotifyInternalCollectionChangedAction[NotifyInternalCollectionChangedAction["Reset"] = 4] = "Reset";
+        })(Controls.NotifyInternalCollectionChangedAction || (Controls.NotifyInternalCollectionChangedAction = {}));
+        var NotifyInternalCollectionChangedAction = Controls.NotifyInternalCollectionChangedAction;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (RowEditingState) {
+            RowEditingState[RowEditingState["Unchanged"] = 0] = "Unchanged";
+            RowEditingState[RowEditingState["Editing"] = 1] = "Editing";
+            RowEditingState[RowEditingState["Edited"] = 2] = "Edited";
+            RowEditingState[RowEditingState["Ending"] = 3] = "Ending";
+            RowEditingState[RowEditingState["Committing"] = 4] = "Committing";
+            RowEditingState[RowEditingState["Canceling"] = 5] = "Canceling";
+        })(Controls.RowEditingState || (Controls.RowEditingState = {}));
+        var RowEditingState = Controls.RowEditingState;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (RowEndEditResult) {
+            RowEndEditResult[RowEndEditResult["Succeeded"] = 0] = "Succeeded";
+            RowEndEditResult[RowEndEditResult["Failed"] = 1] = "Failed";
+            RowEndEditResult[RowEndEditResult["WillCompleteAsynchronously"] = 2] = "WillCompleteAsynchronously";
+        })(Controls.RowEndEditResult || (Controls.RowEndEditResult = {}));
+        var RowEndEditResult = Controls.RowEndEditResult;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (ScrollDirections) {
+            ScrollDirections[ScrollDirections["None"] = 0] = "None";
+            ScrollDirections[ScrollDirections["Left"] = 1] = "Left";
+            ScrollDirections[ScrollDirections["Right"] = 2] = "Right";
+            ScrollDirections[ScrollDirections["Up"] = 4] = "Up";
+            ScrollDirections[ScrollDirections["Down"] = 8] = "Down";
+        })(Controls.ScrollDirections || (Controls.ScrollDirections = {}));
+        var ScrollDirections = Controls.ScrollDirections;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        (function (SelectionType) {
+            SelectionType[SelectionType["Selection"] = 0] = "Selection";
+            SelectionType[SelectionType["Unselection"] = 1] = "Unselection";
+        })(Controls.SelectionType || (Controls.SelectionType = {}));
+        var SelectionType = Controls.SelectionType;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var ActivatingCellEditorEventArgs = (function (_super) {
+            __extends(ActivatingCellEditorEventArgs, _super);
+            function ActivatingCellEditorEventArgs(targetCell, cellEditor) {
+                _super.call(this);
+                this.OriginalSource = originalSource;
+            }
+            Object.defineProperty(ActivatingCellEditorEventArgs.prototype, "Cell", {
+                get: function () { return this.m_targetCell; },
+                enumerable: true,
+                configurable: true
+            });
+            return ActivatingCellEditorEventArgs;
+        }(Fayde.RoutedEventArgs));
+        Controls.ActivatingCellEditorEventArgs = ActivatingCellEditorEventArgs;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var DataGridRoutedEvent = (function () {
+            function DataGridRoutedEvent() {
+            }
+            return DataGridRoutedEvent;
+        }());
+        Controls.DataGridRoutedEvent = DataGridRoutedEvent;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var DataGridRoutedEventArgs = (function (_super) {
+            __extends(DataGridRoutedEventArgs, _super);
+            function DataGridRoutedEventArgs(originalSource) {
+                _super.call(this);
+                this.OriginalSource = originalSource;
+            }
+            return DataGridRoutedEventArgs;
+        }(Fayde.RoutedEventArgs));
+        Controls.DataGridRoutedEventArgs = DataGridRoutedEventArgs;
+    })(Controls = Fayde.Controls || (Fayde.Controls = {}));
+})(Fayde || (Fayde = {}));
+var Fayde;
+(function (Fayde) {
+    var Controls;
+    (function (Controls) {
+        var LinkedList = Fayde.Controls.LinkedList;
+        var Dictionary = Fayde.Controls.Dictionary;
+        var DataGridEventHelper = (function () {
+            function DataGridEventHelper(element) {
+                this.m_handlers = new Dictionary();
+                if (element) {
+                    this.m_element = element;
+                }
+            }
+            DataGridEventHelper.prototype.RaiseEvent = function (routedEvent, args) {
+                var currentHandledObject = this.m_element;
+                var handlers;
+                while (currentHandledObject != null) {
+                    if (currentHandledObject.EventManager.m_handlers.containsKey(routedEvent)) {
+                        handlers = currentHandledObject.EventManager.m_handlers.getValue(routedEvent);
+                        for (var index = 0; index < handlers.size(); index++) {
+                            var currentHandler = handlers.elementAtIndex(index);
+                            currentHandler(currentHandledObject, args);
+                        }
+                    }
+                    currentHandledObject = DataGridEventHelper.GetParent(currentHandledObject);
+                }
+            };
+            DataGridEventHelper.prototype.AddHandler = function (routedEvent, handler) {
+                var handlers;
+                if (this.m_handlers.containsKey(routedEvent)) {
+                }
+                handlers = this.m_handlers.getValue(routedEvent);
+                if (!handlers) {
+                    handlers = new LinkedList();
+                    this.m_handlers.setValue(routedEvent, handlers);
+                }
+                handlers.add(handler);
+            };
+            DataGridEventHelper.prototype.RemoveHandler = function (routedEvent, handler) {
+                var handlers;
+                if (this.m_handlers.containsKey(routedEvent)) {
+                    handlers = this.m_handlers.getValue(routedEvent);
+                    handlers.remove(handler);
+                }
+            };
+            DataGridEventHelper.GetParent = function (element) {
+                var parent = Fayde.VisualTreeHelper.GetParent(element);
+                while ((parent != null) && !(parent))
+                    parent = Fayde.VisualTreeHelper.GetParent(parent);
+                return parent;
+            };
+            return DataGridEventHelper;
+        }());
+        Controls.DataGridEventHelper = DataGridEventHelper;
     })(Controls = Fayde.Controls || (Fayde.Controls = {}));
 })(Fayde || (Fayde = {}));
 var Fayde;

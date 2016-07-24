@@ -708,13 +708,272 @@ declare module Fayde.Controls.contextmenu {
     }
 }
 declare module Fayde.Controls {
+    interface ICompareFunction<T> {
+        (a: T, b: T): number;
+    }
+    interface IEqualsFunction<T> {
+        (a: T, b: T): boolean;
+    }
+    interface ILoopFunction<T> {
+        (a: T): boolean;
+    }
+    function defaultCompare<T>(a: T, b: T): number;
+    function defaultEquals<T>(a: T, b: T): boolean;
+    function defaultToString(item: any): string;
+    function makeString<T>(item: T, join?: string): string;
+    function isFunction(func: any): boolean;
+    function isUndefined(obj: any): boolean;
+    function isString(obj: any): boolean;
+    function reverseCompareFunction<T>(compareFunction: ICompareFunction<T>): ICompareFunction<T>;
+    function compareToEquals<T>(compareFunction: ICompareFunction<T>): IEqualsFunction<T>;
+    module arrays {
+        function indexOf<T>(array: T[], item: T, equalsFunction?: Fayde.Controls.IEqualsFunction<T>): number;
+        function lastIndexOf<T>(array: T[], item: T, equalsFunction?: Fayde.Controls.IEqualsFunction<T>): number;
+        function contains<T>(array: T[], item: T, equalsFunction?: Fayde.Controls.IEqualsFunction<T>): boolean;
+        function remove<T>(array: T[], item: T, equalsFunction?: Fayde.Controls.IEqualsFunction<T>): boolean;
+        function frequency<T>(array: T[], item: T, equalsFunction?: Fayde.Controls.IEqualsFunction<T>): number;
+        function equals<T>(array1: T[], array2: T[], equalsFunction?: Fayde.Controls.IEqualsFunction<T>): boolean;
+        function copy<T>(array: T[]): T[];
+        function swap<T>(array: T[], i: number, j: number): boolean;
+        function toString<T>(array: T[]): string;
+        function forEach<T>(array: T[], callback: (item: T) => boolean): void;
+    }
+    interface ILinkedListNode<T> {
+        element: T;
+        next: ILinkedListNode<T>;
+    }
+    class LinkedList<T> {
+        firstNode: ILinkedListNode<T>;
+        private lastNode;
+        private nElements;
+        constructor();
+        add(item: T, index?: number): boolean;
+        first(): T;
+        last(): T;
+        elementAtIndex(index: number): T;
+        indexOf(item: T, equalsFunction?: IEqualsFunction<T>): number;
+        contains(item: T, equalsFunction?: IEqualsFunction<T>): boolean;
+        remove(item: T, equalsFunction?: IEqualsFunction<T>): boolean;
+        clear(): void;
+        equals(other: LinkedList<T>, equalsFunction?: IEqualsFunction<T>): boolean;
+        private equalsAux(n1, n2, eqF);
+        removeElementAtIndex(index: number): T;
+        forEach(callback: (item: T) => boolean): void;
+        reverse(): void;
+        toArray(): T[];
+        size(): number;
+        isEmpty(): boolean;
+        toString(): string;
+        private nodeAtIndex(index);
+        private createNode(item);
+    }
+    interface IDictionaryPair<K, V> {
+        key: K;
+        value: V;
+    }
+    class Dictionary<K, V> {
+        protected table: {
+            [key: string]: IDictionaryPair<K, V>;
+        };
+        protected nElements: number;
+        protected toStr: (key: K) => string;
+        constructor(toStrFunction?: (key: K) => string);
+        getValue(key: K): V;
+        setValue(key: K, value: V): V;
+        remove(key: K): V;
+        keys(): K[];
+        values(): V[];
+        forEach(callback: (key: K, value: V) => any): void;
+        containsKey(key: K): boolean;
+        clear(): void;
+        size(): number;
+        isEmpty(): boolean;
+        toString(): string;
+    }
+    class LinkedDictionary<K, V> extends Dictionary<K, V> {
+        private head;
+        private tail;
+        constructor(toStrFunction?: (key: K) => string);
+        private appendToTail(entry);
+        private getLinkedDictionaryPair(key);
+        getValue(key: K): V;
+        remove(key: K): V;
+        clear(): void;
+        private replace(oldPair, newPair);
+        setValue(key: K, value: V): V;
+        keys(): K[];
+        values(): V[];
+        forEach(callback: (key: K, value: V) => any): void;
+    }
+    class MultiDictionary<K, V> {
+        private dict;
+        private equalsF;
+        private allowDuplicate;
+        constructor(toStrFunction?: (key: K) => string, valuesEqualsFunction?: IEqualsFunction<V>, allowDuplicateValues?: boolean);
+        getValue(key: K): V[];
+        setValue(key: K, value: V): boolean;
+        remove(key: K, value?: V): boolean;
+        keys(): K[];
+        values(): V[];
+        containsKey(key: K): boolean;
+        clear(): void;
+        size(): number;
+        isEmpty(): boolean;
+    }
+    class Heap<T> {
+        private data;
+        private compare;
+        constructor(compareFunction?: ICompareFunction<T>);
+        private leftChildIndex(nodeIndex);
+        private rightChildIndex(nodeIndex);
+        private parentIndex(nodeIndex);
+        private minIndex(leftChild, rightChild);
+        private siftUp(index);
+        private siftDown(nodeIndex);
+        peek(): T;
+        add(element: T): boolean;
+        removeRoot(): T;
+        contains(element: T): boolean;
+        size(): number;
+        isEmpty(): boolean;
+        clear(): void;
+        forEach(callback: (item: T) => boolean): void;
+    }
+    class Stack<T> {
+        private list;
+        constructor();
+        push(elem: T): boolean;
+        add(elem: T): boolean;
+        pop(): T;
+        peek(): T;
+        size(): number;
+        contains(elem: T, equalsFunction?: IEqualsFunction<T>): boolean;
+        isEmpty(): boolean;
+        clear(): void;
+        forEach(callback: ILoopFunction<T>): void;
+    }
+    class Queue<T> {
+        private list;
+        constructor();
+        enqueue(elem: T): boolean;
+        add(elem: T): boolean;
+        dequeue(): T;
+        peek(): T;
+        size(): number;
+        contains(elem: T, equalsFunction?: IEqualsFunction<T>): boolean;
+        isEmpty(): boolean;
+        clear(): void;
+        forEach(callback: ILoopFunction<T>): void;
+    }
+    class PriorityQueue<T> {
+        private heap;
+        constructor(compareFunction?: ICompareFunction<T>);
+        enqueue(element: T): boolean;
+        add(element: T): boolean;
+        dequeue(): T;
+        peek(): T;
+        contains(element: T): boolean;
+        isEmpty(): boolean;
+        size(): number;
+        clear(): void;
+        forEach(callback: ILoopFunction<T>): void;
+    }
+    class Set<T> {
+        private dictionary;
+        constructor(toStringFunction?: (item: T) => string);
+        contains(element: T): boolean;
+        add(element: T): boolean;
+        intersection(otherSet: Set<T>): void;
+        union(otherSet: Set<T>): void;
+        difference(otherSet: Set<T>): void;
+        isSubsetOf(otherSet: Set<T>): boolean;
+        remove(element: T): boolean;
+        forEach(callback: ILoopFunction<T>): void;
+        toArray(): T[];
+        isEmpty(): boolean;
+        size(): number;
+        clear(): void;
+        toString(): string;
+    }
+    class Bag<T> {
+        private toStrF;
+        private dictionary;
+        private nElements;
+        constructor(toStrFunction?: (item: T) => string);
+        add(element: T, nCopies?: number): boolean;
+        count(element: T): number;
+        contains(element: T): boolean;
+        remove(element: T, nCopies?: number): boolean;
+        toArray(): T[];
+        toSet(): Set<T>;
+        forEach(callback: ILoopFunction<T>): void;
+        size(): number;
+        isEmpty(): boolean;
+        clear(): void;
+    }
+    class BSTree<T> {
+        private root;
+        private compare;
+        private nElements;
+        constructor(compareFunction?: ICompareFunction<T>);
+        add(element: T): boolean;
+        clear(): void;
+        isEmpty(): boolean;
+        size(): number;
+        contains(element: T): boolean;
+        remove(element: T): boolean;
+        inorderTraversal(callback: ILoopFunction<T>): void;
+        preorderTraversal(callback: ILoopFunction<T>): void;
+        postorderTraversal(callback: ILoopFunction<T>): void;
+        levelTraversal(callback: ILoopFunction<T>): void;
+        minimum(): T;
+        maximum(): T;
+        forEach(callback: ILoopFunction<T>): void;
+        toArray(): T[];
+        height(): number;
+        private searchNode(node, element);
+        private transplant(n1, n2);
+        private removeNode(node);
+        private inorderTraversalAux(node, callback, signal);
+        private levelTraversalAux(node, callback);
+        private preorderTraversalAux(node, callback, signal);
+        private postorderTraversalAux(node, callback, signal);
+        private minimumAux(node);
+        private maximumAux(node);
+        private heightAux(node);
+        private insertNode(node);
+        private createNode(element);
+    }
+}
+declare module "DataControls/DataDictionaryUtil" {
+    export const has: (obj: any, prop: any) => any;
+    export interface ICompareFunction<T> {
+        (a: T, b: T): number;
+    }
+    export interface IEqualsFunction<T> {
+        (a: T, b: T): boolean;
+    }
+    export interface ILoopFunction<T> {
+        (a: T): boolean | void;
+    }
+    export function defaultCompare<T>(a: T, b: T): number;
+    export function defaultEquals<T>(a: T, b: T): boolean;
+    export function defaultToString(item: any): string;
+    export function makeString<T>(item: T, join?: string): string;
+    export function isFunction(func: any): boolean;
+    export function isUndefined(obj: any): boolean;
+    export function isString(obj: any): boolean;
+    export function reverseCompareFunction<T>(compareFunction: ICompareFunction<T>): ICompareFunction<T>;
+    export function compareToEquals<T>(compareFunction: ICompareFunction<T>): IEqualsFunction<T>;
+}
+declare module Fayde.Controls {
     interface IDataFormObject {
         CreateItem(): any;
     }
 }
-declare module Fayde.Controls.DataControls {
+declare module Fayde.Controls {
     import ObservableCollection = Fayde.Collections.ObservableCollection;
-    import IDataFormObject = Fayde.Controls.DataControls.IDataFormObject;
+    import IDataFormObject = Fayde.Controls.IDataFormObject;
     class DataSourceCollection<T> extends ObservableCollection<IDataFormObject> {
         private tCreator;
         constructor(TCreator: {
@@ -1044,32 +1303,6 @@ declare module Fayde.Controls {
         private DrawStarRating(value, fillBrush, outlineBrush, unselectedBrush);
     }
 }
-declare module Fayde.Controls.tabpanel {
-    import Size = minerva.Size;
-    import PanelUpdaterTree = minerva.controls.panel.PanelUpdaterTree;
-    module helpers {
-        function getDesiredSizeWithoutMargin(upd: minerva.core.Updater): Size;
-        function getHeadersSize(tree: PanelUpdaterTree): number[];
-        function setTabItemZ(upd: minerva.core.Updater): void;
-        function getActiveRow(tree: PanelUpdaterTree, solution: number[], isDockTop: boolean): number;
-        function calculateHeaderDistribution(tree: PanelUpdaterTree, rowWidthLimit: number, headerWidth: number[]): number[];
-    }
-}
-declare module Fayde.Controls {
-    class TabPanel extends Panel {
-        CreateLayoutUpdater(): tabpanel.TabPanelUpdater;
-        private TabAlignment;
-        static setTabAlignment(tp: TabPanel, alignment: Dock): void;
-    }
-}
-declare module Fayde.Controls.tabpanel {
-    interface ITabPanelUpdaterAssets extends minerva.controls.panel.IPanelUpdaterAssets, measure.IInput, arrange.IInput {
-    }
-    class TabPanelUpdater extends minerva.controls.panel.PanelUpdater {
-        assets: ITabPanelUpdaterAssets;
-        init(): void;
-    }
-}
 declare module Fayde.Controls {
     function compareSummaryItems(item1: ValidationSummaryItem, item2: ValidationSummaryItem): number;
 }
@@ -1191,6 +1424,32 @@ declare module Fayde.Controls.viewbox {
         private setViewXform(sx, sy);
     }
 }
+declare module Fayde.Controls.tabpanel {
+    import Size = minerva.Size;
+    import PanelUpdaterTree = minerva.controls.panel.PanelUpdaterTree;
+    module helpers {
+        function getDesiredSizeWithoutMargin(upd: minerva.core.Updater): Size;
+        function getHeadersSize(tree: PanelUpdaterTree): number[];
+        function setTabItemZ(upd: minerva.core.Updater): void;
+        function getActiveRow(tree: PanelUpdaterTree, solution: number[], isDockTop: boolean): number;
+        function calculateHeaderDistribution(tree: PanelUpdaterTree, rowWidthLimit: number, headerWidth: number[]): number[];
+    }
+}
+declare module Fayde.Controls {
+    class TabPanel extends Panel {
+        CreateLayoutUpdater(): tabpanel.TabPanelUpdater;
+        private TabAlignment;
+        static setTabAlignment(tp: TabPanel, alignment: Dock): void;
+    }
+}
+declare module Fayde.Controls.tabpanel {
+    interface ITabPanelUpdaterAssets extends minerva.controls.panel.IPanelUpdaterAssets, measure.IInput, arrange.IInput {
+    }
+    class TabPanelUpdater extends minerva.controls.panel.PanelUpdater {
+        assets: ITabPanelUpdaterAssets;
+        init(): void;
+    }
+}
 declare module Fayde.Controls.wrappanel {
     module helpers {
         function coerceChildSize(child: minerva.core.Updater, itemWidth: number, itemHeight: number): void;
@@ -1213,6 +1472,44 @@ declare module Fayde.Controls.wrappanel {
     class WrapPanelUpdater extends minerva.controls.panel.PanelUpdater {
         assets: IWrapPanelUpdaterAssets;
         init(): void;
+    }
+}
+declare module Fayde.Controls {
+    class DataItem {
+        constructor();
+        constructor(data: any, isLoaded: boolean);
+        Equals(obj: any): any;
+        IsLoaded: boolean;
+        private m_isLoaded;
+        Data: any;
+        private m_data;
+    }
+}
+declare module Fayde.Controls {
+    import DataItem = Fayde.Controls.DataItem;
+    import IEnumerable = nullstone.IEnumerable;
+    import IEnumerator = nullstone.IEnumerator;
+    class DataPath extends IEnumerable<DataItem> {
+        private m_path;
+        static Empty: DataPath;
+        constructor(rootItem: DataItem, children: DataItem[], length: number, useClientArray: boolean, objectPath: DataItem[], obj: DataItem);
+        ParentPath: DataPath;
+        LastChild: DataItem;
+        Depth: number;
+        Path: DataItem[];
+        getItem(index: number): DataItem;
+        setItem(index: number, value: DataItem): void;
+        CreateChildPath(child: DataItem): DataPath;
+        CreateChildPathEx(childPath: DataPath, startIndex: number, length: number): DataPath;
+        CreateAncestorPath(depth: number): DataPath;
+        CreateAncestorOrSamePath(depth: number): DataPath;
+        IsAncestorOf(childPath: DataPath): boolean;
+        IsAncestorOfEx(arrayPath: DataItem[], validDepth: number): boolean;
+        ToArray(): DataItem[];
+        IsDescendantOf(parentPath: DataPath): boolean;
+        Equals(obj: any): boolean;
+        static AreSameItems(array1: DataItem[], array2: DataItem[], len: number): boolean;
+        GetEnumerator(): IEnumerator<DataItem>;
     }
 }
 declare module Fayde.Controls {
@@ -1242,7 +1539,7 @@ declare module Fayde.Controls {
 declare module Fayde.Controls {
     import IDataField = Fayde.Controls.IDataField;
     import ObservableCollection = Fayde.Collections.ObservableCollection;
-    import DataFormMode = Fayde.Controls.DataControls.DataFormMode;
+    import DataFormMode = Fayde.Controls.DataFormMode;
     class DataForm extends ItemsControl {
         private partGrid;
         private firstItemButton;
@@ -1320,6 +1617,8 @@ declare module Fayde.Controls {
     class DataFieldsCollection extends ObservableCollection<IDataField> {
     }
 }
+declare module Fayde.Controls.DataControls {
+}
 declare module Fayde.Controls {
     class DataFormInputTypes {
         FormType: FormTypes;
@@ -1327,8 +1626,19 @@ declare module Fayde.Controls {
         PreferredHeight: number;
     }
 }
-declare module Fayde.Controls.DataControls {
-    class DataGrid {
+declare module Fayde.Controls {
+    class DataGrid extends ContentControlBase {
+        DefaultTopLevelGroupZIndex: number;
+        DefaultHeaderGroupByControlPosition: number;
+        DefaultHeaderFilterRowPosition: number;
+        DefaultHeaderColumnManagerRowPosition: number;
+        DefaultHeaderInsertionRowPosition: number;
+        DefaultFooterNotificationControlPosition: number;
+        DefaultGroupSublevelIndent: number;
+        AllowGroupNavigationPropertyName: string;
+        GroupNavigationModesPropertyName: string;
+        AllowGroupCollapsingPropertyName: string;
+        constructor();
     }
 }
 declare module Fayde.Controls {
@@ -1346,32 +1656,9 @@ declare module Fayde.Controls {
         static IsReadOnlyProperty: DependencyProperty;
         CellStyle: Style;
         IsReadOnly: boolean;
-        static WidthProperty: DependencyProperty;
     }
 }
 declare module Fayde.Controls {
-    class DataGridLength {
-        EqualsTo(gl1: DataGridLength, gl2: DataGridLength): boolean;
-        Equals(obj: any): boolean;
-        IsAbsolute: DataGridLength;
-        IsAuto: DataGridLength;
-        IsStar: DataGridLength;
-        IsSizeToCells: DataGridLength;
-        IsSizeToHeader: DataGridLength;
-        Value: DataGridLength;
-        UnitType: DataGridLength;
-        Auto: DataGridLength;
-        SizeToCells: DataGridLength;
-        getSizeToHeaderAuto(): DataGridLength;
-        private _unitValue;
-        private _unitType;
-        private _desiredValue;
-        private _displayValue;
-        AutoValue: number;
-        private _auto;
-        private _sizeToCells;
-        private _sizeToHeader;
-    }
 }
 declare module Fayde.Controls {
     enum DataGridLengthUnitType {
@@ -1380,6 +1667,18 @@ declare module Fayde.Controls {
         SizeToCells = 2,
         SizeToHeader = 3,
         Star = 4,
+    }
+}
+declare module Fayde.Controls.viewbox.processdown {
+    interface IInput extends minerva.core.processdown.IInput {
+        viewXform: number[];
+    }
+    interface IState extends minerva.core.processdown.IState {
+    }
+    interface IOutput extends minerva.core.processdown.IOutput {
+    }
+    class ViewboxProcessDownPipeDef extends minerva.core.processdown.ProcessDownPipeDef {
+        constructor();
     }
 }
 declare module Fayde.Controls.tabpanel.arrange {
@@ -1418,18 +1717,6 @@ declare module Fayde.Controls.tabpanel.measure {
         createOutput(): IOutput;
         prepare(input: IInput, state: IState, output: IOutput): void;
         flush(input: IInput, state: IState, output: IOutput): void;
-    }
-}
-declare module Fayde.Controls.viewbox.processdown {
-    interface IInput extends minerva.core.processdown.IInput {
-        viewXform: number[];
-    }
-    interface IState extends minerva.core.processdown.IState {
-    }
-    interface IOutput extends minerva.core.processdown.IOutput {
-    }
-    class ViewboxProcessDownPipeDef extends minerva.core.processdown.ProcessDownPipeDef {
-        constructor();
     }
 }
 declare module Fayde.Controls.wrappanel.arrange {
@@ -1530,6 +1817,669 @@ declare module Fayde.Controls {
         Content: FrameworkElement;
         GetEditControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
         GetReadOnlyControl(propertyName: string, binding: Fayde.Data.Binding): FrameworkElement;
+    }
+}
+declare module Fayde.Controls {
+    class ArrangeLimit {
+        IsTopLimit: boolean;
+        AbsolutePositionLimit: number;
+    }
+}
+declare module Controls.Fayde {
+    class OffsetLimits {
+        constructor(lowerLimit: number, upperLimit: number);
+        LowerLimit: number;
+        UpperLimit: number;
+    }
+}
+declare module Fayde.Controls {
+    import ArrangeLimit = Fayde.Controls.ArrangeLimit;
+    import OffsetLimits = Fayde.Controls.OffsetLimits;
+    import LayoutParameters = Fayde.Controls.LayoutParameters;
+    class ArrangeParameters {
+        constructor(arrangePosition: Rect, layoutParams: LayoutParameters);
+        constructor(arrangePosition: Rect, visibleBounds: Rect, layoutParams: LayoutParameters);
+        constructor(arrangePosition: Rect, visibleBounds: Rect, visualArrangeLimits: ArrangeLimit, offsetLimits: OffsetLimits, layoutParams: LayoutParameters);
+        ArrangePosition: Rect;
+        VisualArrangeLimits: ArrangeLimit;
+        VisibleBounds: Rect;
+        OffsetLimits: OffsetLimits;
+        LayoutParameters: LayoutParameters;
+    }
+}
+declare module Fayde.Controls {
+    import ArrangeParameters = Fayde.Controls.ArrangeParameters;
+    interface ILayoutElement {
+        ReferenceItem: any;
+        DesiredSize: Size;
+        LastArrangeRect: Rect;
+        Measure(availableSize: Size): void;
+        Arrange(arrangeParameters: ArrangeParameters): void;
+    }
+}
+declare module Fayde.Controls {
+    import ILayoutElement = Fayde.Controls.ILayoutElement;
+    interface IAnimatedLayoutElement extends ILayoutElement {
+        Width: number;
+        Height: number;
+        Opacity: number;
+        Projection: Media.Projection;
+        AnimationX: number;
+        AnimationY: number;
+        PrepareBitmapCache(): void;
+        ClearBitmapCache(): void;
+    }
+}
+declare module Fayde.Controls {
+    interface IColumnElement {
+        ParentColumnContainer: ColumnContainer;
+        ParentHost: IColumnElementHost;
+        SetParentColumnContainer(column: ColumnContainer): void;
+        SetParentHost(column: IColumnElementHost): void;
+    }
+}
+declare module Fayde.Controls {
+    import Size = minerva.Size;
+    class CustomBorder extends Panel {
+        static ChildProperty: DependencyProperty;
+        constructor();
+        private m_child;
+        Child: UIElement;
+        private SetChildren();
+        protected MeasureOverride(availableSize: Size): Size;
+        protected ArrangeOverride(finalSize: Size): Size;
+    }
+}
+declare module Fayde.Controls {
+    interface IRecyclable {
+        IsRecycled: boolean;
+        RecycleKey: any;
+    }
+}
+declare module Fayde.Controls {
+    interface IVisitor {
+    }
+}
+declare module Fayde.Controls {
+    import IVisitor = Fayde.Controls.IVisitor;
+    interface IVisitorElement extends IVisitor {
+        Accept(visitor: IVisitor): void;
+    }
+}
+declare module Fayde.Controls {
+    import CustomBorder = Fayde.Controls.CustomBorder;
+    import IAnimatedLayoutElement = Fayde.Controls.IAnimatedLayoutElement;
+    import IRecyclable = Fayde.Controls.IRecyclable;
+    import IVisitorElement = Fayde.Controls.IVisitorElement;
+    class WrapperBase extends CustomBorder implements IAnimatedLayoutElement, IRecyclable, IVisitorElement {
+        static AnimationXProperty: DependencyProperty;
+        static AnimationYProperty: DependencyProperty;
+        constructor(child: UIElement);
+        ReferenceItem: any;
+        LastArrangeRect: Rect;
+        AnimationX: number;
+        AnimationY: number;
+        Projection: Media.Projection;
+        IsRecycled: boolean;
+        RecycleKey: any;
+        private TranslateTransform;
+        CalculatePositionX(): number;
+        CalculatePositionY(): number;
+        UpdatePositionX(): void;
+        UpdatePositionY(): void;
+        private OnAnimationXChanged(args);
+        private OnAnimationYChanged(args);
+        PrepareBitmapCache(): void;
+        ClearBitmapCache(): void;
+        LayoutMeasure(availableSize: Size): void;
+        LayoutArrange(parameters: ArrangeParameters): void;
+        Accept(visitor: IVisitor): void;
+        Measure(availableSize: Size): void;
+        Arrange(parameters: Rect): void;
+    }
+}
+declare module Fayde.Controls {
+    import WrapperBase = Fayde.Controls.WrapperBase;
+    import Size = minerva.Size;
+    class ColumnElementWrapper extends WrapperBase {
+        constructor(child: UIElement);
+        ColumnOffset: number;
+        ColumnWidth: number;
+        ColumnElement: IColumnElement;
+        Column: Column;
+        protected MeasureOverride(availableSize: Size): Size;
+        private m_offset;
+        private m_width;
+    }
+}
+declare module Fayde.Controls {
+    enum ColumnPosition {
+        Scrollable = 0,
+        LeftFixed = 1,
+        RightFixed = 2,
+    }
+}
+declare module Fayde.Controls {
+    import ColumnElementWrapper = Fayde.Controls.ColumnElementWrapper;
+    import ColumnPosition = Fayde.Controls.ColumnPosition;
+    interface IColumnElementHost {
+        Elements: nullstone.IEnumerable<ColumnElementWrapper>;
+        AddColumnElement(element: ColumnElementWrapper): void;
+        RemoveColumnElement(element: ColumnElementWrapper): void;
+        SetElementPosition(element: ColumnElementWrapper, position: ColumnPosition): void;
+        InvalidateColumnArrange(): void;
+        InvalidateColumnMeasure(): void;
+    }
+}
+declare module Fayde.Controls {
+    import IVisitorElement = Fayde.Controls.IVisitorElement;
+    interface IDataGridElement extends IVisitorElement {
+        Visual: UIElement;
+        Path: DataPath;
+        SetDataPath(path: DataPath): void;
+    }
+}
+declare module Fayde.Controls {
+    import IValueConverter = Data.IValueConverter;
+    import PropertyPath = Data.PropertyPath;
+    import Binding = Data.Binding;
+    class DataGridBindingInfo {
+        private m_binding;
+        private m_autoGenerated;
+        constructor();
+        constructor(path: string, readOnly: boolean, autoGenerated: boolean);
+        IsAutoGenerated: boolean;
+        BindsDirectlyToSource: boolean;
+        Converter: IValueConverter;
+        ConverterCulture: any;
+        ConverterParameter: any;
+        ElementName: string;
+        FallbackValue: any;
+        Path: PropertyPath;
+        ReadOnly: boolean;
+        StringFormat: string;
+        TargetNullValue: any;
+        GetBinding(): Binding;
+    }
+}
+declare module Fayde.Controls {
+    class ColumnElementsInnerHost extends Panel {
+        private m_cellsIndent;
+        constructor();
+        CellsIndent: number;
+        protected MeasureOverride(availableSize: Size): Size;
+        protected ArrangeOverride(finalSize: Size): Size;
+    }
+}
+declare module Fayde.Controls {
+    import ColumnElementWrapper = Fayde.Controls.ColumnElementWrapper;
+    import ColumnElementsInnerHost = Fayde.Controls.ColumnElementsInnerHost;
+    class ColumnElementsHost extends Panel {
+        m_leftFixedPanel: ColumnElementsInnerHost;
+        m_rightFixedPanel: ColumnElementsInnerHost;
+        m_scrollablePanel: ColumnElementsInnerHost;
+        constructor();
+        Elements: nullstone.IEnumerable<ColumnElementWrapper>;
+        CellsIndent: number;
+        UIElements: nullstone.IEnumerable<UIElement>;
+        TransfertCells(cellsHost: ColumnElementsHost): void;
+        TransferCells(fromPanel: ColumnElementsInnerHost, toPanel: ColumnElementsInnerHost): void;
+        AddColumnElement(element: ColumnElementWrapper): void;
+        RemoveColumnElement(element: ColumnElementWrapper): void;
+        SetElementPosition(element: ColumnElementWrapper, position: ColumnPosition): void;
+        private SetElementPanel(element, targetPanel, otherPanel1, otherPanel2);
+        protected MeasureOverride(availableSize: Size): Size;
+        protected ArrangeOverride(finalSize: Size): Size;
+        InvalidateColumnArrange(): void;
+        InvalidateColumnMeasure(): void;
+    }
+}
+declare module Fayde.Controls {
+    class ControlBase extends Control {
+        private m_eventHelper;
+        EventManager: DataGridEventHelper;
+    }
+}
+declare module Fayde.Controls {
+    import ColumnElementsHost = Fayde.Controls.ColumnElementsHost;
+    import ControlBase = Fayde.Controls.ControlBase;
+    import IDataGridElement = Fayde.Controls.IDataGridElement;
+    import IColumnElementHost = Fayde.Controls.IColumnElementHost;
+    import DataPath = Fayde.Controls.DataPath;
+    class Row extends ControlBase implements IDataGridElement, IColumnElementHost, INotifyPropertyChanged {
+        OnMouseEnterRowEvent: DataGridRoutedEvent;
+        OnMouseLeaveRowEvent: DataGridRoutedEvent;
+        RowMouseLeftButtonDownEvent: DataGridRoutedEvent;
+        RowMouseLeftButtonUpEvent: DataGridRoutedEvent;
+        OnRowCellStyleChangedEvent: DataGridRoutedEvent;
+        CurrentStateCurrent: string;
+        CurrentStateNotCurrent: string;
+        constructor();
+        OnApplyTemplate(): void;
+        static CellStyleProperty: DependencyProperty;
+        CellStyle: Style;
+        private OnCellStyleChanged(args);
+        Visual: UIElement;
+        CellsHost: ColumnElementsHost;
+        Elements: nullstone.IEnumerable<ColumnElementWrapper>;
+        RenderedElements: nullstone.IEnumerable<ColumnElementWrapper>;
+        RenderedCells: nullstone.IEnumerable<Cell>;
+        CellsOffset: number;
+        InvalidateColumnArrange(): void;
+        InvalidateColumnMeasure(): void;
+        AddColumnElement(element: ColumnElementWrapper): void;
+        RemoveColumnElement(element: ColumnElementWrapper): void;
+        SetElementPosition(element: ColumnElementWrapper, position: ColumnPosition): void;
+        Path: DataPath;
+        SetDataPath(path: DataPath): void;
+        Accept(visitor: IVisitor): void;
+        private m_path;
+        private m_cellsHost;
+        PropertyChanged: nullstone.Event<PropertyChangedEventArgs>;
+        OnPropertyChanged(propertyName: string): void;
+    }
+}
+declare module Fayde.Controls {
+    enum CellEditorDisplayConditions {
+        None = 0,
+        RowIsBeingEdited = 1,
+        MouseOverCell = 2,
+        MouseOverRow = 4,
+        RowIsCurrent = 8,
+        CellIsCurrent = 16,
+        Always = 32,
+    }
+}
+declare module Fayde.Controls {
+    enum EditTriggers {
+        None = 0,
+        ClickOnCurrentCell = 2,
+        CellIsCurrent = 8,
+        RowIsCurrent = 32,
+    }
+}
+declare module Fayde.Controls {
+    enum SortDirection {
+        Nonde = 0,
+        Ascending = 1,
+        Descending = 2,
+    }
+}
+declare module Fayde.Controls {
+    import CellEditorDisplayConditions = Fayde.Controls.CellEditorDisplayConditions;
+    import EditTriggers = Fayde.Controls.EditTriggers;
+    import DataGridBindingInfo = Fayde.Controls.DataGridBindingInfo;
+    import SortDirection = Fayde.Controls.SortDirection;
+    class Column extends DependencyObject implements INotifyPropertyChanged {
+        static AllowFilterProperty: DependencyProperty;
+        static AllowGroupProperty: DependencyProperty;
+        static AllowResizeProperty: DependencyProperty;
+        static AllowSortProperty: DependencyProperty;
+        static CellContentTemplateProperty: DependencyProperty;
+        static CellContentStyleProperty: DependencyProperty;
+        static CellEditorDisplayConditionsProperty: DependencyProperty;
+        static EditTriggersProperty: DependencyProperty;
+        static CellHorizontalContentAlignmentProperty: DependencyProperty;
+        static CellVerticalContentAlignmentProperty: DependencyProperty;
+        static CellStyleProperty: DependencyProperty;
+        static ColumnManagerCellStyleProperty: DependencyProperty;
+        static FilterCellStyleProperty: DependencyProperty;
+        static InsertionCellStyleProperty: DependencyProperty;
+        private m_actualWidth;
+        ActualWidth: number;
+        AllowFilter: boolean;
+        private OnAllowFilterChanged(args);
+        AllowGroup: boolean;
+        private OnAllowGroupChanged(args);
+        AllowResize: boolean;
+        private OnAllowColumnResizeChanged(args);
+        AllowSort: boolean;
+        CellContentTemplate: DataTemplate;
+        private OnCellContentTemplateChanged(args);
+        CellContentStyle: Style;
+        private OnCellContentStyleChanged(args);
+        CellEditorDisplayConditions: CellEditorDisplayConditions;
+        private OnCellEditorDisplayConditionsChanged(args);
+        EditTriggers: EditTriggers;
+        private OnEditTriggersChanged(args);
+        CellHorizontalContentAlignment: HorizontalAlignment;
+        private OnCellHorizontalContentAlignmentChanged(args);
+        CellVerticalContentAlignmentProperty: VerticalAlignment;
+        private OnCellVerticalContentAlignmentChanged(args);
+        CellStyle: Style;
+        private OnCellStyleChanged(args);
+        ColumnManagerCellStyle: Style;
+        private OnColumnManagerCellStyleChanged(args);
+        FilterCellStyle: Style;
+        private OnFilterCellStyleChanged(args);
+        InsertionCellStyle: Style;
+        private OnInsertionCellStyleChanged(args);
+        private m_displayMemberBindingInfo;
+        DisplayMemberBindingInfo: DataGridBindingInfo;
+        private m_displayMemberBinding;
+        DisplayMemberBinding: Data.Binding;
+        DisplayTitle: any;
+        private m_fieldName;
+        FieldName: string;
+        private m_minWidth;
+        MinWidth: number;
+        private m_maxWidth;
+        MaxWidth: number;
+        static ReadOnlyProperty: DependencyProperty;
+        ReadOnly: boolean;
+        private OnReadOnlyChanged(args);
+        static SortBindingInfoProperty: DependencyProperty;
+        SortBindingInfo: string;
+        private OnSortBindingInfoChanged(args);
+        static SortDirectionProperty: DependencyProperty;
+        SortDirection: SortDirection;
+        private OnSortDirectionChanged(args);
+        SortFieldName: string;
+        static TitleProperty: DependencyProperty;
+        Title: any;
+        private OnTitleChanged(args);
+        static TitleTemplateProperty: DependencyProperty;
+        TitleTemplate: DataTemplate;
+        private OnTitleTemplateChanged(args);
+        static CellEditorTemplateProperty: DependencyProperty;
+        CellEditorTemplate: DataTemplate;
+        private OnCellEditorTemplateChanged(args);
+        static CellEditorStyleProperty: DependencyProperty;
+        CellEditorStyle: Style;
+        private OnCellEditorStyleChanged(args);
+        IsAutoGenerated: boolean;
+        static VisibleProperty: DependencyProperty;
+        Visible: boolean;
+        private OnVisibleChanged(args);
+        static VisiblePositionProperty: DependencyProperty;
+        VisiblePosition: number;
+        private OnVisiblePositionChanged(args);
+        static WidthProperty: DependencyProperty;
+        Width: number;
+        private OnWidthChanged(args);
+        static TextTrimmingProperty: DependencyProperty;
+        TextTrimming: TextTrimming;
+        private OnTextTrimmingPropertyChanged(args);
+        private RaiseDisplayTitleChanged();
+        private ResolveSortFieldName(bindingInfo, sortBindingInfo);
+        PropertyChanged: nullstone.Event<PropertyChangedEventArgs>;
+        OnPropertyChanged(propertyName: string): void;
+    }
+}
+declare module Fayde.Controls {
+    import IAnimatedLayoutElement = Fayde.Controls.IAnimatedLayoutElement;
+    import IRecyclable = Fayde.Controls.IRecyclable;
+    import ColumnElementWrapper = Fayde.Controls.ColumnElementWrapper;
+    import Cell = Fayde.Controls.Cell;
+    class ColumnContainer extends DependencyObject implements IAnimatedLayoutElement, IRecyclable {
+        static AnimationXProperty: DependencyProperty;
+        static AnimationYProperty: DependencyProperty;
+        static WidthProperty: DependencyProperty;
+        static OpacityProperty: DependencyProperty;
+        static ProjectionProperty: DependencyProperty;
+        private m_columnWidth;
+        private m_columnOffset;
+        private m_lastArrangeRect;
+        private m_isRecycled;
+        private m_elements;
+        private m_position;
+        Column: Column;
+        ReferenceItem: any;
+        IsRecycled: boolean;
+        RecycleKey: any;
+        ColumnPosition: any;
+        Wrappers: nullstone.ICollection<ColumnElementWrapper>;
+        Elements: nullstone.ICollection<IColumnElement>;
+        Cells: nullstone.IEnumerable<Cell>;
+        Opacity: number;
+        Projection: Media.Projection;
+        Width: number;
+        LastArrangeRect: Rect;
+        ColumnOffset: number;
+        ColumnWidth: number;
+        AnimationX: number;
+        AnimationY: number;
+        Height: number;
+        private m_isDragged;
+        IsDragged: boolean;
+        private m_isDragPaused;
+        IsDragPaused: boolean;
+        DesiredSize: Size;
+        Add(element: ColumnElementWrapper): void;
+        Remove(element: ColumnElementWrapper): void;
+        Contains(element: ColumnElementWrapper): boolean;
+        private UpdateColumnOffset(elem);
+        private UpdateColumnWidth(elem);
+        private UpdateWidth(elem);
+        private UpdateOpacity(elem);
+        private UpdateProjection(elem);
+        private UpdateAnimationX(elem);
+        private UpdateAnimationY(elem);
+        private UpdateIsRecycled(elem);
+        private OnWidthChanged(obj, args);
+        private OnAnimationXChanged(obj, args);
+        private OnAnimationYChanged(obj, args);
+        private OnOpacityChanged(obj, args);
+        private OnProjectionChanged(obj, args);
+        private ApplyToAllChildren(action);
+        PrepareBitmapCache(): void;
+        ClearBitmapCache(): void;
+        Measure(availableSize: Size): void;
+        Arrange(arrangeParameters: ArrangeParameters): void;
+    }
+}
+declare module Fayde.Controls {
+    class ContentControlBase extends ContentControl {
+        private m_eventHelper;
+        EventManager: DataGridEventHelper;
+    }
+}
+declare module Fayde.Controls {
+    import Row = Fayde.Controls.Row;
+    import Column = Fayde.Controls.Column;
+    import ColumnContainer = Fayde.Controls.ColumnContainer;
+    import IColumnElementHost = Fayde.Controls.IColumnElementHost;
+    import ContentControlBase = Fayde.Controls.ContentControlBase;
+    class Cell extends ContentControlBase implements IColumnElement, INotifyPropertyChanged {
+        OnMouseEnterCellEvent: DataGridRoutedEvent;
+        OnMouseLeaveCellEvent: DataGridRoutedEvent;
+        CellMouseLeftButtonDownEvent: DataGridRoutedEvent;
+        CellMouseLeftButtonUpEvent: DataGridRoutedEvent;
+        static CommonStateNormal: string;
+        static CommonStatePressed: string;
+        static CommonStateDragged: string;
+        static CommonStateMouseOver: string;
+        static CurrentStateCurrent: string;
+        static CurrentStateNotCurrent: string;
+        constructor();
+        ParentRow: Row;
+        ParentColumn: Column;
+        ParentColumnContainer: ColumnContainer;
+        ParentHost: IColumnElementHost;
+        OnMouseEnter(e: Input.MouseEventArgs): void;
+        OnMouseLeave(e: Input.MouseEventArgs): void;
+        OnMouseMove(e: Input.MouseEventArgs): void;
+        OnMouseLeftButtonDown(e: Input.MouseButtonEventArgs): void;
+        OnMouseLeftButtonUp(e: Input.MouseButtonEventArgs): void;
+        SetContentAlignment<TAlignment>(dp: DependencyProperty, newValue: any): void;
+        SetParentColumnContainer(columnContainer: ColumnContainer): void;
+        SetParentHost(parentHost: IColumnElementHost): void;
+        SetCommonState(state: string, useTransitions: boolean): void;
+        SetCurrentState(isCurrent: boolean, useTransitions: boolean): void;
+        OnColumnIsDragPausedChanged(): void;
+        PropertyChanged: nullstone.Event<PropertyChangedEventArgs>;
+        OnPropertyChanged(propertyName: string): void;
+    }
+}
+declare module Fayde.Controls {
+    enum ColumnPosition {
+        Unchanged = 0,
+        Editing = 1,
+        Edited = 2,
+        Committing = 3,
+        Canceling = 4,
+    }
+}
+declare module Fayde.Controls {
+    enum ContainerType {
+        Cell = 0,
+        Row = 1,
+    }
+}
+declare module Fayde.Controls {
+    enum DataGridClipboardCopyMode {
+        None = 0,
+        ExcludeHeader = 1,
+        IncludeHeader = 2,
+    }
+}
+declare module Fayde.Controls {
+    enum EditableCellContentElementType {
+        Viewer = 0,
+        Editor = 1,
+    }
+}
+declare module Fayde.Controls {
+    enum FetchDirection {
+        Forward = 0,
+        Backward = 1,
+    }
+}
+declare module Fayde.Controls {
+    enum FixedColumnToggleButtonVisibility {
+        Auto = 0,
+        Always = 1,
+        Never = 2,
+    }
+}
+declare module Fayde.Controls {
+    enum GroupNavigationModes {
+        None = 0,
+        NavigationButtons = 1,
+        SearchBox = 2,
+        All = 3,
+    }
+}
+declare module Fayde.Controls {
+    enum HeaderFooterTypes {
+        None = 0,
+        GroupByControl = 1,
+        ColumnManagerRow = 2,
+        FilterRow = 4,
+        InsertionRow = 8,
+        NotificationControl = 16,
+        All = 31,
+    }
+}
+declare module Fayde.Controls {
+    enum ItemScrollingBehavior {
+        Deferred = 0,
+        Immediate = 1,
+    }
+}
+declare module Fayde.Controls {
+    enum LocationState {
+        GridHeader = 0,
+        GridFooter = 1,
+        GroupHeader = 2,
+        GroupFooter = 3,
+    }
+}
+declare module Fayde.Controls {
+    enum NotificationSource {
+        Grouping = 0,
+        Filtering = 1,
+        Navigation = 2,
+        Selection = 3,
+    }
+}
+declare module Fayde.Controls {
+    enum NotificationType {
+        GroupingCanceled = 0,
+        FilteringCanceled = 1,
+        NavigationIncomplete = 2,
+    }
+}
+declare module Fayde.Controls {
+    enum NotifyInternalCollectionChangedAction {
+        Add = 0,
+        Remove = 1,
+        Replace = 2,
+        Move = 3,
+        Reset = 4,
+    }
+}
+declare module Fayde.Controls {
+    enum RowEditingState {
+        Unchanged = 0,
+        Editing = 1,
+        Edited = 2,
+        Ending = 3,
+        Committing = 4,
+        Canceling = 5,
+    }
+}
+declare module Fayde.Controls {
+    enum RowEndEditResult {
+        Succeeded = 0,
+        Failed = 1,
+        WillCompleteAsynchronously = 2,
+    }
+}
+declare module Fayde.Controls {
+    enum ScrollDirections {
+        None = 0,
+        Left = 1,
+        Right = 2,
+        Up = 4,
+        Down = 8,
+    }
+}
+declare module Fayde.Controls {
+    enum SelectionType {
+        Selection = 0,
+        Unselection = 1,
+    }
+}
+declare module Fayde.Controls {
+    class ActivatingCellEditorEventArgs extends RoutedEventArgs {
+        constructor(targetCell: Cell, cellEditor: FrameworkElement);
+        private m_targetCell;
+        Cell: Cell;
+    }
+}
+declare module Fayde.Controls {
+    import DataGridEventHelper = Fayde.Controls.DataGridEventHelper;
+    interface IDataGridRoutedEventElement {
+        EventManager: DataGridEventHelper;
+    }
+}
+declare module Fayde.Controls {
+    class DataGridRoutedEvent {
+        constructor();
+        Lock: any;
+    }
+}
+declare module Fayde.Controls {
+    class DataGridRoutedEventArgs extends RoutedEventArgs {
+        constructor(originalSource: any);
+    }
+}
+declare module Fayde.Controls {
+    import IDataGridRoutedEventElement = Fayde.Controls.IDataGridRoutedEventElement;
+    class DataGridEventHelper {
+        private m_handlers;
+        private m_element;
+        constructor(element: IDataGridRoutedEventElement);
+        RaiseEvent(routedEvent: DataGridRoutedEvent, args: DataGridRoutedEventArgs): void;
+        AddHandler(routedEvent: DataGridRoutedEvent, handler: DataGridRoutedEventHandler): void;
+        RemoveHandler(routedEvent: DataGridRoutedEvent, handler: DataGridRoutedEventHandler): void;
+        static GetParent(element: any): any;
+    }
+}
+declare module Fayde.Controls {
+    interface DataGridRoutedEventHandler {
+        (sender: any, args: DataGridRoutedEventArgs): void;
     }
 }
 declare module Fayde.Controls.tabpanel.arrange.tapins {

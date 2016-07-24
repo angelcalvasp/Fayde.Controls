@@ -6,7 +6,7 @@ module Fayde.Controls {
     import IDataField = Fayde.Controls.IDataField;
     import DataFormDataField = Fayde.Controls.DataFormDataField;
     import ObservableCollection =  Fayde.Collections.ObservableCollection;
-    import DataFormMode = Fayde.Controls.DataControls.DataFormMode;
+    import DataFormMode = Fayde.Controls.DataFormMode;
     import DataSourceCollection = Fayde.Controls.DataSourceCollection;
 
     export class DataForm extends ItemsControl  {
