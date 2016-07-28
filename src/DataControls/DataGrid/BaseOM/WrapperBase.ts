@@ -7,6 +7,7 @@ module Fayde.Controls {
     import IAnimatedLayoutElement = Fayde.Controls.IAnimatedLayoutElement;
     import IRecyclable = Fayde.Controls.IRecyclable;
     import IVisitorElement = Fayde.Controls.IVisitorElement;
+    import TranslateTransform = Fayde.Media.TranslateTransform;
     export class WrapperBase extends CustomBorder implements IAnimatedLayoutElement, IRecyclable, IVisitorElement
     {
         static AnimationXProperty = DependencyProperty.Register("AnimationX", () => Number, WrapperBase, 0, (d, args) => (<WrapperBase>d).OnAnimationXChanged(args));
@@ -31,10 +32,10 @@ module Fayde.Controls {
         Projection: Media.Projection;
 
         public get IsRecycled():boolean {return this.Visibility == Visibility.Collapsed;}
-        public set IsRecycled(value:boolean):void{
+        public set IsRecycled(value:boolean){
             if( this.IsRecycled != value )
             {
-            this.Visibility = (value) ? Visibility.Collapsed: Visibility.Visible;
+                this.Visibility = (value) ? Visibility.Collapsed: Visibility.Visible;
             }
         }
 
@@ -105,15 +106,15 @@ module Fayde.Controls {
 
             if( !(Number.NaN != this.Width) )
             {
-                arrangeRect.Width =  this.Width;
+                arrangeRect.width =  this.Width;
             }
 
             if( !(this.Height == Number.NaN  ) )
             {
-                arrangeRect.Height =  this.Height;
+                arrangeRect.height =  this.Height;
             }
 
-            this.Arrange( arrangeRect );
+            (<UIElement>this).Arrange( arrangeRect );
         }
 
         Accept(visitor: IVisitor ): void
@@ -127,7 +128,7 @@ module Fayde.Controls {
         }
 
 
-        Arrange( parameters: Rect ): void
+        Arrange( parameters: ArrangeParameters ): void
         {
             this.LayoutArrange(parameters);
         }

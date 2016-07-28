@@ -58,13 +58,17 @@ module Fayde.Controls {
       }
 
       public get FixedHeaders(): IEnumerable<UIElement>{
-          return CompatibilityUtils.GetEnumerable(this.Children)
-              .Take( this.RootContainerIndex );
+
+
+          return this.Take(CompatibilityUtils.GetEnumerable(this.Children),this.RootContainerIndex);
+          //return .Take( this.RootContainerIndex );
       }
 
       public get FixedFooters(): IEnumerable<UIElement>{
+            return this.Skip(CompatibilityUtils.GetEnumerable(this.Children),this.RootContainerIndex + 1 );
+          /*
           return CompatibilityUtils.GetEnumerable(this.Children)
-              .Skip( this.RootContainerIndex + 1 );
+              .Skip( this.RootContainerIndex + 1 );*/
       }
 
       public get RootContainerIndex(): number {
@@ -77,7 +81,36 @@ module Fayde.Controls {
           throw new Error();
       }
 
-        PendingTransitionContext: TransitionContext;
+      private Take(items: IEnumerable<UIElement>,take: number): IEnumerable<UIElement>{
+          var array = IEnumerable_.toArray(items);
+          var result = new Array<UIElement>();
+            for (var i = 0;i<take;i++){
+                if(i >= array.length){
+                    break;
+                }else{
+                    result.push(array[i])
+                }
+
+            }
+
+            return IEnumerable_.fromArray(result);
+      }
+
+        private Skip(items: IEnumerable<UIElement>,skip: number): IEnumerable<UIElement>{
+            var array = IEnumerable_.toArray(items);
+            var result = new Array<UIElement>();
+            for (var i = 0;i<array.length;i++){
+                if(i>= skip){
+                    result.push(array[i])
+                }
+
+            }
+
+            return IEnumerable_.fromArray(result);
+        }
+
+
+      PendingTransitionContext: TransitionContext;
 
 
         public get CoumnElementHosts(): IEnumerable<IColumnElementHost>{
@@ -112,7 +145,6 @@ module Fayde.Controls {
 
         protected MeasureOverride(availableSize: Size): Size
         {
-          var isInDesign: boolean = DesignerProperties.GetIsInDesignMode();
 
           if(Number.POSITIVE_INFINITY == availableSize.width  || Number.NaN == availableSize.width)
           {
@@ -139,7 +171,7 @@ module Fayde.Controls {
           var measuredSize: Size = new Size( Math.min( columnPanelWidth, availableSize.width) , 0 );
           var rootContainerIndex: number = this.RootContainerIndex;
 
-            measureChild: (n:number)=>void= (i) =>
+            var measureChild: ((n:number)=>void) = (i) =>
               {
                 var child: UIElement = this.Children[ i ];
                 child.Measure( availableSize );
@@ -185,22 +217,22 @@ module Fayde.Controls {
 
           var headersArrangeHeight: number = 0;
           var footersArrangeHeight: number = 0;
-          Rect finalRect = new Rect( new Point( 0, 0 ), finalSize );
+          var finalRect = new Rect( new Point( 0, 0 ), finalSize );
           for(var i = 0; i < rootContainerIndex; i++ )
           {
             var child: UIElement = this.Children[ i ];
-            finalRect.Height = child.DesiredSize.height;
+            finalRect.height = child.DesiredSize.height;
             child.Arrange( finalRect );
-            finalRect.Y += finalRect.Height;
-            headersArrangeHeight += finalRect.Height;
+            finalRect.Y += finalRect.height;
+            headersArrangeHeight += finalRect.height;
           }
 
           finalRect = new Rect( new Point( 0, finalSize.height ), finalSize );
           for(var i = this.Children.Count - 1; i > rootContainerIndex; i-- )
           {
             var child: UIElement = this.Children[ i ];
-            finalRect.Height = child.DesiredSize.height;
-            finalRect.Y -= finalRect.height;
+            finalRect.height = child.DesiredSize.height;
+            finalRect.y -= finalRect.height;
             child.Arrange( finalRect );
             footersArrangeHeight += finalRect.height;
           }
